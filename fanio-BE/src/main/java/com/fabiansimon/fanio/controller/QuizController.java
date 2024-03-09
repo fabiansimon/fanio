@@ -39,7 +39,7 @@ public class QuizController {
 
         return ResponseEntity.notFound().build();
     }
-    @PostMapping("/add-quiz")
+    @PostMapping("/create-quiz")
     public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz) {
         try {
             return new ResponseEntity<>(quizService.saveQuiz(quiz), HttpStatus.CREATED);

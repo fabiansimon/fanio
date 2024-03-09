@@ -15,7 +15,11 @@ import java.util.UUID;
 public class QuizService {
     @Autowired
     private QuizRepository quizRepository;
-    public List<Quiz> getAllQuizzes() { return quizRepository.findAll(); }
+
+    public List<Quiz> getAllQuizzes() {
+        return quizRepository.findAll();
+    }
+
     public Page<Quiz> getAllQuizzes(Pageable pageable) {
         return quizRepository.findAll(pageable);
     }
@@ -37,3 +41,4 @@ public class QuizService {
         return false;
     }
 }
+

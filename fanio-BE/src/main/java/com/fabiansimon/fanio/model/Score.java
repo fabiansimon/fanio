@@ -9,26 +9,23 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "quizzes")
+@Table(name = "scores")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Quiz {
+public class Score {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
     @CreationTimestamp
     private Date createdAt;
-    private String title;
-    private String description;
-    private Long creatorId;
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "quiz_id")
-    private List<Question> questions;
+    private String userName;
+    private Double timeElapsed;
+    private Double score;
+    private UUID quizId;
 }
