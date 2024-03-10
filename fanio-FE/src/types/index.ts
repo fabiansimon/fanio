@@ -22,7 +22,7 @@ export interface Score {
   quizId: string;
   userName: string;
   timeElapsed: number;
-  score: number;
+  totalScore: number;
 }
 
 export interface QuestionInput {
@@ -40,6 +40,6 @@ export interface QuizInput {
 export interface ScoreInput {
   userName: string;
   timeElapsed: number;
-  score: number;
+  totalScore: number;
   quizId: string;
 }

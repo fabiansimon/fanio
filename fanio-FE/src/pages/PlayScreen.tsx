@@ -20,7 +20,7 @@ interface Guess {
   score: number;
 }
 
-function QuizScreen(): JSX.Element {
+function PlayScreen(): JSX.Element {
   const {id} = useParams();
 
   const playerRef = useRef<ReactPlayer>(null);
@@ -67,7 +67,7 @@ function QuizScreen(): JSX.Element {
       if (!id) return;
       const {totalScore, totalTime} = score;
       await uploadScore({
-        score: totalScore,
+        totalScore,
         timeElapsed: totalTime,
         userName: 'NEWWW',
         quizId: id,
@@ -183,7 +183,8 @@ function QuizScreen(): JSX.Element {
       {isEnd &&
         scores.length > 0 &&
         scores.map((s, i) => (
-          <Text key={i}>{`${s.userName}: ${s.score} ${s.timeElapsed}`}</Text>
+          <Text
+            key={i}>{`${s.userName}: ${s.totalScore} ${s.timeElapsed}`}</Text>
         ))}
       {!isEnd && <Button onClick={handleSubmitGuess}>Guess</Button>}
       {!isPlaying && !isEnd && <Button onClick={handlePlay}>Play</Button>}
@@ -192,4 +193,4 @@ function QuizScreen(): JSX.Element {
   );
 }
 
-export default QuizScreen;
+export default PlayScreen;

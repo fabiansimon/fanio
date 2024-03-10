@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {Quiz, QuizInput, Score, ScoreInput} from '../types/index';
+import {Quiz, QuizInput, ScoreInput} from '../types/index';
 const BASE_URL = 'http://localhost:8080/api';
 
 const _axios = axios.create({
@@ -42,6 +42,16 @@ export async function fetchScoresFromQuiz(quizId: string) {
     return res.data.content;
   } catch (error) {
     console.error('Failed to fetch scores:', error);
+    throw error;
+  }
+}
+
+export async function fetchAllQuizzes() {
+  try {
+    const res = await _axios.get(`/quizzes`);
+    return res.data.content;
+  } catch (error) {
+    console.error('Failed to fetch all quizzes:', error);
     throw error;
   }
 }

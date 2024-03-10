@@ -26,6 +26,6 @@ public class Score {
     private Date createdAt;
     private String userName;
     private Double timeElapsed;
-    private Double score;
+    private Double totalScore;
     private UUID quizId;
 }

@@ -15,8 +15,8 @@ enum InputType {
 
 const MAX_QUESTIONS = 15;
 
-function CreateQuizScreen(): JSX.Element {
-  let navigate = useNavigate();
+function CreateScreen(): JSX.Element {
+  const navigation = useNavigate();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [quizInput, setInput] = useState<QuizInput | null>({
@@ -36,7 +36,7 @@ function CreateQuizScreen(): JSX.Element {
     setIsLoading(true);
     try {
       const {id} = await createQuiz(quizInput);
-      navigate(`${ROUTES.quiz}/${id}`);
+      navigation(`${ROUTES.playQuiz}/${id}`);
     } catch (error) {
       console.log(error);
     } finally {
@@ -168,4 +168,4 @@ function QuestionInputContainer({
   );
 }
 
-export default CreateQuizScreen;
+export default CreateScreen;
