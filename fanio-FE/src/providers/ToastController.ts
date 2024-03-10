@@ -1,6 +1,7 @@
 export default class ToastController {
-  //static ref;
-  //static setRef = (ref) => (this.ref = ref);
-  //static showErrorToast = (title: string, desciption?: string) => this.ref.current?.show(title, desciption);
-  //static hideToast = () => this.ref.current?.hide();
+  static ref: any;
+  static setRef = (ref: any) => (this.ref = ref);
+  static showErrorToast = (title?: string, desciption?: string) =>
+    this.ref.current?.showErrorToast(title, desciption);
+  static hideToast = () => this.ref.current?.hide();
 }

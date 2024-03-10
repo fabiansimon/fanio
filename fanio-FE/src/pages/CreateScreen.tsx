@@ -3,7 +3,8 @@ import {useState} from 'react';
 import {QuestionInput, QuizInput} from '../types';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
-import {createQuiz} from '../utils/api';
+import {fetchTitleSuggestion, uploadQuiz} from '../utils/api';
+import {REGEX} from '../constants/Regex';
 
 enum InputType {
   TITLE,
@@ -31,17 +32,34 @@ function CreateScreen(): JSX.Element {
     ],
   });
 
-  const uploadQuiz = async () => {
+  const createQuiz = async () => {
     if (!quizInput) return;
     setIsLoading(true);
     try {
-      const {id} = await createQuiz(quizInput);
+      const {id} = await uploadQuiz(quizInput);
       navigation(`${ROUTES.playQuiz}/${id}`);
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleTitleSuggestion = async (url: string, index: number) => {
+    try {
+      if (!REGEX.youtube.test(url)) return;
+      const title = await fetchTitleSuggestion(url);
+      setInput(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          questions: prev?.questions.map((q, i) => {
+            if (index === i) return {...q, answer: q.answer || title};
+            return q;
+          }),
+        };
+      });
+    } catch {}
   };
 
   const handleInput = (value: string, type: InputType, index?: number) => {
@@ -59,6 +77,8 @@ function CreateScreen(): JSX.Element {
         case InputType.ANSWER:
         case InputType.OFFSET:
           if (index === undefined) return null;
+
+          if (type === InputType.URL) handleTitleSuggestion(value, index);
 
           return {
             ...prev,
@@ -127,7 +147,7 @@ function CreateScreen(): JSX.Element {
       {quizInput!.questions.length < MAX_QUESTIONS && (
         <IconButton onClick={handleAddRow} />
       )}
-      {!isLoading && <Button onClick={uploadQuiz}>Upload</Button>}
+      {!isLoading && <Button onClick={createQuiz}>Upload</Button>}
     </div>
   );
 }

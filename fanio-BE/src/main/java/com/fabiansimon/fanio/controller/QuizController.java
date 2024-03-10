@@ -2,7 +2,6 @@ package com.fabiansimon.fanio.controller;
 
 import com.fabiansimon.fanio.model.Quiz;
 import com.fabiansimon.fanio.service.QuizService;
-import org.hibernate.jdbc.Expectation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.UUID;
 

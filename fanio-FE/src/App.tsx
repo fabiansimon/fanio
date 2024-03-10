@@ -1,6 +1,10 @@
 import '@radix-ui/themes/styles.css';
-import * as RadixToast from '@radix-ui/react-toast';
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
 import './App.css';
 import {Theme} from '@radix-ui/themes';
 import Toast from './components/Toast';
@@ -13,10 +17,11 @@ import QuizScoreScreen from './pages/QuizScoreScreen';
 
 function App(): JSX.Element {
   return (
-    <Theme>
-      <RadixToast.Provider swipeDirection="right">
+    <>
+      <Theme>
         <Router>
           <Routes>
+            <Route path="*" element={<Navigate to="/" replace={true} />} />
             <Route path="/" element={<LandingScreen />} />
             <Route path={`${ROUTES.playQuiz}/:id`} element={<PlayScreen />} />
             <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
@@ -27,10 +32,9 @@ function App(): JSX.Element {
             />
           </Routes>
         </Router>
-        <Toast />
-        <RadixToast.Viewport className="ToastViewport" />
-      </RadixToast.Provider>
-    </Theme>
+      </Theme>
+      <Toast />
+    </>
   );
 }
 

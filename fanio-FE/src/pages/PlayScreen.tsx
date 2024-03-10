@@ -6,8 +6,9 @@ import {useParams} from 'react-router-dom';
 import {fetchQuizById, fetchScoresFromQuiz, uploadScore} from '../utils/api';
 import {shuffle, similarity} from '../utils/logic';
 import useKeyShortcut from '../hooks/useKeyShortcut';
+import {LocalStorage} from '../utils/localStorage';
 
-const ANSWER_THRESHOLD = 80;
+const ANSWER_THRESHOLD = 70;
 
 interface ScoreState {
   totalScore: number;
@@ -50,7 +51,7 @@ function PlayScreen(): JSX.Element {
           questions: shuffle(res.questions),
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     })();
   }, [id]);
@@ -66,12 +67,13 @@ function PlayScreen(): JSX.Element {
     try {
       if (!id) return;
       const {totalScore, totalTime} = score;
-      await uploadScore({
+      const {id: scoreId} = await uploadScore({
         totalScore,
         timeElapsed: totalTime,
-        userName: 'NEWWW',
+        userName: 'Julia',
         quizId: id,
       });
+      LocalStorage.saveScoreId(scoreId);
     } catch (error) {
       console.log(error);
     }
@@ -81,7 +83,6 @@ function PlayScreen(): JSX.Element {
     try {
       if (!id) return;
       const res = await fetchScoresFromQuiz(id);
-      console.log(res);
       setScores(res);
     } catch (error) {
       console.error(error);
@@ -152,7 +153,7 @@ function PlayScreen(): JSX.Element {
   });
 
   return (
-    <div className="flex space-y-2 flex-col text-rightl w-full h-screen bg-slate-500 items-center justify-center">
+    <div className="flex space-y-2 flex-col w-full h-screen bg-slate-500 items-center justify-center">
       <Text>{quizData?.title}</Text>
       <Text>{quizData?.description}</Text>
       <Text>{score.totalScore}</Text>

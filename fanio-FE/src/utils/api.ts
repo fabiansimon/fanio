@@ -1,5 +1,6 @@
 import axios from 'axios';
-import {Quiz, QuizInput, ScoreInput} from '../types/index';
+import {Quiz, QuizInput, Score, ScoreInput} from '../types/index';
+import ToastController from '../providers/ToastController';
 const BASE_URL = 'http://localhost:8080/api';
 
 const _axios = axios.create({
@@ -13,25 +14,29 @@ export async function fetchQuizById(id: string): Promise<Quiz> {
     return response.data;
   } catch (error) {
     console.error('Failed to fetch quiz by ID:', error);
+    ToastController.showErrorToast();
     throw error;
   }
 }
 
-export async function createQuiz(quiz: QuizInput): Promise<Quiz> {
+export async function uploadQuiz(quiz: QuizInput): Promise<Quiz> {
   try {
     const response = await _axios.post<Quiz>('/create-quiz', quiz);
     return response.data;
   } catch (error) {
     console.error('Failed to create quiz:', error);
+    ToastController.showErrorToast();
     throw error;
   }
 }
 
-export async function uploadScore(score: ScoreInput): Promise<void> {
+export async function uploadScore(score: ScoreInput): Promise<Score> {
   try {
-    await _axios.post<void>('/upload-score', score);
+    const res = await _axios.post<Score>('/upload-score', score);
+    return res.data;
   } catch (error) {
     console.error('Failed to upload score:', error);
+    ToastController.showErrorToast();
     throw error;
   }
 }
@@ -42,6 +47,7 @@ export async function fetchScoresFromQuiz(quizId: string) {
     return res.data.content;
   } catch (error) {
     console.error('Failed to fetch scores:', error);
+    ToastController.showErrorToast();
     throw error;
   }
 }
@@ -52,6 +58,20 @@ export async function fetchAllQuizzes() {
     return res.data.content;
   } catch (error) {
     console.error('Failed to fetch all quizzes:', error);
+    ToastController.showErrorToast();
+    throw error;
+  }
+}
+
+export async function fetchTitleSuggestion(url: string): Promise<string> {
+  try {
+    const res = await _axios.post<string>('/strip-meta', {
+      url,
+      type: 'youtube',
+    });
+    return res.data;
+  } catch (error) {
+    console.warn('Failed to fetch suggested title:', error);
     throw error;
   }
 }
