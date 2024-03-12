@@ -14,6 +14,7 @@ public class MetaDataController {
             RestTemplate template = new RestTemplate();
             ResponseEntity<String> res = template.getForEntity(requestDTO.getUrl(), String.class);
             String title = stripTitle(res.getBody());
+            // System.out.println(res.getBody().substring(res.getBody().indexOf("lengthInSeconds"), res.getBody().indexOf("lengthInSeconds")+10));
             title = cleanRawTitle(title);
             return ResponseEntity.ok(title);
         } catch (Exception e) {
@@ -42,7 +43,7 @@ public class MetaDataController {
 
     private String cleanRawTitle(String title) {
         String lowerTitle = title.toLowerCase();
-        String[] featKeys = {"feat",  "feat.", "ft", "ft.", "feature", "featuring", "by", "Official Video", "Official Music Video", "Music Video", "prod", "prod."};
+        String[] featKeys = {"feat",  "feat.", "ft", "ft.", "feature", "featuring", "by", "Official Video", "Official Music Video", "Music Video", "prod", "prod.", "Official Version", "official version"};
         title = title.replace("- YouTube", "");
         int left = title.indexOf("-") != -1 ? title.indexOf("-") + 1 : 0;
         int right = title.length()-1;

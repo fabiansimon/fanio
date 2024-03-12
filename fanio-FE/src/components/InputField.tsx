@@ -33,7 +33,7 @@ function InputField({className, type, ...props}: InputFieldProps, ref: any) {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setVisible(true)}
       onMouseLeave={() => setVisible(false)}
-      className="p-[2px] rounded-lg transition duration-300 group/input">
+      className="p-[2px] rounded-lg transition duration-300 w-full group/input">
       <input
         type={type}
         className={UI.cn(

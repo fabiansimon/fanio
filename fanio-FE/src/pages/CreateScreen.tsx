@@ -1,10 +1,12 @@
-import {Button, IconButton, Text, TextField} from '@radix-ui/themes';
+import {Button, Heading, IconButton, Text} from '@radix-ui/themes';
+import {PlusIcon} from '@radix-ui/react-icons';
 import {useState} from 'react';
 import {QuestionInput, QuizInput} from '../types';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
 import {fetchTitleSuggestion, uploadQuiz} from '../utils/api';
 import {REGEX} from '../constants/Regex';
+import InputField from '../components/InputField';
 
 enum InputType {
   TITLE,
@@ -121,33 +123,50 @@ function CreateScreen(): JSX.Element {
   };
 
   return (
-    <div className="flex space-y-2 flex-col text-rightl w-full h-screen bg-slate-500 items-center justify-center">
-      <Text>Create quiz</Text>
-      <TextField.Input
-        value={quizInput?.title}
-        onInput={({currentTarget: {value}}) =>
-          handleInput(value, InputType.TITLE)
-        }
-        placeholder="Enter title"
-      />
-      <TextField.Input
-        value={quizInput?.description}
-        onInput={({currentTarget: {value}}) =>
-          handleInput(value, InputType.DESCRIPTION)
-        }
-        placeholder="Enter Description (optional)"
-      />
-      {quizInput?.questions.map((question, index) => (
-        <QuestionInputContainer
-          key={index}
-          question={question}
-          handleInput={(value, type) => handleInput(value, type, index)}
-        />
-      ))}
-      {quizInput!.questions.length < MAX_QUESTIONS && (
-        <IconButton onClick={handleAddRow} />
-      )}
-      {!isLoading && <Button onClick={createQuiz}>Upload</Button>}
+    <div className="flex space-y-2 w-full h-screen bg-slate-900 items-center justify-center">
+      <div className="flex flex-col mx-20 w-full">
+        <Heading size="6" className="text-white">
+          Create quiz
+        </Heading>
+        <Text size="2" className="text-neutral-300">
+          Make sure to only use youtube links at the moment.
+        </Text>
+        <div className="my-4">
+          <InputField
+            value={quizInput?.title}
+            onInput={({currentTarget: {value}}) =>
+              handleInput(value, InputType.TITLE)
+            }
+            placeholder="Enter title"
+          />
+          <InputField
+            value={quizInput?.description}
+            onInput={({currentTarget: {value}}) =>
+              handleInput(value, InputType.DESCRIPTION)
+            }
+            placeholder="Enter Description (optional)"
+          />
+        </div>
+        <div className="align-center justify-center items-center flex flex-col">
+          {quizInput?.questions.map((question, index) => (
+            <div className="space-y-2 flex flex-col w-full mt-4" key={index}>
+              <Text className="text-white pl-2" size="2" weight={'bold'}>{`${
+                index + 1
+              }. Song`}</Text>
+              <QuestionInputContainer
+                question={question}
+                handleInput={(value, type) => handleInput(value, type, index)}
+              />
+            </div>
+          ))}
+          {quizInput!.questions.length < MAX_QUESTIONS && (
+            <IconButton style={{marginBlock: 10}} onClick={handleAddRow}>
+              <PlusIcon />
+            </IconButton>
+          )}
+        </div>
+        {!isLoading && <Button onClick={createQuiz}>Upload</Button>}
+      </div>
     </div>
   );
 }
@@ -161,7 +180,7 @@ function QuestionInputContainer({
 }): JSX.Element {
   return (
     <div className="flex flex-col">
-      <TextField.Input
+      <InputField
         value={question.url}
         onInput={({currentTarget: {value}}) =>
           handleInput(value, InputType.URL)
@@ -169,15 +188,17 @@ function QuestionInputContainer({
         placeholder="Enter url"
       />
       <div className="flex">
-        <TextField.Input
+        <InputField
+          className="flex w-full"
           onInput={({currentTarget: {value}}) =>
             handleInput(value, InputType.ANSWER)
           }
           value={question.answer}
           placeholder="Answer"
         />
-        <TextField.Input
-          value={question.startOffset}
+        <InputField
+          className="flex w-full"
+          value={question.startOffset || ''}
           onInput={({currentTarget: {value}}) =>
             handleInput(value, InputType.OFFSET)
           }

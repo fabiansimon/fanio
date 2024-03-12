@@ -18,7 +18,7 @@ export function similarity(input: string, answer: string) {
   return ((max - levenshteinDistance(input, answer)) / max) * 100;
 }
 
-function sanitizeTerm(input: string) {
+export function sanitizeTerm(input: string) {
   let clean = '';
   for (const char of input) {
     if (!/[\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(char)) {

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {Quiz, QuizInput, Score, ScoreInput} from '../types/index';
 import ToastController from '../providers/ToastController';
+import {sanitizeTerm} from './logic';
 const BASE_URL = 'http://localhost:8080/api';
 
 const _axios = axios.create({
@@ -78,6 +79,7 @@ export async function fetchTitleSuggestion(url: string): Promise<string> {
 
 export async function searchQuizByTerm(term: string): Promise<Quiz[] | []> {
   try {
+    term = sanitizeTerm(term);
     const res = await _axios.get(`/search-quiz?term=${term}`);
     return res.data.content;
   } catch (error) {

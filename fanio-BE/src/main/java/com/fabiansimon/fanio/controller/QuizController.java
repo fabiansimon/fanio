@@ -18,6 +18,7 @@ import java.util.UUID;
 public class QuizController {
     @Autowired
     private QuizService quizService;
+
     @GetMapping("/quizzes")
     public ResponseEntity<Page<Quiz>> getAllQuizzes(
             @RequestParam(defaultValue = "0") int page,
@@ -25,8 +26,22 @@ public class QuizController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Quiz> quizzes = quizService.getAllQuizzes(pageable);
+
         return ResponseEntity.ok(quizzes);
     }
+
+    @GetMapping("/search-quiz")
+    public ResponseEntity<Page<Quiz>> searchForQuizzes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = true) String term
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Quiz> quizzes = quizService.getQuizzesByTerm(pageable, term);
+
+        return ResponseEntity.ok(quizzes);
+    }
+
 
     @GetMapping("/quiz/{id}")
     public ResponseEntity<Quiz> getQuiz(@PathVariable UUID id) {
