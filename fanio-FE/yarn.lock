@@ -2485,6 +2485,18 @@
     "@svgr/plugin-svgo" "^5.5.0"
     loader-utils "^2.0.0"
 
+"@tabler/icons-react@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@tabler/icons-react/-/icons-react-3.0.0.tgz#2e31699f984a878bd6d7fd688658ca2382e13f8d"
+  integrity sha512-KI3rFTvH6k/4fJVVegvqdqiaaPyo2YZ4X/4A0HExwJKfqZrUeZZHB2/iCTXnvecI9REWrexmFlyYMpthA9dEDw==
+  dependencies:
+    "@tabler/icons" "3.0.0"
+
+"@tabler/icons@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-3.0.0.tgz#39cebe224bec1ac54d5ee7ad2064f00a014b16a4"
+  integrity sha512-DT27tfUt7v6wqn+NVBp5zSxYwfVuyImdgih0ULTbs0qQrAANmjobyMSrD+ATWvIsS5QuhbA+lX4hv8pEe7Lm/w==
+
 "@testing-library/dom@^8.5.0":
   version "8.20.1"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.20.1.tgz#2e52a32e46fc88369eef7eef634ac2a192decd9f"
@@ -2722,6 +2734,11 @@
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==
+
+"@types/lodash@^4.14.202":
+  version "4.14.202"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.202.tgz#f09dbd2fb082d507178b2f2a5c7e74bd72ff98f8"
+  integrity sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==
 
 "@types/mime@*":
   version "3.0.4"

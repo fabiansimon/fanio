@@ -1,5 +1,8 @@
+import clsx, {ClassValue} from 'clsx';
+import {twMerge} from 'tailwind-merge';
+
 export class DateUtils {
-  static formatDate(date: Date) {
+  static formatDate(date: Date, ignoreTime: boolean = false) {
     const _date = new Date(date);
     const readableDate = _date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -13,7 +16,7 @@ export class DateUtils {
       hour12: false,
     });
 
-    return `${readableDate} ${readableTime}`;
+    return `${readableDate} ${!ignoreTime ? readableTime : ''}`.trim();
   }
 
   static formatTime(time: number, postfix?: string) {
@@ -22,5 +25,11 @@ export class DateUtils {
     const milliSeconds = String(Math.round((time % 1) * 1000)).padStart(3, '0');
 
     return `${seconds}:${milliSeconds} ${postfix}`;
+  }
+}
+
+export class UI {
+  static cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
   }
 }

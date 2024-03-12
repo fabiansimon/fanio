@@ -1,37 +1,55 @@
 import {Text} from '@radix-ui/themes';
 import {Quiz} from '../types';
-import {DateUtils} from '../utils/common';
+import {useNavigate} from 'react-router-dom';
+import ROUTES from '../constants/Routes';
+import BackgroundLight from './BackgroundLight';
 
 function QuizPreview({
   quiz,
+  defaultNavigation,
   onClick,
   onClickScores,
 }: {
   quiz: Quiz;
+  defaultNavigation?: boolean;
   onClick?: (id: string) => void;
   onClickScores?: (id: string) => void;
 }): JSX.Element {
-  const {title, description, createdAt, questions, id} = quiz;
+  const navigate = useNavigate();
+  const {title, description, id} = quiz;
+
   return (
-    <div className="flex">
+    <BackgroundLight className="flex cursor-pointer bg-slate-900 rounded-[5px]">
       <div
-        onClick={() => onClick?.(id)}
-        className="flex w-full p-2 rounded-md cursor-pointer bg-white justify-between">
+        onClick={() =>
+          defaultNavigation
+            ? navigate(`${ROUTES.playQuiz}/${id}`)
+            : onClick?.(id)
+        }
+        className="flex w-full py-2 px-2 justify-between items-start">
         <div className="flex flex-col">
-          <Text>{title}</Text>
-          <Text>{description}</Text>
-        </div>
-        <div className="flex text-right flex-col">
-          <Text>{`${questions.length} questions`}</Text>
-          <Text>{DateUtils.formatDate(createdAt)}</Text>
+          <div className="flex">
+            <Text size="2" weight="medium" className="text-white">
+              {title}
+            </Text>
+          </div>
+          <Text size="2" className="text-slate-400">
+            {description}
+          </Text>
         </div>
       </div>
       <div
-        onClick={() => onClickScores?.(id)}
-        className="flex cursor-pointer bg-white items-center ml-2 rounded-md text-center">
-        see scores
+        onClick={() =>
+          defaultNavigation
+            ? navigate(`${ROUTES.quizScores}/${id}`)
+            : onClickScores?.(id)
+        }
+        className="flex items-center ml-2 text-center border-l px-2">
+        <Text size="1" weight="medium" className="text-white">
+          see scores
+        </Text>
       </div>
-    </div>
+    </BackgroundLight>
   );
 }
 

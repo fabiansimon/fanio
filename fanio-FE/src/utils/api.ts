@@ -75,3 +75,13 @@ export async function fetchTitleSuggestion(url: string): Promise<string> {
     throw error;
   }
 }
+
+export async function searchQuizByTerm(term: string): Promise<Quiz[] | []> {
+  try {
+    const res = await _axios.get(`/search-quiz?term=${term}`);
+    return res.data.content;
+  } catch (error) {
+    console.error('Failed to fetch all quizzes:', error);
+    throw error;
+  }
+}
