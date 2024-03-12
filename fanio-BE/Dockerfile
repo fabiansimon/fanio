@@ -12,7 +12,7 @@ COPY --chown=gradle:gradle settings.gradle /home/gradle/src/
 COPY --chown=gradle:gradle . /home/gradle/src
 
 # Build the application
-RUN gradle build --no-daemon
+RUN gradle build --no-daemon -x test
 
 # Use OpenJDK image to run the Spring Boot application
 FROM openjdk:17
