@@ -51,5 +51,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "css-loader": "^6.10.0",
+    "postcss-loader": "^8.1.1",
+    "source-map-loader": "^5.0.0",
+    "style-loader": "^3.3.4"
   }
 }

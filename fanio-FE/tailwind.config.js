@@ -1,3 +1,10 @@
+const defaultTheme = require('tailwindcss/defaultTheme');
+const colors = require('tailwindcss/colors');
+const {
+  default: flattenColorPalette,
+} = require('tailwindcss/lib/util/flattenColorPalette');
+const plugin = require('tailwindcss/plugin');
+
 /** @type {import('tailwindcss').Config} */
 
 module.exports = {
@@ -24,5 +31,17 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({addBase, theme}) {
+      // Wrap your function with plugin()
+      let allColors = flattenColorPalette(theme('colors'));
+      let newVars = Object.fromEntries(
+        Object.entries(allColors).map(([key, val]) => [`--${key}`, val]),
+      );
+
+      addBase({
+        ':root': newVars,
+      });
+    }),
+  ],
 };

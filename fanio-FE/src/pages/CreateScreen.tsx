@@ -1,4 +1,5 @@
-import {Button, Heading, IconButton, Text} from '@radix-ui/themes';
+import {Heading, IconButton, Text} from '@radix-ui/themes';
+import Button from '../components/Button';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {useState} from 'react';
 import {QuestionInput, QuizInput} from '../types';
@@ -131,7 +132,7 @@ function CreateScreen(): JSX.Element {
         <Text size="2" className="text-neutral-300">
           Make sure to only use youtube links at the moment.
         </Text>
-        <div className="my-4">
+        <div className="my-4 space-y-1">
           <InputField
             value={quizInput?.title}
             onInput={({currentTarget: {value}}) =>
@@ -165,7 +166,11 @@ function CreateScreen(): JSX.Element {
             </IconButton>
           )}
         </div>
-        {!isLoading && <Button onClick={createQuiz}>Upload</Button>}
+        {!isLoading && (
+          <Button hotkey="C" onClick={createQuiz}>
+            Upload
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -179,7 +184,7 @@ function QuestionInputContainer({
   handleInput: (value: string, type: InputType) => void;
 }): JSX.Element {
   return (
-    <div className="flex flex-col">
+    <div className="flex space-y-1 flex-col">
       <InputField
         value={question.url}
         onInput={({currentTarget: {value}}) =>
@@ -187,9 +192,9 @@ function QuestionInputContainer({
         }
         placeholder="Enter url"
       />
-      <div className="flex">
+      <div className="flex space-x-1">
         <InputField
-          className="flex w-full"
+          className="flex "
           onInput={({currentTarget: {value}}) =>
             handleInput(value, InputType.ANSWER)
           }
@@ -197,7 +202,7 @@ function QuestionInputContainer({
           placeholder="Answer"
         />
         <InputField
-          className="flex w-full"
+          className="flex"
           value={question.startOffset || ''}
           onInput={({currentTarget: {value}}) =>
             handleInput(value, InputType.OFFSET)

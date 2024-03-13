@@ -1,24 +1,24 @@
 'use client';
-import * as React from 'react';
 import {useMotionTemplate, useMotionValue, motion} from 'framer-motion';
 import {UI} from '../utils/common';
+import {forwardRef, useState} from 'react';
 
 export interface InputFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 function InputField({className, type, ...props}: InputFieldProps, ref: any) {
   const radius = 100;
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
 
   let mouseX = useMotionValue(0);
   let mouseY = useMotionValue(0);
 
-  function handleMouseMove({currentTarget, clientX, clientY}: any) {
+  const handleMouseMove = ({currentTarget, clientX, clientY}: any) => {
     let {left, top} = currentTarget.getBoundingClientRect();
 
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
-  }
+  };
   return (
     <motion.div
       style={{
@@ -55,4 +55,4 @@ function InputField({className, type, ...props}: InputFieldProps, ref: any) {
 
 InputField.displayName = 'Input';
 
-export default React.forwardRef(InputField);
+export default forwardRef(InputField);

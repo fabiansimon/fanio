@@ -1,12 +1,14 @@
 import ReactPlayer from 'react-player';
 import {Quiz, Score} from '../types';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import {Button, Text, TextField} from '@radix-ui/themes';
+import {Heading, Text, TextField} from '@radix-ui/themes';
+import Button from '../components/Button';
 import {useParams} from 'react-router-dom';
 import {fetchQuizById, fetchScoresFromQuiz, uploadScore} from '../utils/api';
 import {shuffle, similarity} from '../utils/logic';
 import useKeyShortcut from '../hooks/useKeyShortcut';
 import {LocalStorage} from '../utils/localStorage';
+import InputField from '../components/InputField';
 
 const ANSWER_THRESHOLD = 70;
 
@@ -41,6 +43,11 @@ function PlayScreen(): JSX.Element {
     () => score.guesses.length >= quizData?.questions.length!,
     [score, quizData],
   );
+
+  const runningGame = useMemo(() => {
+    return !isEnd && isPlaying;
+  }, [isPlaying, isEnd]);
+
   useEffect(() => {
     if (!id) return;
     (async () => {
@@ -153,43 +160,61 @@ function PlayScreen(): JSX.Element {
   });
 
   return (
-    <div className="flex space-y-2 flex-col w-full h-screen bg-slate-500 items-center justify-center">
-      <Text>{quizData?.title}</Text>
-      <Text>{quizData?.description}</Text>
-      <Text>{score.totalScore}</Text>
-      {question && (
-        <>
-          <ReactPlayer
-            playing={isPlaying}
-            onReady={() => {
-              if (questionIndex === 0) return;
-              if (question.startOffset) {
-                playerRef.current?.seekTo(question.startOffset, 'seconds');
-              }
-              handlePlay();
-            }}
-            controls
-            width={0}
-            height={0}
-            ref={playerRef}
-            url={question.url}
-          />
-          <TextField.Input
-            value={input}
-            onInput={handleInput}
-            placeholder="Enter name of Song"
-          />
-        </>
-      )}
-      {isEnd &&
-        scores.length > 0 &&
-        scores.map((s, i) => (
-          <Text
-            key={i}>{`${s.userName}: ${s.totalScore} ${s.timeElapsed}`}</Text>
-        ))}
-      {!isEnd && <Button onClick={handleSubmitGuess}>Guess</Button>}
-      {!isPlaying && !isEnd && <Button onClick={handlePlay}>Play</Button>}
-      {isEnd && <Button onClick={restartGame}>Restart</Button>}
+    <div className="flex space-y-2 flex-col w-full h-screen bg-slate-900 items-center justify-center">
+      <div className="w-full px-20 flex flex-col">
+        <Heading size={'4'} className="text-white">
+          {quizData?.title}
+        </Heading>
+        <Text size={'2'} className="text-white">
+          {quizData?.description}
+        </Text>
+        <Text>{score.totalScore}</Text>
+        {question && (
+          <>
+            <ReactPlayer
+              playing={isPlaying}
+              onReady={() => {
+                if (questionIndex === 0) return;
+                if (question.startOffset) {
+                  playerRef.current?.seekTo(question.startOffset, 'seconds');
+                }
+                handlePlay();
+              }}
+              controls
+              width={0}
+              height={0}
+              ref={playerRef}
+              url={question.url}
+            />
+            {runningGame && (
+              <InputField
+                value={input}
+                onInput={handleInput}
+                placeholder="Enter name of Song"
+              />
+            )}
+          </>
+        )}
+        {isEnd &&
+          scores.length > 0 &&
+          scores.map((s, i) => (
+            <Text
+              className="text-white"
+              key={i}>{`${s.userName}: ${s.totalScore} ${s.timeElapsed}`}</Text>
+          ))}
+        <div className="mt-2 flex justify-center">
+          {!isEnd && !isPlaying ? (
+            <Button hotkey="Enter" onClick={handlePlay}>
+              Play
+            </Button>
+          ) : (
+            <Button hotkey="Enter" onClick={handleSubmitGuess}>
+              Guess
+            </Button>
+          )}
+        </div>
+        {isEnd && <Button onClick={restartGame}>Restart</Button>}
+      </div>
     </div>
   );
 }
