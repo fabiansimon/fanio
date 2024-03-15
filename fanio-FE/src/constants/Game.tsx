@@ -1,0 +1,3 @@
+export const GAME_OPTIONS = {
+  MAX_POINTS_PER_ROUND: 10_000,
+};
