@@ -1,10 +1,12 @@
 'use client';
 import {useMotionTemplate, useMotionValue, motion} from 'framer-motion';
 import {UI} from '../utils/common';
-import {forwardRef, useState} from 'react';
+import {LegacyRef, forwardRef, useState} from 'react';
 
 export interface InputFieldProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  ref?: LegacyRef<HTMLInputElement> | undefined;
+}
 
 function InputField({className, type, ...props}: InputFieldProps, ref: any) {
   const radius = 100;

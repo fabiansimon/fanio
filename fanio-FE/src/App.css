@@ -36,3 +36,21 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes movingGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.movingGradient {
+  background: linear-gradient(270deg, #007cf0, #00dfd8, #ff0080);
+  background-size: 200% 200%;
+  animation: movingGradient 3s linear infinite;
+}

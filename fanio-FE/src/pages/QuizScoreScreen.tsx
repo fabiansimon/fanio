@@ -24,7 +24,7 @@ function QuizScoreScreen(): JSX.Element {
   }, [id]);
 
   return (
-    <div className="flex space-y-2 text-rightl w-full h-screen bg-slate-500 items-center justify-center">
+    <div className="flex space-y-2 text-rightl w-full h-screen bg-slate-900 items-center justify-center">
       <div className="flex flex-col space-y-2 w-1/2">
         {scores?.map((s, i) => (
           <ScoreTile isLocal={userScores?.has(s.id)} key={i} score={s} />

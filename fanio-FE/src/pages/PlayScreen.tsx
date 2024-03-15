@@ -1,7 +1,8 @@
 import ReactPlayer from 'react-player';
-import {Quiz, Score} from '../types';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import {Heading, Text, TextField} from '@radix-ui/themes';
+import {Quiz, Score} from '../types';
+import {motion, useAnimation} from 'framer-motion';
+import {Heading, Text} from '@radix-ui/themes';
 import Button from '../components/Button';
 import {useParams} from 'react-router-dom';
 import {fetchQuizById, fetchScoresFromQuiz, uploadScore} from '../utils/api';
@@ -9,6 +10,8 @@ import {shuffle, similarity} from '../utils/logic';
 import useKeyShortcut from '../hooks/useKeyShortcut';
 import {LocalStorage} from '../utils/localStorage';
 import InputField from '../components/InputField';
+import PointsBar from '../components/PointsBar';
+import {UI} from '../utils/common';
 
 const ANSWER_THRESHOLD = 70;
 
@@ -27,17 +30,21 @@ function PlayScreen(): JSX.Element {
   const {id} = useParams();
 
   const playerRef = useRef<ReactPlayer>(null);
+  const barRef = useRef<any>(null);
+  const inputRef = useRef<any>(null);
+
   const [quizData, setQuizData] = useState<Quiz | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isReady, setIsReady] = useState<boolean>(false);
   const [questionIndex, setQuestionIndex] = useState<number>(0);
   const [scores, setScores] = useState<Score[]>([]);
+  const [input, setInput] = useState<string>('');
 
   const [score, setScore] = useState<ScoreState>({
     totalScore: 0,
     totalTime: 0,
     guesses: [],
   });
-  const [input, setInput] = useState<string>('');
 
   const isEnd = useMemo(
     () => score.guesses.length >= quizData?.questions.length!,
@@ -47,6 +54,10 @@ function PlayScreen(): JSX.Element {
   const runningGame = useMemo(() => {
     return !isEnd && isPlaying;
   }, [isPlaying, isEnd]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [runningGame]);
 
   useEffect(() => {
     if (!id) return;
@@ -65,6 +76,7 @@ function PlayScreen(): JSX.Element {
 
   useEffect(() => {
     if (isEnd) {
+      barRef.current?.clear();
       (async () => uploadGameScore())();
       (async () => getQuizScores())();
     }
@@ -169,11 +181,17 @@ function PlayScreen(): JSX.Element {
           {quizData?.description}
         </Text>
         <Text>{score.totalScore}</Text>
+        <PointsBar
+          ref={barRef}
+          className={UI.cn('mb-2', !runningGame && 'h-0')}
+        />
         {question && (
           <>
             <ReactPlayer
               playing={isPlaying}
-              onReady={() => {
+              onReady={e => {
+                setIsReady(true);
+                barRef.current?.startAnimation(e.getDuration());
                 if (questionIndex === 0) return;
                 if (question.startOffset) {
                   playerRef.current?.seekTo(question.startOffset, 'seconds');
@@ -186,13 +204,12 @@ function PlayScreen(): JSX.Element {
               ref={playerRef}
               url={question.url}
             />
-            {runningGame && (
-              <InputField
-                value={input}
-                onInput={handleInput}
-                placeholder="Enter name of Song"
-              />
-            )}
+            <InputField
+              ref={inputRef}
+              value={input}
+              onInput={handleInput}
+              placeholder="Enter name of Song"
+            />
           </>
         )}
         {isEnd &&
@@ -203,7 +220,7 @@ function PlayScreen(): JSX.Element {
               key={i}>{`${s.userName}: ${s.totalScore} ${s.timeElapsed}`}</Text>
           ))}
         <div className="mt-2 flex justify-center">
-          {!isEnd && !isPlaying ? (
+          {!isEnd && !isPlaying && isReady ? (
             <Button hotkey="Enter" onClick={handlePlay}>
               Play
             </Button>
