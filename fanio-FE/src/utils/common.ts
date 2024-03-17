@@ -19,12 +19,17 @@ export class DateUtils {
     return `${readableDate} ${!ignoreTime ? readableTime : ''}`.trim();
   }
 
-  static formatTime(time: number, postfix?: string) {
-    // const minutes = String(Math.floor(time / 60)).padStart(2, '0');
+  static formatTime(time: number, postfix: string = '') {
     const seconds = String(Math.floor(time % 60)).padStart(2, '0');
     const milliSeconds = String(Math.round((time % 1) * 1000)).padStart(3, '0');
 
     return `${seconds}:${milliSeconds} ${postfix}`;
+  }
+
+  static formatSeconds(seconds: number, postfix: string = '') {
+    return `${new Date(seconds * 1000)
+      .toISOString()
+      .substring(14, 19)}${postfix}`;
   }
 }
 

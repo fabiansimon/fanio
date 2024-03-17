@@ -29,6 +29,7 @@ export interface QuestionInput {
   url: string;
   answer: string;
   startOffset?: number;
+  maxLength?: number;
 }
 
 export interface QuizInput {
@@ -42,4 +43,9 @@ export interface ScoreInput {
   timeElapsed: number;
   totalScore: number;
   quizId: string;
+}
+
+export interface MetaData {
+  title: string;
+  length: number;
 }

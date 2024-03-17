@@ -5,15 +5,21 @@ interface ButtonProps extends React.HTMLProps<HTMLDivElement> {
   hotkey?: string;
   children?: React.ReactNode;
   rest: any;
+  disabled: boolean;
 }
 
-function Button({hotkey, children, ...rest}: any): JSX.Element {
-  useKeyShortcut(hotkey, () => rest.onClick());
+function Button({
+  hotkey,
+  children,
+  disabled = false,
+  ...rest
+}: any): JSX.Element {
+  useKeyShortcut(hotkey, () => !disabled && rest.onClick());
 
   return (
-    <RadixButton size="3" radius="medium" {...rest}>
+    <RadixButton disabled={disabled} size={'2'} radius="medium" {...rest}>
       {children}
-      {hotkey && <Kbd>{hotkey}</Kbd>}
+      {hotkey && !disabled && <Kbd>{hotkey}</Kbd>}
     </RadixButton>
   );
 }

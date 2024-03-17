@@ -1,12 +1,12 @@
 import axios from 'axios';
-import {Quiz, QuizInput, Score, ScoreInput} from '../types/index';
+import {MetaData, Quiz, QuizInput, Score, ScoreInput} from '../types/index';
 import ToastController from '../providers/ToastController';
 import {sanitizeTerm} from './logic';
 const BASE_URL = 'http://localhost:8080/api';
 
 const _axios = axios.create({
   baseURL: BASE_URL,
-  //headers: {"Access-Control-Allow-Origin": "*"}
+  headers: {'Access-Control-Allow-Origin': '*'},
 });
 
 export async function fetchQuizById(id: string): Promise<Quiz> {
@@ -64,9 +64,9 @@ export async function fetchAllQuizzes() {
   }
 }
 
-export async function fetchTitleSuggestion(url: string): Promise<string> {
+export async function fetchMetaData(url: string): Promise<MetaData> {
   try {
-    const res = await _axios.post<string>('/strip-meta', {
+    const res = await _axios.post<MetaData>('/strip-meta', {
       url,
       type: 'youtube',
     });
