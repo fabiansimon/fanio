@@ -29,7 +29,7 @@ function QuizListScreen(): JSX.Element {
   };
 
   return (
-    <div className="flex flex-col w-full h-screen bg-slate-900 items-center justify-center">
+    <div className="flex flex-col w-full h-screen bg-slate-950 items-center justify-center">
       <div className="flex flex-col w-full px-20 space-y-2">
         {quizzes?.map((q, i) => (
           <QuizPreview

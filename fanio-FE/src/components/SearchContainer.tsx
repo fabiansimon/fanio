@@ -4,13 +4,23 @@ import {useState, useEffect, useCallback} from 'react';
 import QuizPreview from './QuizPreview';
 import {searchQuizByTerm} from '../utils/api';
 import {debounce} from 'lodash';
+import {UI} from '../utils/common';
+import {Heading, Text} from '@radix-ui/themes';
+import Loading from './Loading';
 
 const DEBOUNCE_TIMEOUT = 500;
 
-function SearchContainer(): JSX.Element {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [results, setResults] = useState<Quiz[] | []>();
+interface SearchContainerProps {
+  className?: string;
+  setSearchResult: (resultData: Quiz[] | null) => void;
+}
+
+function SearchContainer({
+  className,
+  setSearchResult,
+}: SearchContainerProps): JSX.Element {
   const [input, setInput] = useState<string | null>();
+  const [isLoading, setIsLoading] = useState<boolean>();
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {value} = e.target;
@@ -18,9 +28,10 @@ function SearchContainer(): JSX.Element {
   };
 
   const searchForQuiz = async (val: string) => {
+    setIsLoading(true);
     try {
       const res = await searchQuizByTerm(val);
-      if (res?.length > 0) setResults(res);
+      setSearchResult(res);
     } catch (error) {
       console.warn('No quiz found with title:', val);
     } finally {
@@ -35,11 +46,11 @@ function SearchContainer(): JSX.Element {
 
   useEffect(() => {
     if (!input) {
-      return setResults([]);
+      return setSearchResult(null);
     }
     setIsLoading(true);
     debouncedSearch(input);
-  }, [input]);
+  }, [input, debouncedSearch, setSearchResult]);
 
   useEffect(() => {
     return () => {
@@ -48,17 +59,18 @@ function SearchContainer(): JSX.Element {
   }, [debouncedSearch]);
 
   return (
-    <div className="flex flex-col">
-      <InputField onChange={handleInput} value={input || ''} />
-      {isLoading ? (
-        <div>loading...</div>
-      ) : (
-        <div className="mt-2 space-y-2">
-          {results?.map((r, i) => (
-            <QuizPreview defaultNavigation key={i} quiz={r} />
-          ))}
-        </div>
-      )}
+    <div className={UI.cn('flex flex-col', className)}>
+      <Heading size={'3'} weight="medium" className="text-white">
+        Looking for anything specific?
+      </Heading>
+      <Text size={'2'} className="text-neutral-500">
+        search for artists, titles or even possible song titles
+      </Text>
+      <div className="h-2" />
+      <div className="flex relative">
+        <InputField onChange={handleInput} value={input || ''} />
+        {isLoading && <Loading className="absolute right-1 bottom-1 size-7" />}
+      </div>
     </div>
   );
 }

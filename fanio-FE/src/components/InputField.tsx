@@ -2,6 +2,7 @@
 import {useMotionTemplate, useMotionValue, motion} from 'framer-motion';
 import {UI} from '../utils/common';
 import {LegacyRef, forwardRef, useState} from 'react';
+import Loading from './Loading';
 
 export interface InputFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -35,7 +36,7 @@ function InputField({className, type, ...props}: InputFieldProps, ref: any) {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setVisible(true)}
       onMouseLeave={() => setVisible(false)}
-      className="p-[2px] rounded-lg transition duration-300 w-full group/input">
+      className="p-[2px] flex rounded-lg transition duration-300 w-full group/input">
       <input
         type={type}
         className={UI.cn(

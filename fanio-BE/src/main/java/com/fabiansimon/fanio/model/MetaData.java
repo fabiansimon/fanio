@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MetaData {
     private String title;
+    private String imageUri;
     private Integer length;
 }

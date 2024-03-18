@@ -18,10 +18,12 @@ public class MetaDataController {
 
             MetaData metaData = new MetaData();
             String title = cleanRawTitle(stripTitle(body));
+            String imageUri = extractThumbnail(body);
             Integer length = extractLength(body);
 
             metaData.setTitle(title);
             metaData.setLength(length);
+            metaData.setImageUri(imageUri);
 
             return ResponseEntity.ok(metaData);
         } catch (Exception e) {
@@ -29,10 +31,23 @@ public class MetaDataController {
         }
     }
 
+    private String extractThumbnail(String body) throws Exception {
+        String key = "thumbnails\":[{\"url\":\"";
+        int start = body.indexOf(key), right;
+        if (start == -1) {
+            throw new Exception("Unable to extract the thumbnail");
+        }
+
+        start += key.length();
+        right = start;
+        while (body.charAt(right++) != '\\');
+
+        return body.substring(start, right-1);
+    }
+
     private Integer extractLength(String body) throws Exception {
         String key = "approxDurationMs";
         int start = body.indexOf(key), right;
-        System.out.println(start);
         if (start == -1) {
             throw new Exception("Unable to extract the length");
         }
