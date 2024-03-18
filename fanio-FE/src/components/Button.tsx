@@ -17,7 +17,7 @@ function Button({
   useKeyShortcut(hotkey, () => !disabled && rest.onClick());
 
   return (
-    <RadixButton disabled={disabled} size={'2'} radius="medium" {...rest}>
+    <RadixButton disabled={disabled} size={'2'} {...rest} radius="medium">
       {children}
       {hotkey && !disabled && <Kbd>{hotkey}</Kbd>}
     </RadixButton>

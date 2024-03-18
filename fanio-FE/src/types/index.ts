@@ -30,6 +30,7 @@ export interface QuestionInput {
   answer: string;
   startOffset?: number;
   maxLength?: number;
+  imageUri?: string;
 }
 
 export interface QuizInput {
@@ -48,4 +49,5 @@ export interface ScoreInput {
 export interface MetaData {
   title: string;
   length: number;
+  imageUri: string;
 }

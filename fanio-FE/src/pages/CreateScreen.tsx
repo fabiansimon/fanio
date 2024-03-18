@@ -1,6 +1,6 @@
 import {Heading, IconButton, Slider, Strong, Text} from '@radix-ui/themes';
 import Button from '../components/Button';
-import {PlusIcon} from '@radix-ui/react-icons';
+import {PlusIcon, ChevronDownIcon} from '@radix-ui/react-icons';
 import {useMemo, useState} from 'react';
 import {QuestionInput, QuizInput} from '../types';
 import {useNavigate} from 'react-router-dom';
@@ -8,12 +8,13 @@ import ROUTES from '../constants/Routes';
 import {fetchMetaData, uploadQuiz} from '../utils/api';
 import {REGEX} from '../constants/Regex';
 import InputField from '../components/InputField';
-import {DateUtils} from '../utils/common';
+import {DateUtils, UI} from '../utils/common';
 
 enum InputType {
   TITLE,
   DESCRIPTION,
   URL,
+  ERROR,
   ANSWER,
   OFFSET,
 }
@@ -24,92 +25,29 @@ function CreateScreen(): JSX.Element {
   const navigation = useNavigate();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [quizInput, setInput] = useState<QuizInput | null>({
+  const [error, setError] = useState<string | null>(null);
+  const [quizInput, setQuizInput] = useState<QuizInput | null>({
     title: '',
     description: '',
     questions: [
       {
         answer: '',
         url: '',
-        startOffset: 0,
+        imageUri: '',
         maxLength: 0,
+        startOffset: 0,
       },
     ],
   });
-
-  const handleError = (type: InputType, index?: number) => {
-    console.log('ERROR:', type, index);
-    return false;
-  };
-
-  const validInput = useMemo(() => {
-    if (!quizInput) return false;
-    const {title, questions} = quizInput;
-
-    let valid = true;
-    if (!title.trim()) {
-      valid = handleError(InputType.TITLE);
-    }
-
-    for (var i = 0; i < questions.length; i++) {
-      const {url, answer} = questions[i];
-      if (!REGEX.youtube.test(url)) valid = handleError(InputType.URL, i);
-      if (!answer.trim()) valid = handleError(InputType.ANSWER, i);
-    }
-
-    return valid;
-  }, [quizInput]);
-
-  const cleanInput = (input: QuizInput) => {
-    return {
-      ...input,
-      questions: input.questions.map(q => {
-        delete q.maxLength;
-        return q;
-      }),
-    };
-  };
-
-  const createQuiz = async () => {
-    if (!quizInput) return;
-    setIsLoading(true);
-    try {
-      const {id} = await uploadQuiz(cleanInput(quizInput));
-      navigation(`${ROUTES.playQuiz}/${id}`);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleMetaData = async (url: string, index: number) => {
-    try {
-      if (!REGEX.youtube.test(url)) return;
-      const {title, length} = await fetchMetaData(url);
-
-      setInput(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          questions: prev?.questions.map((q, i) => {
-            if (index === i)
-              return {...q, answer: q.answer || title, maxLength: length};
-            return q;
-          }),
-        };
-      });
-    } catch {}
-  };
+  const [focusIndex, setFocusIndex] = useState<number>(0);
 
   const handleInput = (
     value: string | number,
     type: InputType,
     index?: number,
   ) => {
-    setInput(prev => {
+    setQuizInput(prev => {
       if (!prev) return null;
-
       switch (type) {
         case InputType.TITLE:
           return {...prev, title: value as string};
@@ -119,6 +57,7 @@ function CreateScreen(): JSX.Element {
 
         case InputType.URL:
         case InputType.ANSWER:
+        case InputType.ERROR:
         case InputType.OFFSET:
           if (index === undefined) return null;
 
@@ -126,7 +65,7 @@ function CreateScreen(): JSX.Element {
 
           return {
             ...prev,
-            questions: prev.questions.map((q, i) => {
+            questions: prev?.questions.map((q, i) => {
               if (i === index) {
                 return {
                   ...q,
@@ -149,13 +88,84 @@ function CreateScreen(): JSX.Element {
     });
   };
 
-  const handleAddRow = () => {
-    setInput(prev => {
-      if (!prev) return null;
+  const cleanInput = (input: QuizInput) => {
+    return {
+      ...input,
+      questions: input.questions
+        .filter(q => isQuestionValid(q))
+        .map(q => {
+          delete q.maxLength;
+          delete q.imageUri;
+          return q;
+        }),
+    };
+  };
 
+  const createQuiz = async () => {
+    if (!quizInput) return;
+    setIsLoading(true);
+    try {
+      const {id} = await uploadQuiz(cleanInput(quizInput));
+      navigation(`${ROUTES.playQuiz}/${id}`);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMetaData = async (url: string, index: number) => {
+    try {
+      if (!REGEX.youtube.test(url)) return;
+      const res = await fetchMetaData(url);
+      const {title, length, imageUri} = res;
+      setQuizInput(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          questions: prev?.questions.map((q, i) => {
+            if (index === i)
+              return {
+                ...q,
+                answer: q.answer || title,
+                maxLength: length,
+                imageUri: imageUri,
+              };
+            return q;
+          }),
+        };
+      });
+    } catch {}
+  };
+
+  const isQuestionValid = (question?: QuestionInput) => {
+    let _question = question;
+    if (!question) {
+      _question = quizInput?.questions[quizInput.questions.length - 1];
+    }
+
+    const {url, answer} = _question!;
+    if (!REGEX.youtube.test(url) || !answer.trim()) return false;
+    return true;
+  };
+
+  const trimList = () => {
+    setQuizInput(prev => {
+      if (!prev) return null;
       return {
         ...prev,
-        questions: prev?.questions.concat({
+        questions: prev?.questions.filter(q => isQuestionValid(q)),
+      };
+    });
+  };
+
+  const handleAddRow = () => {
+    setFocusIndex(quizInput?.questions.length || 0);
+    setQuizInput(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        questions: prev.questions.concat({
           answer: '',
           url: '',
           startOffset: 0,
@@ -191,28 +201,87 @@ function CreateScreen(): JSX.Element {
           />
         </div>
         <div className="align-center justify-center items-center flex flex-col">
-          {quizInput?.questions.map((question, index) => (
-            <div className="space-y-2 flex flex-col w-full mt-4" key={index}>
-              <Text className="text-white pl-2" size="2" weight={'bold'}>{`${
-                index + 1
-              }: Song`}</Text>
-              <QuestionInputContainer
+          {quizInput?.questions.map((question, index) => {
+            if (focusIndex === index) {
+              return (
+                <div
+                  className="space-y-2 flex flex-col w-full mt-4"
+                  key={index}>
+                  <div className="flex w-full justify-between">
+                    <Text
+                      className="text-white pl-2"
+                      size="2"
+                      weight={'bold'}>{`${index + 1}: Song`}</Text>
+                    {error && (
+                      <Text
+                        className="text-red-600 pl-2"
+                        size="2"
+                        weight={'bold'}>
+                        {error}
+                      </Text>
+                    )}
+                  </div>
+                  <QuestionInputContainer
+                    question={question}
+                    handleInput={(value, type) =>
+                      handleInput(value, type, index)
+                    }
+                  />
+                </div>
+              );
+            }
+
+            return (
+              <QuestionPreviewContainer
+                className="mt-4"
+                key={index}
                 question={question}
-                handleInput={(value, type) => handleInput(value, type, index)}
+                onClick={() => {
+                  trimList();
+                  setFocusIndex(index);
+                }}
               />
-            </div>
-          ))}
-          {quizInput!.questions.length < MAX_QUESTIONS && (
+            );
+          })}
+
+          {isQuestionValid() && (
             <IconButton style={{marginBlock: 10}} onClick={handleAddRow}>
               <PlusIcon />
             </IconButton>
           )}
         </div>
         {!isLoading && (
-          <Button disabled={!validInput} hotkey="C" onClick={createQuiz}>
+          <Button style={{marginTop: 12}} hotkey="C" onClick={createQuiz}>
             Upload
           </Button>
         )}
+      </div>
+    </div>
+  );
+}
+
+function QuestionPreviewContainer({
+  question,
+  onClick,
+  className,
+}: {
+  question: QuestionInput;
+  className?: string;
+  onClick: () => void;
+}): JSX.Element {
+  const {answer, startOffset} = question;
+  return (
+    <div className={UI.cn('flex w-full justify-between', className)}>
+      <div className="flex flex-col">
+        <Heading size="3" className="text-white">
+          {answer}
+        </Heading>
+        <Text size="2" className="text-slate-200">
+          Offset: <Strong>{startOffset}</Strong> sec
+        </Text>
+      </div>
+      <div onClick={onClick}>
+        <ChevronDownIcon className="text-white size-8" />
       </div>
     </div>
   );
@@ -225,6 +294,7 @@ function QuestionInputContainer({
   question: QuestionInput;
   handleInput: (value: string | number, type: InputType) => void;
 }): JSX.Element {
+  const {url, answer, imageUri, startOffset, maxLength} = question;
   const defaultMaxValue = 100;
 
   const calculateOffset = (input: number) => {
@@ -240,26 +310,42 @@ function QuestionInputContainer({
 
   return (
     <div className="flex space-y-1 flex-col">
-      <InputField
-        value={question.url}
-        onInput={({currentTarget: {value}}) =>
-          handleInput(value, InputType.URL)
-        }
-        placeholder="Enter url"
-      />
-      <div className="flex space-x-1">
-        <InputField
-          className="flex "
-          onInput={({currentTarget: {value}}) =>
-            handleInput(value, InputType.ANSWER)
-          }
-          value={question.answer}
-          placeholder="Answer"
-        />
+      <div className="flex">
+        <div className="flex flex-col space-y-1 flex-1">
+          <InputField
+            value={url}
+            onInput={({currentTarget: {value}}) =>
+              handleInput(value, InputType.URL)
+            }
+            placeholder="Enter url"
+          />
+          <InputField
+            className="flex"
+            onInput={({currentTarget: {value}}) =>
+              handleInput(value, InputType.ANSWER)
+            }
+            value={answer}
+            placeholder="Answer"
+          />
+        </div>
+        {question.imageUri && (
+          <ThumbnailPreview className="ml-2" imageUri={imageUri!} url={url} />
+        )}
       </div>
-      <Text size="2" className="text-slate-200 pt-4 pb-2">
-        Start offset: <Strong>{question.startOffset}</Strong> seconds
-      </Text>
+
+      <div className="flex justify-between pt-2 pb-1">
+        <Text size="1" className="text-white">
+          0:00
+        </Text>
+        <Text size="2" className="text-slate-200">
+          Start offset: <Strong>{startOffset}</Strong> sec
+        </Text>
+        {maxLength && (
+          <Text size="1" className="text-white">
+            {DateUtils.formatSeconds(maxLength)}
+          </Text>
+        )}
+      </div>
       <Slider
         onValueChange={(e: number[]) => {
           handleInput(calculateOffset(e[0]), InputType.OFFSET);
@@ -269,17 +355,27 @@ function QuestionInputContainer({
         inverted
         defaultValue={[100]}
       />
-      <div className="flex justify-between pt-2">
-        <Text size="1" className="text-white">
-          0:00
-        </Text>
-        {question.maxLength && (
-          <Text size="1" className="text-white">
-            {DateUtils.formatSeconds(question.maxLength)}
-          </Text>
-        )}
-      </div>
     </div>
+  );
+}
+
+function ThumbnailPreview({
+  url,
+  imageUri,
+  className,
+}: {
+  url: string;
+  imageUri: string;
+  className?: string;
+}): JSX.Element {
+  return (
+    <a href={url} target="_blank" rel="noreferrer">
+      <img
+        src={imageUri}
+        alt="video thumbnail"
+        className={UI.cn('w-32 rounded-md cursor-pointer', className)}
+      />
+    </a>
   );
 }
 
