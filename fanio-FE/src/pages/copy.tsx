@@ -3,7 +3,7 @@ import ROUTES from '../constants/Routes';
 import {useNavigate} from 'react-router-dom';
 import Spotlight from '../components/Spotlight';
 import Button from '../components/Button';
-import SearchContainer from '../components/SearchContainer';
+import SearchContainer from '../components/SearchInput';
 interface MenuOptions {
   string: string;
   description?: string;

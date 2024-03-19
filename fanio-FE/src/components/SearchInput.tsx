@@ -1,24 +1,28 @@
 import {Quiz} from '../types';
 import InputField from './InputField';
-import {useState, useEffect, useCallback} from 'react';
-import QuizPreview from './QuizPreview';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import {searchQuizByTerm} from '../utils/api';
 import {debounce} from 'lodash';
 import {UI} from '../utils/common';
 import {Heading, Text} from '@radix-ui/themes';
-import Loading from './Loading';
 
 const DEBOUNCE_TIMEOUT = 500;
 
-interface SearchContainerProps {
+interface SearchInputProps {
   className?: string;
   setSearchResult: (resultData: Quiz[] | null) => void;
 }
 
-function SearchContainer({
-  className,
-  setSearchResult,
-}: SearchContainerProps): JSX.Element {
+function SearchInput(
+  {className, setSearchResult}: SearchInputProps,
+  ref: any,
+): JSX.Element {
   const [input, setInput] = useState<string | null>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
@@ -58,6 +62,18 @@ function SearchContainer({
     };
   }, [debouncedSearch]);
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      clearSearch: () => {
+        setSearchResult(null);
+        setInput(null);
+        setIsLoading(false);
+      },
+    }),
+    [setSearchResult, setInput, setIsLoading],
+  );
+
   return (
     <div className={UI.cn('flex flex-col', className)}>
       <Heading size={'3'} weight="medium" className="text-white">
@@ -68,11 +84,15 @@ function SearchContainer({
       </Text>
       <div className="h-2" />
       <div className="flex relative">
-        <InputField onChange={handleInput} value={input || ''} />
-        {isLoading && <Loading className="absolute right-1 bottom-1 size-7" />}
+        <InputField
+          isLoading={isLoading}
+          placeholder="e.g. Taylor Swift"
+          onChange={handleInput}
+          value={input || ''}
+        />
       </div>
     </div>
   );
 }
 
-export default SearchContainer;
+export default forwardRef(SearchInput);

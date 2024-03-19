@@ -1,15 +1,20 @@
 import {useEffect} from 'react';
+import useDetectOS from './useDetectOS';
+import {OperationSystem} from '../types';
 
 function useKeyShortcut(hotkey: string, action: () => void): void {
+  const OS = useDetectOS();
+
   useEffect(() => {
     if (!hotkey) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === hotkey.toLowerCase()) action();
+      const metaDown = OS === OperationSystem.MAC ? e.metaKey : e.ctrlKey;
+      if (metaDown && e.key.toLowerCase() === hotkey.toLowerCase()) action();
     };
-    window.addEventListener('keypress', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
 
-    return () => window.removeEventListener('keypress', handleKeyDown);
-  }, [hotkey, action]);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [hotkey, action, OS]);
 }
 
 export default useKeyShortcut;

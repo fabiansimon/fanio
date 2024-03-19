@@ -1,30 +1,40 @@
-import React from 'react';
+import React, {LegacyRef, forwardRef} from 'react';
 import {motion} from 'framer-motion';
 import {UI} from '../utils/common';
 
-function BackgroundLight({
-  children,
-  className,
-  containerClassName,
-  animate = true,
-  active = false,
-}: {
+interface BackgroundLightProps {
   children?: React.ReactNode;
   className?: string;
   containerClassName?: string;
   animate?: boolean;
   active?: boolean;
-}) {
+  onClick?: () => void;
+}
+
+function BackgroundLight(
+  {
+    children,
+    className,
+    containerClassName,
+    animate = true,
+    active = false,
+    onClick,
+  }: BackgroundLightProps,
+  ref: LegacyRef<HTMLDivElement>,
+) {
   const variants = {
     initial: {
-      backgroundPosition: '0 50%',
+      backgroundPosition: '0 0%',
     },
     animate: {
       backgroundPosition: ['0, 50%', '100% 50%', '0 50%'],
     },
   };
   return (
-    <div className={UI.cn('relative p-[1.5px] group', containerClassName)}>
+    <div
+      ref={ref}
+      onClick={onClick}
+      className={UI.cn('relative group', containerClassName)}>
       <motion.div
         variants={animate ? variants : undefined}
         initial={animate ? 'initial' : undefined}
@@ -42,8 +52,9 @@ function BackgroundLight({
           backgroundSize: animate ? '400% 400%' : undefined,
         }}
         className={UI.cn(
-          'absolute inset-0 rounded-md z-[1] opacity-30 group-hover:opacity-100 blur-xl  transition duration-500',
-          ' bg-[radial-gradient(circle_farthest-side_at_0_100%,#00ccb1,transparent),radial-gradient(circle_farthest-side_at_100%_0,#7b61ff,transparent),radial-gradient(circle_farthest-side_at_100%_100%,#ffc414,transparent),radial-gradient(circle_farthest-side_at_0_0,#1ca0fb,#141316)]',
+          'absolute inset-0 rounded-md z-[1] opacity-30 group-hover:opacity-30 blur-xl  transition duration-500',
+          animate &&
+            ' bg-[radial-gradient(circle_farthest-side_at_0_100%,#00ccb1,transparent),radial-gradient(circle_farthest-side_at_100%_0,#7b61ff,transparent),radial-gradient(circle_farthest-side_at_100%_100%,#ffc414,transparent),radial-gradient(circle_farthest-side_at_0_0,#1ca0fb,#141316)]',
         )}
       />
       <motion.div
@@ -74,4 +85,4 @@ function BackgroundLight({
   );
 }
 
-export default BackgroundLight;
+export default forwardRef(BackgroundLight);

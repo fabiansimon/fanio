@@ -1,3 +1,12 @@
+export enum OperationSystem {
+  WINDOWS,
+  MAC,
+  LINUX,
+  IOS,
+  ANDROID,
+  MISC,
+}
+
 export interface Quiz {
   id: string;
   title: string;
@@ -50,4 +59,9 @@ export interface MetaData {
   title: string;
   length: number;
   imageUri: string;
+}
+
+export interface PaginationData {
+  maxItems: number;
+  pageIndex: number;
 }

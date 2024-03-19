@@ -88,3 +88,7 @@ export const DATA = {
     'Bad Bunny',
   ],
 };
+
+export const PAGE_DATA = {
+  maxItemsOptions: [5, 10, 30, 50],
+};

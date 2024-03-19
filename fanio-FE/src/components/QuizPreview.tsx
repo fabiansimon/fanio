@@ -1,61 +1,84 @@
-import {Text} from '@radix-ui/themes';
+import {Heading, Text} from '@radix-ui/themes';
 import {Quiz} from '../types';
+import {BarChartIcon} from '@radix-ui/react-icons';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
 import BackgroundLight from './BackgroundLight';
 import useMouseEntered from '../hooks/useMouseEntered';
-import {useRef} from 'react';
+import {useMemo, useRef} from 'react';
+import {DateUtils, UI} from '../utils/common';
+
+interface QuizPreviewProps {
+  quiz: Quiz;
+  className?: string;
+  defaultNavigation?: boolean;
+  onClick?: (id: string) => void;
+  onClickScores?: (id: string) => void;
+  invertColors?: boolean;
+}
 
 function QuizPreview({
   quiz,
   defaultNavigation,
+  className,
   onClick,
   onClickScores,
-}: {
-  quiz: Quiz;
-  defaultNavigation?: boolean;
-  onClick?: (id: string) => void;
-  onClickScores?: (id: string) => void;
-}): JSX.Element {
+  invertColors = false,
+}: QuizPreviewProps): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
   const mouseEntered = useMouseEntered(ref);
   const navigate = useNavigate();
-  const {title, description, id} = quiz;
+  const {title, description, id, questions, createdAt} = quiz;
+
+  const {_onClick, _onClickScores} = useMemo(() => {
+    return {
+      _onClick: defaultNavigation
+        ? () => navigate(`${ROUTES.playQuiz}/${id}`)
+        : () => onClick?.(id),
+      _onClickScores: defaultNavigation
+        ? () => navigate(`${ROUTES.quizScores}/${id}`)
+        : () => onClickScores?.(id),
+    };
+  }, [onClick, onClickScores, defaultNavigation, id, navigate]);
+
+  const {textColor, subtitleColor, borderColor, backgroundColor} =
+    useMemo(() => {
+      return {
+        textColor: invertColors ? 'text-black' : 'text-white',
+        subtitleColor: invertColors ? 'text-slate-500' : 'text-white',
+        borderColor: invertColors ? 'border-black/10' : 'border-white/30',
+        backgroundColor: invertColors ? 'bg-white' : 'transparent',
+      };
+    }, [invertColors]);
 
   return (
     <BackgroundLight
-      active={mouseEntered}
-      className="flex cursor-pointer bg-slate-900 rounded-[5px]">
-      <div
-        ref={ref}
-        onClick={() =>
-          defaultNavigation
-            ? navigate(`${ROUTES.playQuiz}/${id}`)
-            : onClick?.(id)
-        }
-        className="flex w-full py-2 px-2 justify-between items-start">
-        <div className="flex flex-col">
-          <div className="flex">
-            <Text size="2" weight="medium" className="text-white">
-              {title}
-            </Text>
-          </div>
-          <Text size="2" className="text-slate-400">
-            {description}
-          </Text>
-        </div>
-      </div>
-      <div
-        onClick={() =>
-          defaultNavigation
-            ? navigate(`${ROUTES.quizScores}/${id}`)
-            : onClickScores?.(id)
-        }
-        className="flex items-center ml-2 text-center border-l px-2">
-        <Text size="1" weight="medium" className="text-white">
-          see scores
+      ref={ref}
+      animate={!invertColors && mouseEntered}
+      className={UI.cn(
+        'flex w-full flex-col min-h-14 cursor-pointer justify-center space-y-1 border px-2 py-1.5 rounded-lg',
+        borderColor,
+        backgroundColor,
+        className,
+      )}
+      onClick={_onClick}>
+      <Heading weight={'medium'} className={textColor} size={'2'}>
+        {title}
+      </Heading>
+      <div className="flex flex-row justify-between w-full">
+        <Text className={subtitleColor} size={'1'}>
+          {`${questions.length} Questions`}
+        </Text>
+        <Text className={subtitleColor} size={'1'}>
+          {DateUtils.formatDate(createdAt, true)}
         </Text>
       </div>
+      {/* <div>
+          <BarChartIcon className="text-white" />
+          <Text size={'1'} className="text-white">
+            scores
+          </Text>
+        </div> */}
     </BackgroundLight>
   );
 }

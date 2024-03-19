@@ -87,3 +87,17 @@ export async function searchQuizByTerm(term: string): Promise<Quiz[] | []> {
     throw error;
   }
 }
+
+export async function fetchTopQuizzes(
+  page: number = 0,
+  size: number = 10,
+): Promise<{content: Quiz[] | []; totalElements: number}> {
+  try {
+    const res = await _axios.get(`/quizzes?page=${page}&size=${size}`);
+    return res.data;
+  } catch (error) {
+    console.error('Failed to fetch all quizzes:', error);
+    ToastController.showErrorToast();
+    throw error;
+  }
+}
