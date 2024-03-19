@@ -30,9 +30,21 @@ function SearchResultsContainer({
   searchResults,
 }: SearchResultContainerProps): JSX.Element {
   const {title, description} = useMemo(() => {
+    let title = '';
+    let description = ',';
+
+    const amount = searchResults?.length;
+    if (!amount) {
+      title = 'Oh no 🙃';
+      description = "I'm sorry we weren't able to find anything.";
+    } else {
+      title = 'Results';
+      description = `${amount} matching ${amount === 1 ? 'quiz' : 'quizzes'}`;
+    }
+
     return {
-      title: `Search results`,
-      description: `${searchResults?.length} quizzes found.`,
+      title,
+      description,
     };
   }, [searchResults]);
   return (

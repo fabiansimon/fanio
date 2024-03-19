@@ -28,7 +28,7 @@ function QuizPreview({
   const ref = useRef<HTMLDivElement>(null);
   const mouseEntered = useMouseEntered(ref);
   const navigate = useNavigate();
-  const {title, description, id, questions, createdAt} = quiz;
+  const {title, id, questions, createdAt} = quiz;
 
   const {_onClick, _onClickScores} = useMemo(() => {
     return {
@@ -45,41 +45,52 @@ function QuizPreview({
     useMemo(() => {
       return {
         textColor: invertColors ? 'text-black' : 'text-white',
-        subtitleColor: invertColors ? 'text-slate-500' : 'text-white',
-        borderColor: invertColors ? 'border-black/10' : 'border-white/30',
+        subtitleColor: invertColors ? 'text-slate-500' : 'text-white/80',
+        borderColor: invertColors ? 'border-slate-200/60' : 'border-white/10',
         backgroundColor: invertColors ? 'bg-white' : 'transparent',
       };
     }, [invertColors]);
 
   return (
-    <BackgroundLight
-      ref={ref}
-      animate={!invertColors && mouseEntered}
-      className={UI.cn(
-        'flex w-full flex-col min-h-14 cursor-pointer justify-center space-y-1 border px-2 py-1.5 rounded-lg',
-        borderColor,
-        backgroundColor,
-        className,
-      )}
-      onClick={_onClick}>
-      <Heading weight={'medium'} className={textColor} size={'2'}>
-        {title}
-      </Heading>
-      <div className="flex flex-row justify-between w-full">
-        <Text className={subtitleColor} size={'1'}>
-          {`${questions.length} Questions`}
-        </Text>
-        <Text className={subtitleColor} size={'1'}>
-          {DateUtils.formatDate(createdAt, true)}
+    <div className="flex w-full">
+      <BackgroundLight
+        ref={ref}
+        containerClassName="w-full"
+        animate={!invertColors && mouseEntered}
+        className={UI.cn(
+          'flex w-full flex-col min-h-14 cursor-pointer justify-center space-y-1 border px-2 py-1.5 rounded-lg',
+          'hover:scale-[101%] transition-transform duration-150 ease-in-out cursor-pointer',
+          borderColor,
+          backgroundColor,
+          className,
+        )}
+        onClick={_onClick}>
+        <Heading weight={'medium'} className={textColor} size={'2'}>
+          {title}
+        </Heading>
+        <div className="flex flex-row justify-between w-full">
+          <Text className={subtitleColor} size={'1'}>
+            {`${questions.length} Questions`}
+          </Text>
+          <Text className={subtitleColor} size={'1'}>
+            {DateUtils.formatDate(createdAt, true)}
+          </Text>
+        </div>
+      </BackgroundLight>
+      <div
+        onClick={_onClickScores}
+        className={UI.cn(
+          'rounded-md border ml-1 cursor-pointer w-16 flex flex-col items-center align-middle justify-center',
+          'hover:scale-[105%] transition-transform duration-150 ease-in-out cursor-pointer',
+          backgroundColor,
+          borderColor,
+        )}>
+        <BarChartIcon className={textColor} />
+        <Text size={'1'} className={UI.cn('pt-1', subtitleColor)}>
+          scores
         </Text>
       </div>
-      {/* <div>
-          <BarChartIcon className="text-white" />
-          <Text size={'1'} className="text-white">
-            scores
-          </Text>
-        </div> */}
-    </BackgroundLight>
+    </div>
   );
 }
 

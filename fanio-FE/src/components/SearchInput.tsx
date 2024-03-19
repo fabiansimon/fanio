@@ -16,11 +16,18 @@ const DEBOUNCE_TIMEOUT = 500;
 
 interface SearchInputProps {
   className?: string;
+  title?: string;
+  subtitle?: string;
   setSearchResult: (resultData: Quiz[] | null) => void;
 }
 
 function SearchInput(
-  {className, setSearchResult}: SearchInputProps,
+  {
+    className,
+    setSearchResult,
+    title = 'Looking for anything specific?',
+    subtitle = 'Search for artists, titles or even possible song titles',
+  }: SearchInputProps,
   ref: any,
 ): JSX.Element {
   const [input, setInput] = useState<string | null>();
@@ -77,10 +84,10 @@ function SearchInput(
   return (
     <div className={UI.cn('flex flex-col', className)}>
       <Heading size={'3'} weight="medium" className="text-white">
-        Looking for anything specific?
+        {title}
       </Heading>
       <Text size={'2'} className="text-neutral-500">
-        search for artists, titles or even possible song titles
+        {subtitle}
       </Text>
       <div className="h-2" />
       <div className="flex relative">

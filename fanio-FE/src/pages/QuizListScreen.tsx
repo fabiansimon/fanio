@@ -1,45 +1,76 @@
-import {useEffect, useState} from 'react';
-import {Quiz} from '../types';
+import {useCallback, useEffect, useState} from 'react';
+import {PaginatedQuizData, PaginationState, Quiz} from '../types';
 import {fetchAllQuizzes} from '../utils/api';
-import QuizPreview from '../components/QuizPreview';
 import {useNavigate} from 'react-router-dom';
-import ROUTES from '../constants/Routes';
+import {Heading, Link} from '@radix-ui/themes';
+import SearchInput from '../components/SearchInput';
+import PaginationBar from '../components/PaginationBar';
+import {ArrowLeftIcon} from '@radix-ui/react-icons';
+import QuizList from '../components/QuizList';
+import {PAGE_DATA} from '../constants/Data';
 
 function QuizListScreen(): JSX.Element {
-  const [quizzes, setQuizzes] = useState<Quiz[] | null>(null);
+  const [quizData, setQuizData] = useState<PaginatedQuizData | null>();
+  const [searchResults, setSearchResult] = useState<Quiz[] | null>(null);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    maxItems: PAGE_DATA.maxItemsOptions[0],
+  });
+
   const navigation = useNavigate();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetchAllQuizzes();
-        setQuizzes(res);
-      } catch (error) {
-        console.error(error);
-      }
-    })();
+  const loadQuizzes = useCallback(async () => {
+    try {
+      const {pageIndex, maxItems} = pagination;
+      const {totalElements, content} = await fetchAllQuizzes(
+        pageIndex,
+        maxItems,
+      );
+      setQuizData({totalElements, content});
+    } catch (error) {
+      console.error(error);
+    }
+  }, [pagination]);
+
+  const handlePaginationChange = useCallback((data: PaginationState) => {
+    setPagination(data);
   }, []);
 
-  const handleNavigation = (id: string) => {
-    navigation(`${ROUTES.playQuiz}/${id}`);
-  };
-
-  const handleScoreNavigation = (id: string) => {
-    navigation(`${ROUTES.quizScores}/${id}`);
-  };
+  useEffect(() => {
+    (async () => loadQuizzes())();
+  }, [loadQuizzes]);
 
   return (
-    <div className="flex flex-col w-full h-screen bg-slate-950 items-center justify-center">
-      <div className="flex flex-col w-full px-20 space-y-2">
-        {quizzes?.map((q, i) => (
-          <QuizPreview
-            onClick={handleNavigation}
-            onClickScores={handleScoreNavigation}
-            key={i}
-            quiz={q}
+    <div className="flex flex-col bg-slate-950  w-full h-screen justify-between pb-12 px-10">
+      <div>
+        <div className="mt-12 w-full">
+          <ArrowLeftIcon
+            onClick={() => navigation(-1)}
+            className="size-6 cursor-pointer text-white mb-1"
           />
-        ))}
+          <Heading size={'7'} className="text-white text-left ">
+            All Quizzes
+          </Heading>
+          <Heading
+            size={'4'}
+            weight={'light'}
+            className="text-neutral-500 pr-2">
+            If you can't find something that you like, just go ahead and create
+            it.
+          </Heading>
+        </div>
+        <SearchInput
+          title=""
+          subtitle="Filter Results"
+          setSearchResult={setSearchResult}
+          className="mt-5"
+        />
+        <QuizList data={searchResults || quizData?.content || []} />
       </div>
+      <PaginationBar
+        totalElements={quizData?.totalElements || 0}
+        onValueChange={handlePaginationChange}
+      />
     </div>
   );
 }

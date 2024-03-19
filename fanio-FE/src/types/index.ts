@@ -61,7 +61,31 @@ export interface MetaData {
   imageUri: string;
 }
 
-export interface PaginationData {
+export interface PaginationState {
   maxItems: number;
   pageIndex: number;
+}
+
+export interface PaginatedQuizData {
+  totalElements: number;
+  content: Quiz[];
+}
+
+export interface GameStatistic {
+  totalGames: {
+    title: string;
+    amount: number;
+  };
+  totalGuesses: {
+    title: string;
+    amount: number;
+  };
+  totalSongs: {
+    title: string;
+    amount: number;
+  };
+  totalTimeSpent: {
+    title: string;
+    amount: number;
+  };
 }

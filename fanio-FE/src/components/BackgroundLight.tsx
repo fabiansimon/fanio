@@ -25,9 +25,11 @@ function BackgroundLight(
   const variants = {
     initial: {
       backgroundPosition: '0 0%',
+      borderOpacity: 0,
     },
     animate: {
       backgroundPosition: ['0, 50%', '100% 50%', '0 50%'],
+      borderOpacity: 1,
     },
   };
   return (

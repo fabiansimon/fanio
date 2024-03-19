@@ -2,10 +2,9 @@ import {useCallback, useEffect, useState} from 'react';
 import {UI} from '../utils/common';
 import PaginationBar from './PaginationBar';
 import QuizList from './QuizList';
-import {PaginationData, Quiz} from '../types';
+import {PaginatedQuizData, PaginationState} from '../types';
 import {fetchTopQuizzes} from '../utils/api';
 import Loading from './Loading';
-import {PAGE_DATA} from '../constants/Data';
 
 interface TopQuizListProps {
   className?: string;
@@ -13,13 +12,10 @@ interface TopQuizListProps {
 
 function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [quizData, setQuizData] = useState<{
-    quizzes: Quiz[];
-    totalElements: number;
-  } | null>(null);
+  const [quizData, setQuizData] = useState<PaginatedQuizData | null>(null);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    maxItems: PAGE_DATA.maxItemsOptions[0],
+    maxItems: 5,
   });
 
   const loadQuizzes = useCallback(async () => {
@@ -30,8 +26,8 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
         maxItems,
       );
       setQuizData({
-        quizzes: content,
-        totalElements: totalElements,
+        content,
+        totalElements,
       });
     } catch (error) {
       console.error(error);
@@ -40,7 +36,7 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
     }
   }, [pagination]);
 
-  const handlePaginationChange = useCallback((data: PaginationData) => {
+  const handlePaginationChange = useCallback((data: PaginationState) => {
     setPagination(data);
   }, []);
 
@@ -54,9 +50,10 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
         <Loading className="size-10 self-center my-auto" />
       ) : (
         <>
-          <QuizList data={quizData?.quizzes || []} className="mt-4" />
+          <QuizList data={quizData?.content || []} className="mt-4" />
           <PaginationBar
             disableItemsSelector
+            initialState={{maxItems: 5, pageIndex: 0}}
             totalElements={quizData?.totalElements || 0}
             onValueChange={handlePaginationChange}
             className="ml-auto"

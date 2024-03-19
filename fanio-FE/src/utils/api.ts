@@ -1,5 +1,12 @@
 import axios from 'axios';
-import {MetaData, Quiz, QuizInput, Score, ScoreInput} from '../types/index';
+import {
+  MetaData,
+  PaginatedQuizData,
+  Quiz,
+  QuizInput,
+  Score,
+  ScoreInput,
+} from '../types/index';
 import ToastController from '../providers/ToastController';
 import {sanitizeTerm} from './logic';
 const BASE_URL = 'http://localhost:8080/api';
@@ -53,10 +60,13 @@ export async function fetchScoresFromQuiz(quizId: string) {
   }
 }
 
-export async function fetchAllQuizzes() {
+export async function fetchAllQuizzes(
+  page: number = 0,
+  size: number = 10,
+): Promise<{content: Quiz[] | []; totalElements: number}> {
   try {
-    const res = await _axios.get(`/quizzes`);
-    return res.data.content;
+    const res = await _axios.get(`/quizzes?page=${page}&size=${size}`);
+    return res.data;
   } catch (error) {
     console.error('Failed to fetch all quizzes:', error);
     ToastController.showErrorToast();
@@ -91,7 +101,7 @@ export async function searchQuizByTerm(term: string): Promise<Quiz[] | []> {
 export async function fetchTopQuizzes(
   page: number = 0,
   size: number = 10,
-): Promise<{content: Quiz[] | []; totalElements: number}> {
+): Promise<PaginatedQuizData> {
   try {
     const res = await _axios.get(`/quizzes?page=${page}&size=${size}`);
     return res.data;

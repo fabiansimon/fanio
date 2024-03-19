@@ -35,7 +35,7 @@ function Container({
       className={UI.cn(
         'rounded-3xl shadow-2xl flex border-2 flex-col px-5 py-4',
         onClick &&
-          'hover:scale-a[98%] transition-transform duration-150 ease-in-out cursor-pointer',
+          'hover:scale-[98%] transition-transform duration-150 ease-in-out cursor-pointer',
         className,
       )}>
       <div className="flex justify-between">

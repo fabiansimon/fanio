@@ -2,15 +2,16 @@ import {Select, Text} from '@radix-ui/themes';
 import {UI} from '../utils/common';
 import {ChevronLeftIcon, ChevronRightIcon} from '@radix-ui/react-icons';
 import {useEffect, useMemo, useState} from 'react';
-import {PaginationData} from '../types/index';
+import {PaginationState} from '../types/index';
 import {PAGE_DATA} from '../constants/Data';
 
 interface PaginationBarProps {
   totalElements: number;
-  onValueChange: (data: PaginationData) => void;
+  onValueChange: (data: PaginationState) => void;
   className?: string;
   disableItemsSelector?: boolean;
   disablePageSelector?: boolean;
+  initialState?: PaginationState;
 }
 
 interface PageSelectorProps {
@@ -22,15 +23,18 @@ interface PageSelectorProps {
 
 function PaginationBar({
   totalElements,
+  initialState,
   onValueChange,
   className,
   disableItemsSelector,
   disablePageSelector,
 }: PaginationBarProps): JSX.Element {
   const [maxItems, setMaxItems] = useState<number>(
-    PAGE_DATA.maxItemsOptions[0],
+    initialState?.maxItems || PAGE_DATA.maxItemsOptions[0],
   );
-  const [pageIndex, setPageIndex] = useState<number>(0);
+  const [pageIndex, setPageIndex] = useState<number>(
+    initialState?.pageIndex || 0,
+  );
 
   useEffect(() => {
     onValueChange({
@@ -41,11 +45,6 @@ function PaginationBar({
 
   return (
     <div className={UI.cn('flex justify-between w-full h-10', className)}>
-      {!disableItemsSelector ? (
-        <MaxItemsSelector onValueChange={setMaxItems} />
-      ) : (
-        <div />
-      )}
       {!disablePageSelector && (
         <PageSelector
           onValueChange={setPageIndex}
@@ -53,6 +52,11 @@ function PaginationBar({
           maxItems={maxItems}
           totalElements={totalElements}
         />
+      )}
+      {!disableItemsSelector ? (
+        <MaxItemsSelector onValueChange={setMaxItems} />
+      ) : (
+        <div />
       )}
     </div>
   );
@@ -90,7 +94,7 @@ function PageSelector({
       )}
       {currPage < maxLength - 1 && (
         <>
-          <div className="w-2" />
+          <div className="text-white mt-3 px-1">...</div>
           <div onClick={() => onValueChange(maxLength - 1)} className={style}>
             <Text className="text-slate-600" size={'2'}>
               {maxLength}

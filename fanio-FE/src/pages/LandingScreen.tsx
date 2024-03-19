@@ -5,12 +5,12 @@ import SearchContainer from '../components/SearchInput';
 import {DATA} from '../constants/Data';
 import Marquee from 'react-fast-marquee';
 import Container from '../components/Container';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useMemo, useRef, useState} from 'react';
 import {motion} from 'framer-motion';
 import {Quiz} from '../types';
-import {fetchTopQuizzes} from '../utils/api';
 import SearchResultsContainer from '../components/SearchResultsContainer';
 import TopQuizListContainer from '../components/TopQuizListContainer';
+import AllGamesContainer from '../components/AllGamesContainer';
 
 interface MenuOptions {
   title: string;
@@ -45,34 +45,41 @@ function LandingScreen(): JSX.Element {
       {
         title: 'Todays top quizzes',
         description:
-          "If you can't see anything you like, you can always search for it or even create it",
-        className: 'bg-blue-500 w-full h-full border-blue-700',
+          "If you can't see anything you like, you can always search for it or just create it.",
+        className:
+          'bg-gradient-to-b from-blue-600 to-blue-500 w-full h-full border-blue-700',
         content: <TopQuizListContainer />,
       },
       {
         title: 'All Games',
+        description: 'Check out what we have to offer so far.',
         onPress: () => navigation(ROUTES.listQuizzes),
         hotkey: 'A',
-        className: 'bg-green-600 border-green-900',
+        className:
+          'bg-gradient-to-b from-green-600 to-green-500 border-green-900',
+        content: <AllGamesContainer />,
       },
       {
         title: 'Create Game',
+        description: 'Join the community and challenge your peers!',
         onPress: () => navigation(ROUTES.createQuiz),
         hotkey: 'C',
-        className: 'bg-violet-700 border-violet-900 ',
+        className:
+          'bg-gradient-to-b from-violet-700 to-violet-500 border-violet-900 ',
       },
       {
         title: 'Leaderboard',
         onPress: () => navigation(ROUTES.createQuiz),
         hotkey: 'L',
-        className: 'bg-red-600 border-red-900 col-span-2',
+        className:
+          'bg-gradient-to-b from-red-600 to-red-500 border-red-900 col-span-2 row-span-6',
       },
     ],
     [navigation],
   );
 
   return (
-    <div className="flex flex-col space-y-2 items-center bg-slate-950 w-full h-screen">
+    <div className="flex flex-col space-y-2 bg-slate-950 items-center w-full h-screen">
       <div className="mt-12  flex w-full px-12">
         <Heading size={'9'} className="text-white text-left ">
           Fanio 🎤
@@ -82,7 +89,7 @@ function LandingScreen(): JSX.Element {
       <SearchContainer
         ref={searchRef}
         setSearchResult={setSearchResult}
-        className="flex h-[50%] justify-center px-[30%]"
+        className="flex h-[50%] justify-center"
       />
       <SearchResultsContainer
         onBack={() => searchRef.current?.clearSearch()}
@@ -104,7 +111,8 @@ function LandingScreen(): JSX.Element {
         />
         <div className="grid grid-cols-2 gap-2 w-full">
           {MENU_OPTIONS.slice(1).map((option, index) => {
-            const {hotkey, title, description, onPress, className} = option;
+            const {hotkey, title, description, onPress, className, content} =
+              option;
             return (
               <Container
                 hotkey={hotkey}
@@ -113,6 +121,7 @@ function LandingScreen(): JSX.Element {
                 description={description}
                 onClick={onPress}
                 className={className}
+                content={content}
               />
             );
           })}
