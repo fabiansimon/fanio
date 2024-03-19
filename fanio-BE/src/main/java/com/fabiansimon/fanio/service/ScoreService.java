@@ -22,6 +22,14 @@ public class ScoreService {
         return scoreRepository.findByQuizId(pageable, quizId);
     }
 
+    public Integer getTotalTimeElapsed() {
+        return (int) (scoreRepository.countTotalTimeElapsed() / 60);
+    }
+
+    public Integer getTotalGuesses() {
+        return scoreRepository.countTotalGuesses();
+    }
+
     public Score saveScore(Score score) {
         return scoreRepository.save(score);
     }

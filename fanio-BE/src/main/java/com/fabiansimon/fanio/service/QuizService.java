@@ -26,6 +26,9 @@ public class QuizService {
     public Page<Quiz> getQuizzesByTerm(Pageable pageable, String term) {
         return quizRepository.findByTitleContainingIgnoreCase(term, pageable);
     }
+    public Integer getQuizzesCount() {
+        return (int) quizRepository.count();
+    };
 
     public Optional<Quiz> getQuiz(UUID id) {
         return quizRepository.findById(id);

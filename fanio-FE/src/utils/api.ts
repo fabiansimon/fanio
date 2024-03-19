@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {
+  GameStatistic,
   MetaData,
   PaginatedQuizData,
   Quiz,
@@ -104,6 +105,17 @@ export async function fetchTopQuizzes(
 ): Promise<PaginatedQuizData> {
   try {
     const res = await _axios.get(`/quizzes?page=${page}&size=${size}`);
+    return res.data;
+  } catch (error) {
+    console.error('Failed to fetch all quizzes:', error);
+    ToastController.showErrorToast();
+    throw error;
+  }
+}
+
+export async function fetchGameStatistic(): Promise<GameStatistic> {
+  try {
+    const res = await _axios.get('/statistic');
     return res.data;
   } catch (error) {
     console.error('Failed to fetch all quizzes:', error);

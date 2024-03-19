@@ -1,4 +1,4 @@
-package com.fabiansimon.fanio.model;
+package com.fabiansimon.fanio.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class MetaData {
+public class MetaResponseDTO {
     private String title;
     private String imageUri;
     private Integer length;

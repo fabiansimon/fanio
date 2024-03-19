@@ -72,20 +72,8 @@ export interface PaginatedQuizData {
 }
 
 export interface GameStatistic {
-  totalGames: {
-    title: string;
-    amount: number;
-  };
-  totalGuesses: {
-    title: string;
-    amount: number;
-  };
-  totalSongs: {
-    title: string;
-    amount: number;
-  };
-  totalTimeSpent: {
-    title: string;
-    amount: number;
-  };
+  totalQuizzes: number;
+  totalGuesses: number;
+  totalSongs: number;
+  totalTime: number;
 }

@@ -1,7 +1,12 @@
 package com.fabiansimon.fanio.controller;
 
+import com.fabiansimon.fanio.DTO.GameStatisticDTO;
 import com.fabiansimon.fanio.DTO.MetaRequestDTO;
-import com.fabiansimon.fanio.model.MetaData;
+import com.fabiansimon.fanio.DTO.MetaResponseDTO;
+import com.fabiansimon.fanio.service.QuestionService;
+import com.fabiansimon.fanio.service.QuizService;
+import com.fabiansimon.fanio.service.ScoreService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -9,14 +14,36 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 @RequestMapping("/api")
 public class MetaDataController {
+    @Autowired
+    QuestionService questionService = new QuestionService();
+    @Autowired
+    QuizService quizService = new QuizService();
+    @Autowired
+    ScoreService scoreService = new ScoreService();
+
+
+    @GetMapping("/statistic")
+    public ResponseEntity<GameStatisticDTO> fetchTotalGameStatistic() {
+        try {
+            GameStatisticDTO gameStatistic = new GameStatisticDTO();
+            gameStatistic.setTotalQuizzes(quizService.getQuizzesCount());
+            gameStatistic.setTotalSongs(questionService.getDistinctSongsCount());
+            gameStatistic.setTotalTime(scoreService.getTotalTimeElapsed());
+            gameStatistic.setTotalGuesses(scoreService.getTotalGuesses());
+            return ResponseEntity.ok(gameStatistic);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @PostMapping("/strip-meta")
-    public ResponseEntity<?> stripMetaOfYoutube(@RequestBody MetaRequestDTO requestDTO) {
+    public ResponseEntity<MetaResponseDTO> stripMetaOfYoutube(@RequestBody MetaRequestDTO requestDTO) {
         try {
             RestTemplate template = new RestTemplate();
             ResponseEntity<String> res = template.getForEntity(requestDTO.getUrl(), String.class);
             String body = res.getBody();
 
-            MetaData metaData = new MetaData();
+            MetaResponseDTO metaData = new MetaResponseDTO();
             String title = cleanRawTitle(stripTitle(body));
             String imageUri = extractThumbnail(body);
             Integer length = extractLength(body);
@@ -27,7 +54,7 @@ public class MetaDataController {
 
             return ResponseEntity.ok(metaData);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("");
+            return ResponseEntity.internalServerError().build();
         }
     }
 
