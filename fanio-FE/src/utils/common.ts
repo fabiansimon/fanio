@@ -29,12 +29,21 @@ export class DateUtils {
   static formatSeconds(seconds: number, postfix: string = '') {
     return `${new Date(seconds * 1000)
       .toISOString()
-      .substring(14, 19)}${postfix}`;
+      .substring(14, 19)} ${postfix}`;
   }
 }
 
 export class UI {
   static cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
+  }
+
+  static formatPoints(points: number) {
+    const formattedPoints = new Intl.NumberFormat('de-DE', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(points);
+
+    return `${formattedPoints} pts`;
   }
 }

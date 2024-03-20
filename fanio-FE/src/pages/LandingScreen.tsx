@@ -82,7 +82,7 @@ function LandingScreen(): JSX.Element {
     <div className="flex flex-col space-y-2 bg-slate-950 items-center w-full h-screen">
       <div className="mt-12 flex w-full px-12">
         <Heading size={'9'} className="text-white ">
-          Fanio 🎤
+          Fan.io 🎤
         </Heading>
       </div>
       <MarqueeContainer className="pt-4" />
