@@ -6,9 +6,15 @@ import {
   useState,
   useMemo,
 } from 'react';
+import {
+  CrossCircledIcon,
+  CheckCircledIcon,
+  QuestionMarkCircledIcon,
+} from '@radix-ui/react-icons';
 import ToastController from '../providers/ToastController';
-import {Text} from '@radix-ui/themes';
+import {Heading, Text} from '@radix-ui/themes';
 import {motion} from 'framer-motion';
+import {UI} from '../utils/common';
 
 interface ModalInfo {
   title?: string;
@@ -39,7 +45,7 @@ function Toast(): JSX.Element {
     hidden: {opacity: 0, x: 100},
   };
 
-  const {backgroundColor, defaultMessage} = useMemo(() => {
+  const {backgroundColor, defaultMessage, icon} = useMemo(() => {
     if (!info)
       return {
         backgroundColor: undefined,
@@ -48,7 +54,12 @@ function Toast(): JSX.Element {
 
     const {type} = info;
     return {
-      backgroundColor: ['red', 'orange', 'green'][type],
+      icon: [
+        <CrossCircledIcon className="text-white size-6" />,
+        <QuestionMarkCircledIcon className="text-white size-6" />,
+        <CheckCircledIcon className="text-white size-6" />,
+      ][type],
+      backgroundColor: ['bg-red-600', 'bg-orange-500', 'bg-green-600'][type],
       defaultMessage: ['Something went wrong', 'Warning', 'Success'][type],
     };
   }, [info]);
@@ -57,7 +68,6 @@ function Toast(): JSX.Element {
     setTimeout(() => {
       setIsVisible(false);
     }, AUTOCLOSE_DURATION);
-
     setTimeout(() => {
       setInfo(null);
     }, AUTOCLOSE_DURATION + ANIMATION_DURATION * 1000);
@@ -92,9 +102,19 @@ function Toast(): JSX.Element {
         damping: 10,
         mass: 1,
       }}
-      className="absolute z-10 right-10 bottom-10 p-4 rounded-md">
-      <Text>{info?.title || defaultMessage}</Text>
-      <Text>{info?.description}</Text>
+      className={UI.cn(
+        'absolute z-10 right-10 bottom-10 p-4 rounded-md flex items-center space-x-3',
+        backgroundColor,
+      )}>
+      {icon}
+      <div>
+        <Heading className="text-white" weight={'bold'} size={'2'}>
+          {info?.title || defaultMessage}
+        </Heading>
+        <Text size={'2'} weight={'light'} className="text-white/90">
+          {info?.description}
+        </Text>
+      </div>
     </motion.div>
   );
 }

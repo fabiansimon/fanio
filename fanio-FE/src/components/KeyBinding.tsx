@@ -7,20 +7,25 @@ import {OperationSystem} from '../types';
 function KeyBinding({
   hotkey,
   onActivate,
+  ignoreMetaKey,
+  className,
 }: {
   hotkey: string;
   onActivate?: () => void;
+  ignoreMetaKey?: boolean;
+  className?: string;
 }): JSX.Element {
-  useKeyShortcut(hotkey, () => onActivate && onActivate());
+  useKeyShortcut(hotkey, () => onActivate && onActivate(), ignoreMetaKey);
   const OS = useDetectOS();
 
   const metaKey = useMemo(() => {
+    if (ignoreMetaKey) return '';
     if (OS === OperationSystem.IOS || OS === OperationSystem.ANDROID) return;
     if (OS === OperationSystem.MAC) return '⌘';
     return 'Ctrl';
-  }, [OS]);
+  }, [OS, ignoreMetaKey]);
 
-  return <Kbd>{`${metaKey}${hotkey}`}</Kbd>;
+  return <Kbd className={className}>{`${metaKey}${hotkey}`}</Kbd>;
 }
 
 export default KeyBinding;

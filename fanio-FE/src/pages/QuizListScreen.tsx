@@ -8,6 +8,7 @@ import PaginationBar from '../components/PaginationBar';
 import {ArrowLeftIcon} from '@radix-ui/react-icons';
 import QuizList from '../components/QuizList';
 import {PAGE_DATA} from '../constants/Data';
+import PageContainer from '../components/PageContainer';
 
 function QuizListScreen(): JSX.Element {
   const [quizData, setQuizData] = useState<PaginatedQuizData | null>();
@@ -41,25 +42,12 @@ function QuizListScreen(): JSX.Element {
   }, [loadQuizzes]);
 
   return (
-    <div className=" bg-slate-950 flex items-center justify-center">
-      <div className="flex flex-col max-w-screen-xl justify-between  w-full h-screen pb-12 px-10">
+    <PageContainer
+      title="All Quizzes"
+      description="If you can't find something that you like, just go ahead and create
+    it.">
+      <div className="flex flex-col h-full justify-between">
         <div>
-          <div className="mt-12 w-full">
-            <ArrowLeftIcon
-              onClick={() => navigation(-1)}
-              className="size-6 cursor-pointer text-white mb-1"
-            />
-            <Heading size={'7'} className="text-white text-left ">
-              All Quizzes
-            </Heading>
-            <Heading
-              size={'4'}
-              weight={'light'}
-              className="text-neutral-500 pr-2">
-              If you can't find something that you like, just go ahead and
-              create it.
-            </Heading>
-          </div>
           <SearchInput
             title=""
             subtitle="Filter Results"
@@ -73,7 +61,7 @@ function QuizListScreen(): JSX.Element {
           onValueChange={handlePaginationChange}
         />
       </div>
-    </div>
+    </PageContainer>
   );
 }
 

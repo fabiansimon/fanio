@@ -119,10 +119,7 @@ function MaxItemsSelector({
       <Select.Content position="popper">
         <Select.Group>
           {PAGE_DATA.maxItemsOptions.map((m, i) => (
-            <Select.Item
-              key={i}
-              value={m.toString()}
-              onClickCapture={() => console.log('jlökasj')}>
+            <Select.Item key={i} value={m.toString()}>
               {m}
             </Select.Item>
           ))}
