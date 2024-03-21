@@ -1,16 +1,17 @@
-import {Button as RadixButton, Kbd, Text} from '@radix-ui/themes';
+import React, {useMemo} from 'react';
+import {Button as RadixButton, Kbd, Text, Responsive} from '@radix-ui/themes';
 import useKeyShortcut from '../hooks/useKeyShortcut';
 import KeyBinding from './KeyBinding';
 import {UI} from '../utils/common';
+import {ButtonType} from '../types';
 
-interface ButtonProps extends React.HTMLProps<HTMLDivElement> {
+interface ButtonProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   hotkey?: string;
-  children?: React.ReactNode;
-  disabled: boolean;
-  rest: any;
+  textSize?: string;
+  type?: ButtonType;
   text?: string;
-  ignoreMetaKey: boolean;
-  className?: string;
+  ignoreMetaKey?: boolean;
 }
 
 function Button({
@@ -19,18 +20,32 @@ function Button({
   disabled = false,
   text,
   ignoreMetaKey = false,
+  textSize = '3',
+  type,
+  icon,
   className,
   ...rest
 }: any): JSX.Element {
+  const customClass = useMemo(() => {
+    if (type === ButtonType.outline)
+      return 'bg-transparent border border-neutral-700';
+
+    return 'bg-blue-600';
+  }, [type]);
+
   return (
     <button
+      {...rest}
       disabled={disabled}
-      onClick={rest.onClick}
       className={UI.cn(
-        'bg-primary-700 flex bg-blue-600 px-10 py-2 rounded-xl items-center justify-center',
+        `flex px-10 py-2 rounded-xl items-center justify-center ${
+          disabled && 'opacity-50'
+        }`,
+        customClass,
         className,
       )}>
-      <Text size={'3'} className="text-white">
+      {icon && icon}
+      <Text size={textSize} className="text-white">
         {text}
       </Text>
       {children}

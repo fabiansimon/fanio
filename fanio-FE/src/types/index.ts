@@ -77,3 +77,9 @@ export interface GameStatistic {
   totalSongs: number;
   totalTime: number;
 }
+
+export enum ButtonType {
+  primary,
+  secondary,
+  outline,
+}

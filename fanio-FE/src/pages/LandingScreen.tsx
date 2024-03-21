@@ -51,7 +51,7 @@ function LandingScreen(): JSX.Element {
         content: <TopQuizListContainer />,
       },
       {
-        title: 'All Games',
+        title: 'All Quizzes',
         description: 'Check out what we have to offer so far.',
         onPress: () => navigation(ROUTES.listQuizzes),
         hotkey: 'A',
@@ -60,7 +60,7 @@ function LandingScreen(): JSX.Element {
         content: <AllGamesContainer />,
       },
       {
-        title: 'Create Game',
+        title: 'Create Quiz',
         description: 'Join the community and challenge your peers!',
         onPress: () => navigation(ROUTES.createQuiz),
         hotkey: 'C',

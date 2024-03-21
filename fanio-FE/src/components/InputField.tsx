@@ -1,16 +1,30 @@
 import {useMotionTemplate, useMotionValue, motion} from 'framer-motion';
 import {UI} from '../utils/common';
-import {LegacyRef, forwardRef, useEffect, useState} from 'react';
+import {forwardRef, useEffect, useState} from 'react';
 import Loading from './Loading';
 
 export interface InputFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
-  ref?: LegacyRef<HTMLInputElement> | undefined;
   isLoading?: boolean;
+  showSimple?: boolean;
 }
 
+const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
+  (props, ref) => (
+    <input
+      {...props}
+      ref={ref}
+      type="text"
+      className={UI.cn(
+        'relative bg-transparent pb-1 flex w-full text-2xl text-white font-medium text-left focus:outline-none focus:border-b-2 focus:border-white/70 border-b-2 border-b-white/10 placeholder-neutral-600',
+        props.className,
+      )}
+    />
+  ),
+);
+
 function InputField(
-  {className, type, isLoading = false, ...props}: InputFieldProps,
+  {className, showSimple, type, isLoading = false, ...props}: InputFieldProps,
   ref: any,
 ) {
   const radius = 100;
@@ -30,6 +44,8 @@ function InputField(
     mouseY.set(clientY - top);
   };
 
+  if (showSimple) return <SimpleInputField {...props} className={className} />;
+
   return (
     <motion.div
       style={{
@@ -46,6 +62,7 @@ function InputField(
       onMouseLeave={() => setVisible(false)}
       className={UI.cn(
         'p-[2px] flex rounded-lg transition duration-300 w-full group/input',
+        className,
       )}>
       <div
         className="flex items-center h-10 w-full border-none bg-gray-500 dark:bg-zinc-800 text-black dark:text-white shadow-input rounded-md text-sm  file:border-0 file:bg-transparent 
@@ -56,7 +73,6 @@ function InputField(
           type={type}
           className={UI.cn(
             'flex px-3 py-2 h-10 w-full bg-transparent outline-none',
-            className,
           )}
           ref={ref}
           {...props}

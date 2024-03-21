@@ -9,6 +9,7 @@ import Button from '../components/Button';
 import {Heading, Text} from '@radix-ui/themes';
 import {DateUtils, UI} from '../utils/common';
 import {similarity} from '../utils/logic';
+import InputField from '../components/InputField';
 
 interface ScoreState {
   totalScore: number;
@@ -125,15 +126,13 @@ function PlayQuizScreen({}): JSX.Element {
             url={question.url}
           />
         )}
-        <div className="px-[10%]">
-          <input
+        <div>
+          <InputField
+            showSimple
             onInput={handleInput}
             value={input}
             ref={inputRef}
-            type="text"
-            className="relative bg-transparent flex w-full text-[36px] text-white font-medium text-center
-        focus:outline-none focus:border-b focus:border-white border-b-2 border-b-white/10 placeholder-neutral-600"
-            placeholder="Answer here"
+            className="text-center text-[30px]"
           />
 
           <Button

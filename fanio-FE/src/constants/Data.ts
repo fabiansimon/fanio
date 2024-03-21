@@ -40,6 +40,7 @@ export const DATA = {
     'Bruce Springsteen',
     'Garth Brooks',
     'AC/DC',
+    'Chovo',
     'Metallica',
     'Pink Floyd',
     'Led Zeppelin',
