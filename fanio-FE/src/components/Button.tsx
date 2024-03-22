@@ -4,6 +4,7 @@ import useKeyShortcut from '../hooks/useKeyShortcut';
 import KeyBinding from './KeyBinding';
 import {UI} from '../utils/common';
 import {ButtonType} from '../types';
+import Loading from './Loading';
 
 interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
@@ -11,11 +12,13 @@ interface ButtonProps
   textSize?: string;
   type?: ButtonType;
   text?: string;
+  loading?: boolean;
   ignoreMetaKey?: boolean;
 }
 
 function Button({
   hotkey,
+  loading,
   children,
   disabled = false,
   text,
@@ -44,18 +47,24 @@ function Button({
         customClass,
         className,
       )}>
-      {icon && icon}
-      <Text size={textSize} className="text-white">
-        {text}
-      </Text>
-      {children}
-      {hotkey && !disabled && (
-        <KeyBinding
-          className="ml-2"
-          onActivate={rest.onClick}
-          hotkey={hotkey}
-          ignoreMetaKey={ignoreMetaKey}
-        />
+      {loading ? (
+        <Loading className="size-6" />
+      ) : (
+        <>
+          {icon && icon}
+          <Text size={textSize} className="text-white">
+            {text}
+          </Text>
+          {children}
+          {hotkey && !disabled && (
+            <KeyBinding
+              className="ml-2"
+              onActivate={rest.onClick}
+              hotkey={hotkey}
+              ignoreMetaKey={ignoreMetaKey}
+            />
+          )}
+        </>
       )}
     </button>
   );

@@ -1,4 +1,4 @@
-import {Heading, IconButton, Slider, Strong, Text} from '@radix-ui/themes';
+import {Heading, ScrollArea, Slider, Strong, Text} from '@radix-ui/themes';
 import Button from '../components/Button';
 import {PlusIcon, ChevronDownIcon} from '@radix-ui/react-icons';
 import {CrossCircledIcon} from '@radix-ui/react-icons';
@@ -9,7 +9,7 @@ import ROUTES from '../constants/Routes';
 import {fetchMetaData, uploadQuiz} from '../utils/api';
 import {REGEX} from '../constants/Regex';
 import InputField from '../components/InputField';
-import {DateUtils, UI} from '../utils/common';
+import {UI} from '../utils/common';
 import PageContainer from '../components/PageContainer';
 
 enum InputType {
@@ -43,11 +43,30 @@ function CreateScreen(): JSX.Element {
   });
   const [focusIndex, setFocusIndex] = useState<number>(0);
 
+  const addAnotherVisible = useMemo(() => {
+    if (!quizInput) return false;
+    if (focusIndex === -1 && quizInput?.questions.length < MAX_QUESTIONS)
+      return true;
+    return false;
+  }, [focusIndex, quizInput]);
+
+  const inputValid = useMemo(() => {
+    if (!quizInput) return false;
+    const {title, questions} = quizInput;
+    if (title.trim() && questions.length > 1) return true;
+
+    return false;
+  }, [quizInput]);
+
   const handleInput = (
     value: string | number,
     type: InputType,
     index?: number,
   ) => {
+    if (typeof value === 'string' && type === InputType.URL) {
+      value = value.trim();
+    }
+
     setQuizInput(prev => {
       if (!prev) return null;
       switch (type) {
@@ -107,7 +126,7 @@ function CreateScreen(): JSX.Element {
     if (!quizInput) return;
     setIsLoading(true);
     try {
-      const {id} = await uploadQuiz(cleanInput(quizInput));
+      const {id} = await uploadQuiz(cleanInput(quizInput!));
       navigation(`${ROUTES.playQuiz}/${id}`);
     } catch (error) {
       console.log(error);
@@ -151,8 +170,13 @@ function CreateScreen(): JSX.Element {
     return true;
   };
 
+  const trimList = (question: QuestionInput) => {
+    if (!question.answer.trim() || !question.url.trim()) return false;
+    return true;
+  };
+
   const handleAddRow = () => {
-    setFocusIndex(quizInput?.questions.length || 0);
+    setFocusIndex(quizInput?.questions.length || -1);
     setQuizInput(prev => {
       if (!prev) return null;
       return {
@@ -169,6 +193,7 @@ function CreateScreen(): JSX.Element {
 
   const handleDeleteRow = (index: number) => {
     const onlyRow = index === 0 && quizInput?.questions.length === 1;
+    setFocusIndex(onlyRow ? 0 : -1);
     setQuizInput(prev => {
       if (!prev) return null;
       return {
@@ -187,11 +212,10 @@ function CreateScreen(): JSX.Element {
       <div className="flex mt-8 space-x-4">
         {/* <div className="flex h-full w-[1px] bg-blue-500/50" /> */}
         <div className="flex flex-col w-full">
-          <div className="mr-auto">
-            <Text className="text-slate-100">
+          <div className="mr-auto bg-white py-1 px-2 rounded-sm">
+            <Text className="text-black" weight={'medium'}>
               1. Add a Title and description
             </Text>
-            <div className="h-2 -mt-[7.5px] w-full bg-blue-800/70" />
           </div>
           <InputField
             showSimple
@@ -211,13 +235,15 @@ function CreateScreen(): JSX.Element {
               handleInput(value, InputType.DESCRIPTION)
             }
           />
-          <div className="mr-auto mt-8">
-            <Text className="text-slate-100">
+          <div className="mr-auto bg-white py-1 px-2 rounded-sm mt-10 mb-2">
+            <Text className="text-black" weight={'medium'}>
               2. Start adding some songs to guess
             </Text>
-            <div className="h-2 -mt-[7.5px] w-full bg-pink-800/70" />
           </div>
-          <div className="mt-6">
+          <ScrollArea
+            type="always"
+            scrollbars="vertical"
+            style={{minHeight: '80%'}}>
             {quizInput?.questions.map((question, index) => {
               if (index === focusIndex)
                 return (
@@ -234,25 +260,36 @@ function CreateScreen(): JSX.Element {
 
               return (
                 <QuestionPreviewContainer
-                  className="mb-4"
+                  className="my-4"
                   question={question}
                   onClick={() => setFocusIndex(index)}
                 />
               );
             })}
-            {quizInput && quizInput?.questions.length < MAX_QUESTIONS && (
-              <Button
-                text="Add another"
-                onClick={handleAddRow}
-                icon={<PlusIcon className="text-white  mr-2 size-5" />}
-                className="flex mt-4 w-full"
-                type={ButtonType.outline}
-                textSize="2"
-              />
-            )}
-          </div>
+          </ScrollArea>
+          {addAnotherVisible && (
+            <Button
+              text="Add"
+              hotkey="Enter"
+              ignoreMetaKey
+              onClick={handleAddRow}
+              icon={<PlusIcon className="text-white mr-2 size-5" />}
+              className="flex mt-4 mx-auto"
+              type={ButtonType.outline}
+              textSize="2"
+            />
+          )}
         </div>
       </div>
+      <Button
+        text="Create"
+        hotkey="C"
+        disabled={!inputValid}
+        onClick={createQuiz}
+        loading={isLoading}
+        className="flex mt-auto w-full"
+        textSize="3"
+      />
     </PageContainer>
   );
 
@@ -353,6 +390,7 @@ function QuestionPreviewContainer({
   const {answer, startOffset} = question;
   return (
     <div
+      onClick={onClick}
       className={UI.cn(
         'flex w-full justify-between cursor-pointer',
         className,
@@ -365,7 +403,7 @@ function QuestionPreviewContainer({
           Start offset: <Strong>{startOffset}</Strong> sec.
         </Text>
       </div>
-      <div onClick={onClick}>
+      <div>
         <ChevronDownIcon className="text-white size-6" />
       </div>
     </div>
@@ -474,25 +512,27 @@ function QuestionInputContainer({
         </div>
       )}
 
-      <div className="flex justify-between mx-1 pt-2 space-x-2">
-        <Button
-          textSize={'2'}
-          type={ButtonType.outline}
-          hotkey="R"
-          text="Delete"
-          onClick={onDelete}
-          className="flex w-full"
-        />
-        <Button
-          textSize={'2'}
-          text="Save"
-          hotkey="Enter"
-          onClick={onSave}
-          disabled={!isValid || !url.trim()}
-          ignoreMetaKey
-          className="flex w-full"
-        />
-      </div>
+      {validUrl && (
+        <div className="flex justify-between mx-1 pt-2 space-x-2">
+          <Button
+            textSize={'2'}
+            type={ButtonType.outline}
+            hotkey="R"
+            text="Delete"
+            onClick={onDelete}
+            className="flex w-full"
+          />
+          <Button
+            textSize={'2'}
+            text="Save"
+            hotkey="Enter"
+            onClick={onSave}
+            disabled={!isValid || !url.trim()}
+            ignoreMetaKey
+            className="flex w-full"
+          />
+        </div>
+      )}
     </div>
   );
 }
