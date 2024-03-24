@@ -1,3 +1,5 @@
+import {isVisible} from '@testing-library/user-event/dist/utils';
+
 export enum OperationSystem {
   WINDOWS,
   MAC,
@@ -82,4 +84,18 @@ export enum ButtonType {
   primary,
   secondary,
   outline,
+}
+
+export interface ModalProps {
+  isVisible: boolean;
+  onRequestClose: () => void;
+}
+
+export enum AchievementType {
+  FIRST,
+  SECOND,
+  THIRD,
+  DAILY,
+  WEEK,
+  MONTHLY,
 }

@@ -24,7 +24,7 @@ function Container({
   title,
   titleColor = 'text-white',
   description,
-  descriptionColor = 'text-white',
+  descriptionColor = 'text-white/80',
   content,
   onBack,
 }: ContainerProps): JSX.Element {

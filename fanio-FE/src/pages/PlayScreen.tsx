@@ -101,8 +101,8 @@ function PlayScreen(): JSX.Element {
   const getQuizScores = async () => {
     try {
       if (!id) return;
-      const res = await fetchScoresFromQuiz(id);
-      setScores(res);
+      const {content} = await fetchScoresFromQuiz({quizId: id});
+      setScores(content);
     } catch (error) {
       console.error(error);
     }

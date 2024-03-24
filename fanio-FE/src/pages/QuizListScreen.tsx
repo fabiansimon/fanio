@@ -2,10 +2,8 @@ import {useCallback, useEffect, useState} from 'react';
 import {PaginatedQuizData, PaginationState, Quiz} from '../types';
 import {fetchAllQuizzes} from '../utils/api';
 import {useNavigate} from 'react-router-dom';
-import {Heading, Link} from '@radix-ui/themes';
 import SearchInput from '../components/SearchInput';
 import PaginationBar from '../components/PaginationBar';
-import {ArrowLeftIcon} from '@radix-ui/react-icons';
 import QuizList from '../components/QuizList';
 import {PAGE_DATA} from '../constants/Data';
 import PageContainer from '../components/PageContainer';
@@ -17,8 +15,6 @@ function QuizListScreen(): JSX.Element {
     pageIndex: 0,
     maxItems: PAGE_DATA.maxItemsOptions[0],
   });
-
-  const navigation = useNavigate();
 
   const loadQuizzes = useCallback(async () => {
     try {

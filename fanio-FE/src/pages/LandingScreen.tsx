@@ -11,6 +11,7 @@ import {Quiz} from '../types';
 import SearchResultsContainer from '../components/SearchResultsContainer';
 import TopQuizListContainer from '../components/TopQuizListContainer';
 import AllGamesContainer from '../components/AllGamesContainer';
+import TopScoresContainer from '../components/TopScoresContainer';
 
 interface MenuOptions {
   title: string;
@@ -69,10 +70,12 @@ function LandingScreen(): JSX.Element {
       },
       {
         title: 'Leaderboard',
+        description: 'Todays top players',
         onPress: () => navigation(ROUTES.createQuiz),
         hotkey: 'L',
         className:
           'bg-gradient-to-b from-red-600 to-red-500 border-red-900 col-span-2 row-span-6',
+        content: <TopScoresContainer />,
       },
     ],
     [navigation],

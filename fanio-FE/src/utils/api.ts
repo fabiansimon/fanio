@@ -64,10 +64,18 @@ export async function uploadScore(score: ScoreInput): Promise<Score> {
   }
 }
 
-export async function fetchScoresFromQuiz(quizId: string) {
+export async function fetchScoresFromQuiz({
+  quizId,
+  page = 0,
+  size = 30,
+}: {
+  quizId: string;
+  page?: number;
+  size?: number;
+}): Promise<{content: Score[] | []; totalElements: number}> {
   try {
-    const res = await _axios.get(`/scores/${quizId}`);
-    return res.data.content;
+    const res = await _axios.get(`/scores/${quizId}?page=${page}&size=${size}`);
+    return res.data;
   } catch (error) {
     console.error('Failed to fetch scores:', error);
     ToastController.showErrorToast(

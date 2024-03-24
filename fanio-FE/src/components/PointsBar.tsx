@@ -1,5 +1,5 @@
 import {motion, useAnimation} from 'framer-motion';
-import {forwardRef, useEffect, useImperativeHandle, useState} from 'react';
+import {forwardRef, useImperativeHandle, useState} from 'react';
 import {UI} from '../utils/common';
 import AnimatedText from './AnimatedText';
 import {GAME_OPTIONS} from '../constants/Game';

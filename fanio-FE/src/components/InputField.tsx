@@ -11,15 +11,18 @@ export interface InputFieldProps
 
 const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
   (props, ref) => (
-    <input
-      {...props}
-      ref={ref}
-      type="text"
-      className={UI.cn(
-        'relative bg-transparent pb-1 flex w-full text-2xl text-white font-medium text-left focus:outline-none focus:border-b-2 focus:border-white/70 border-b-2 border-b-white/10 placeholder-neutral-600',
-        props.className,
-      )}
-    />
+    <div className="flex relative">
+      <input
+        {...props}
+        ref={ref}
+        type="text"
+        className={UI.cn(
+          'relative bg-transparent pb-1 flex w-full text-2xl text-white font-medium text-left focus:outline-none focus:border-b-2 focus:border-white/70 border-b-2 border-b-white/10 placeholder-neutral-600',
+          props.className,
+        )}
+      />
+      {props.isLoading && <Loading className="absolute right-1 size-5 " />}
+    </div>
   ),
 );
 
@@ -44,7 +47,14 @@ function InputField(
     mouseY.set(clientY - top);
   };
 
-  if (showSimple) return <SimpleInputField {...props} className={className} />;
+  if (showSimple)
+    return (
+      <SimpleInputField
+        {...props}
+        isLoading={isLoading}
+        className={className}
+      />
+    );
 
   return (
     <motion.div
