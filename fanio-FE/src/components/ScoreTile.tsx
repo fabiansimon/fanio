@@ -49,11 +49,9 @@ function ScoreTile({
           <Heading weight={'medium'} className="text-white" size={'3'}>
             {userName}
           </Heading>
-          {showSimple && (
-            <Text size={'2'} className="text-white/70">
-              {DateUtils.formatDate(createdAt, true)}
-            </Text>
-          )}
+          <Text size={'2'} className="text-white/70">
+            {DateUtils.formatDate(createdAt, true)}
+          </Text>
         </div>
       </div>
       <div className="flex flex-col text-right">

@@ -84,12 +84,12 @@ public class MetaDataController {
         return Integer.parseInt(body.substring(start, right-1)) / 1000; // milliseconds > seconds
     }
 
-    private String stripTitle(String body) throws Exception {
+    private String stripTitle(String body) {
         String startKey = "<title>", endKey = "</title>";
         int start = body.indexOf(startKey) + startKey.length();
         int end = body.indexOf(endKey);
         if (start == -1 || end == -1) {
-            throw new Exception("Unable to extract the Title");
+            return "";
         }
         return body.substring(start, end);
     }
