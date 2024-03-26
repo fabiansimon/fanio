@@ -54,7 +54,10 @@ function PaginationBar({
         />
       )}
       {!disableItemsSelector ? (
-        <MaxItemsSelector onValueChange={setMaxItems} />
+        <MaxItemsSelector
+          defaultValue={maxItems.toString()}
+          onValueChange={setMaxItems}
+        />
       ) : (
         <div />
       )}
@@ -107,14 +110,16 @@ function PageSelector({
 }
 
 function MaxItemsSelector({
+  defaultValue,
   onValueChange,
 }: {
+  defaultValue: string;
   onValueChange: (value: number) => void;
 }): JSX.Element {
   return (
     <Select.Root
       onValueChange={value => onValueChange(parseInt(value))}
-      defaultValue={PAGE_DATA.maxItemsOptions[0].toString()}>
+      defaultValue={defaultValue}>
       <Select.Trigger />
       <Select.Content position="popper">
         <Select.Group>

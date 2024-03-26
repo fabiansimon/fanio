@@ -11,7 +11,7 @@ import {Quiz} from '../types';
 import SearchResultsContainer from '../components/SearchResultsContainer';
 import TopQuizListContainer from '../components/TopQuizListContainer';
 import AllGamesContainer from '../components/AllGamesContainer';
-import TopScoresContainer from '../components/TopScoresContainer';
+import LeaderboardContainer from '../components/LeaderboardContainer';
 
 interface MenuOptions {
   title: string;
@@ -71,11 +71,11 @@ function LandingScreen(): JSX.Element {
       {
         title: 'Leaderboard',
         description: 'Todays top players',
-        onPress: () => navigation(ROUTES.createQuiz),
+        onPress: () => navigation(ROUTES.leaderboard),
         hotkey: 'L',
         className:
           'bg-gradient-to-b from-red-600 to-red-500 border-red-900 col-span-2 row-span-6',
-        content: <TopScoresContainer />,
+        content: <LeaderboardContainer />,
       },
     ],
     [navigation],

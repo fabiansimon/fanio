@@ -2,11 +2,12 @@ import axios from 'axios';
 import {
   GameStatistic,
   MetaData,
-  PaginatedQuizData,
+  PaginatedData,
   Quiz,
   QuizInput,
   Score,
   ScoreInput,
+  TimeFrame,
 } from '../types/index';
 import ToastController from '../providers/ToastController';
 import {sanitizeTerm} from './logic';
@@ -22,7 +23,7 @@ const ERROR_MESSAGE = {
   description: 'This is on us. Please try again later.',
 };
 
-export async function fetchQuizById(id: string): Promise<Quiz> {
+export async function fetchQuizById({id}: {id: string}): Promise<Quiz> {
   try {
     const response = await _axios.get<Quiz>(`/quiz/${id}`);
     return response.data;
@@ -134,12 +135,36 @@ export async function searchQuizByTerm(term: string): Promise<Quiz[] | []> {
 export async function fetchTopQuizzes(
   page: number = 0,
   size: number = 10,
-): Promise<PaginatedQuizData> {
+): Promise<PaginatedData<Quiz>> {
   try {
     const res = await _axios.get(`/quizzes?page=${page}&size=${size}`);
     return res.data;
   } catch (error) {
     console.error('Failed to fetch all quizzes:', error);
+    ToastController.showErrorToast(
+      ERROR_MESSAGE.title,
+      ERROR_MESSAGE.description,
+    );
+    throw error;
+  }
+}
+
+export async function fetchTopScores({
+  timeFrame,
+  page = 0,
+  size = 10,
+}: {
+  timeFrame: TimeFrame;
+  page?: number;
+  size?: number;
+}): Promise<PaginatedData<Score>> {
+  try {
+    const res = await _axios.get(
+      `/top-scores?page=${page}&size=${size}&timeFrame=${timeFrame}`,
+    );
+    return res.data;
+  } catch (error) {
+    console.error('Failed to fetch top scores:', error);
     ToastController.showErrorToast(
       ERROR_MESSAGE.title,
       ERROR_MESSAGE.description,

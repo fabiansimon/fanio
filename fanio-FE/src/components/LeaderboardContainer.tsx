@@ -1,17 +1,18 @@
 import {useEffect, useState} from 'react';
-import {fetchScoresFromQuiz} from '../utils/api';
-import {AchievementType, Score} from '../types';
+import {fetchTopScores} from '../utils/api';
+import {AchievementType, Score, TimeFrame} from '../types';
 import ScoreTile from './ScoreTile';
 import {LocalStorage} from '../utils/localStorage';
 
-function TopScoresContainer(): JSX.Element {
+function LeaderboardContainer(): JSX.Element {
   const [scores, setScores] = useState<Score[] | null>();
   const [localScores, setLocalScores] = useState<Set<string> | null>(null);
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetchScoresFromQuiz({
-          quizId: 'ea308a1f-c5d2-426d-b5a9-a67098639731',
+        const res = await fetchTopScores({
+          timeFrame: TimeFrame.DAILY,
+          size: 5,
         });
         setLocalScores(LocalStorage.fetchScoreIds());
         setScores(res.content);
@@ -23,9 +24,9 @@ function TopScoresContainer(): JSX.Element {
 
   return (
     <div className="flex flex-col mt-4">
-      <div className="space-y-2">
+      <div className="space-y-2 -mx-2">
         {scores?.map((s, i) => {
-          let achievement = null;
+          let achievement;
           if (i < 3) {
             achievement = [
               AchievementType.FIRST,
@@ -50,4 +51,4 @@ function TopScoresContainer(): JSX.Element {
   );
 }
 
-export default TopScoresContainer;
+export default LeaderboardContainer;

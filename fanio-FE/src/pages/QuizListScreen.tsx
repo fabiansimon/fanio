@@ -1,7 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
-import {PaginatedQuizData, PaginationState, Quiz} from '../types';
+import {PaginatedData, PaginationState, Quiz} from '../types';
 import {fetchAllQuizzes} from '../utils/api';
-import {useNavigate} from 'react-router-dom';
 import SearchInput from '../components/SearchInput';
 import PaginationBar from '../components/PaginationBar';
 import QuizList from '../components/QuizList';
@@ -9,7 +8,7 @@ import {PAGE_DATA} from '../constants/Data';
 import PageContainer from '../components/PageContainer';
 
 function QuizListScreen(): JSX.Element {
-  const [quizData, setQuizData] = useState<PaginatedQuizData | null>();
+  const [quizData, setQuizData] = useState<PaginatedData<Quiz> | null>();
   const [searchResults, setSearchResult] = useState<Quiz[] | null>(null);
   const [pagination, setPagination] = useState({
     pageIndex: 0,

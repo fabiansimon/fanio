@@ -1,5 +1,6 @@
 package com.fabiansimon.fanio.service;
 
+import com.fabiansimon.fanio.enums.TimeFrame;
 import com.fabiansimon.fanio.model.Score;
 import com.fabiansimon.fanio.repository.ScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,13 @@ public class ScoreService {
 
     public Page<Score> getScoresFromQuiz(Pageable pageable, UUID quizId) {
         return scoreRepository.findByQuizId(pageable, quizId);
+    }
+
+    public Page<Score> getTopScores(Pageable pageable, TimeFrame timeFrame) {
+        switch (timeFrame) {
+            case day -> { return scoreRepository.findDailyTopScores(pageable); }
+        }
+        return scoreRepository.findAllTimeTopScores(pageable);
     }
 
     public Integer getTotalTimeElapsed() {

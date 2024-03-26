@@ -15,14 +15,18 @@ function QuizList({
 }: QuizListProps): JSX.Element {
   return (
     <div className={UI.cn('flex space-y-2 pt-3 flex-col h-full', className)}>
-      {data.map((quiz, index) => (
-        <QuizPreview
-          invertColors={invertColors}
-          key={index}
-          quiz={quiz}
-          defaultNavigation
-        />
-      ))}
+      {data.map((quiz, index) => {
+        return (
+          <div className="flex space-x-2">
+            <QuizPreview
+              invertColors={invertColors}
+              key={index}
+              quiz={quiz}
+              defaultNavigation
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

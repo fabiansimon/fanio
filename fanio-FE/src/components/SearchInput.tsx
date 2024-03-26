@@ -96,6 +96,7 @@ function SearchInput(
           placeholder="e.g. Taylor Swift"
           onChange={handleInput}
           value={input || ''}
+          hotkey="K"
         />
       </div>
     </div>

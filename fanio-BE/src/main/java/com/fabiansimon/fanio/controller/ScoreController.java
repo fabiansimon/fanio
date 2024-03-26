@@ -1,5 +1,6 @@
 package com.fabiansimon.fanio.controller;
 
+import com.fabiansimon.fanio.enums.TimeFrame;
 import com.fabiansimon.fanio.model.Score;
 import com.fabiansimon.fanio.service.ScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,18 @@ public class ScoreController {
         Page<Score> scores = scoreService.getAllScores(pageable);
         return ResponseEntity.ok(scores);
     }
+
+    @GetMapping("/top-scores")
+    public ResponseEntity<Page<Score>> getTopScores(
+             @RequestParam(defaultValue = "day") TimeFrame timeFrame,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Score> scores = scoreService.getTopScores(pageable, timeFrame);
+        return ResponseEntity.ok(scores);
+    }
+
 
     @GetMapping("/scores/{id}")
     public ResponseEntity<Page<Score>> getScoresFromQuiz(

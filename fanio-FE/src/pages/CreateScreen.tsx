@@ -21,6 +21,7 @@ import AddQuizModal from '../components/AddQuizModal';
 export enum InputType {
   TITLE,
   DESCRIPTION,
+  ARTISTS,
   URL,
   ERROR,
   ANSWER,
@@ -28,15 +29,7 @@ export enum InputType {
 }
 
 const MAX_QUESTIONS = 15;
-const DEFAULT_QUESTION_STATE = [
-  {
-    answer: '',
-    url: '',
-    imageUri: '',
-    maxLength: 0,
-    startOffset: 0,
-  },
-];
+
 function CreateScreen(): JSX.Element {
   const navigation = useNavigate();
 
@@ -45,6 +38,7 @@ function CreateScreen(): JSX.Element {
   const [quizInput, setQuizInput] = useState<QuizInput | null>({
     title: '',
     description: '',
+    artists: [],
     questions: [],
   });
 
@@ -135,11 +129,6 @@ function CreateScreen(): JSX.Element {
     });
   };
 
-  const trimList = (question: QuestionInput) => {
-    if (!question.answer.trim() || !question.url.trim()) return false;
-    return true;
-  };
-
   return (
     <>
       <AddQuizModal
@@ -150,38 +139,59 @@ function CreateScreen(): JSX.Element {
       <PageContainer
         title="Create quiz"
         description="Make sure to only use youtube links at the moment.">
-        <div className="flex mt-8 space-x-4">
+        <div className="flex space-x-4 mx-40 border my-auto border-neutral-500/50 p-5 shadow-md shadow-black bg-black/20 rounded-xl">
           {/* <div className="flex h-full w-[1px] bg-blue-500/50" /> */}
           <div className="flex flex-col w-full">
-            <div className="mr-auto mt-10 mb-2">
+            {/* <div className="mr-auto mt-10 mb-2">
               <Text className="text-white" weight={'medium'}>
                 1. Add a Title and description
               </Text>
+            </div> */}
+            <div className="flex flex-col mr-auto mb-4">
+              <InputField
+                showSimple
+                value={quizInput?.title}
+                placeholder="Title"
+                className="text-2xl"
+                onInput={({currentTarget: {value}}) =>
+                  handleInput(value, InputType.TITLE)
+                }
+              />
             </div>
-            <InputField
+
+            {/* <InputField
               showSimple
-              value={quizInput?.title}
-              placeholder="Title"
-              className="text-2xl mt-4"
+              value={quizInput?.description}
+              placeholder="Add Artists Names"
+              className="text-md mt-4"
               onInput={({currentTarget: {value}}) =>
-                handleInput(value, InputType.TITLE)
+                handleInput(value, InputType.ARTISTS)
               }
-            />
+            /> */}
+
             <InputField
               showSimple
               value={quizInput?.description}
               placeholder="Description (optional)"
-              className="text-1xl mt-4"
+              className="text-1xl mt-1 mb-2"
               onInput={({currentTarget: {value}}) =>
                 handleInput(value, InputType.DESCRIPTION)
               }
             />
-            <div className="mr-auto mt-10 mb-2">
-              <Text className="text-white" weight={'medium'}>
-                2. Start adding some songs to guess
-              </Text>
+            <div className="mr-auto mt-10">
+              {(quizInput?.questions.length || 0) && (
+                <Text className="text-white" size={'3'}>
+                  <Strong className="mr-1">
+                    {quizInput?.questions.length}
+                  </Strong>
+                  Songs Added
+                </Text>
+              )}
             </div>
-            <ScrollArea type="always" scrollbars="vertical">
+            <ScrollArea
+              type="always"
+              scrollbars="vertical"
+              className="max-h-[100%]">
               {quizInput?.questions.map((question, index) => {
                 return (
                   <QuestionPreviewContainer
@@ -195,7 +205,7 @@ function CreateScreen(): JSX.Element {
             </ScrollArea>
             {quizInput && quizInput?.questions.length < MAX_QUESTIONS && (
               <Button
-                text="Add"
+                text="Add Song"
                 hotkey="Enter"
                 ignoreMetaKey
                 onClick={() => setQuestionVisible(true)}

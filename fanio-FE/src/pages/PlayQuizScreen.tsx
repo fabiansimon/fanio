@@ -48,7 +48,7 @@ function PlayQuizScreen({}): JSX.Element {
     if (!id) return;
     (async () => {
       try {
-        const res = await fetchQuizById(id);
+        const res = await fetchQuizById({id});
         setQuizData({
           ...res,
           questions: shuffle(res.questions),

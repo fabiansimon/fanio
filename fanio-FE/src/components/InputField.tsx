@@ -1,12 +1,14 @@
 import {useMotionTemplate, useMotionValue, motion} from 'framer-motion';
 import {UI} from '../utils/common';
-import {forwardRef, useEffect, useState} from 'react';
+import {forwardRef, useEffect, useRef, useState} from 'react';
 import Loading from './Loading';
+import KeyBinding from './KeyBinding';
 
 export interface InputFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   isLoading?: boolean;
   showSimple?: boolean;
+  hotkey?: string;
 }
 
 const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
@@ -27,11 +29,30 @@ const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
 );
 
 function InputField(
-  {className, showSimple, type, isLoading = false, ...props}: InputFieldProps,
+  {
+    className,
+    showSimple,
+    type,
+    hotkey,
+    isLoading = false,
+    ...props
+  }: InputFieldProps,
   ref: any,
 ) {
   const radius = 100;
+  const internalRef = useRef<any>();
   const [visible, setVisible] = useState(false);
+
+  const setRefs = (element: any) => {
+    internalRef.current = element; // Assign to internal ref
+
+    // Assign to forwarded ref
+    if (typeof ref === 'function') {
+      ref(element);
+    } else if (ref) {
+      ref.current = element;
+    }
+  };
 
   let mouseX = useMotionValue(0);
   let mouseY = useMotionValue(0);
@@ -84,10 +105,17 @@ function InputField(
           className={UI.cn(
             'flex px-3 py-2 h-10 w-full bg-transparent outline-none',
           )}
-          ref={ref}
+          ref={setRefs}
           {...props}
         />
         {isLoading && <Loading className="size-6 mr-2" />}
+        {!isLoading && hotkey && (
+          <KeyBinding
+            onActivate={() => internalRef.current?.focus()}
+            hotkey={hotkey}
+            className="mr-3"
+          />
+        )}
       </div>
     </motion.div>
   );

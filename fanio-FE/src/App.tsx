@@ -13,8 +13,8 @@ import CreateScreen from './pages/CreateScreen';
 import QuizListScreen from './pages/QuizListScreen';
 import LandingScreen from './pages/LandingScreen';
 import QuizScoreScreen from './pages/QuizScoreScreen';
-import PlayQuizScreen from './pages/PlayQuizScreen';
 import PlayScreen from './pages/PlayScreen';
+import LeaderboardScreen from './pages/LeaderboardScreen';
 
 function App(): JSX.Element {
   return (
@@ -27,6 +27,7 @@ function App(): JSX.Element {
             <Route path={`${ROUTES.playQuiz}/:id`} element={<PlayScreen />} />
             <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
             <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
+            <Route path={ROUTES.leaderboard} element={<LeaderboardScreen />} />
             <Route
               path={`${ROUTES.quizScores}/:id`}
               element={<QuizScoreScreen />}

@@ -1,5 +1,9 @@
-import {isVisible} from '@testing-library/user-event/dist/utils';
-
+export enum TimeFrame {
+  DAILY = 'day',
+  WEEKLY = 'week',
+  MONTHLY = 'month',
+  ALLTIME = 'allTime',
+}
 export enum OperationSystem {
   WINDOWS,
   MAC,
@@ -48,6 +52,7 @@ export interface QuizInput {
   title: string;
   description?: string;
   questions: QuestionInput[];
+  artists?: string[];
 }
 
 export interface ScoreInput {
@@ -68,9 +73,9 @@ export interface PaginationState {
   pageIndex: number;
 }
 
-export interface PaginatedQuizData {
+export interface PaginatedData<T> {
   totalElements: number;
-  content: Quiz[];
+  content: T[];
 }
 
 export interface GameStatistic {

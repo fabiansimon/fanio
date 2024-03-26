@@ -2,7 +2,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {UI} from '../utils/common';
 import PaginationBar from './PaginationBar';
 import QuizList from './QuizList';
-import {PaginatedQuizData, PaginationState} from '../types';
+import {PaginatedData, PaginationState, Quiz} from '../types';
 import {fetchTopQuizzes} from '../utils/api';
 import Loading from './Loading';
 
@@ -12,7 +12,7 @@ interface TopQuizListProps {
 
 function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [quizData, setQuizData] = useState<PaginatedQuizData | null>(null);
+  const [quizData, setQuizData] = useState<PaginatedData<Quiz> | null>(null);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     maxItems: 5,
@@ -50,7 +50,7 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
         <Loading className="size-10 self-center my-auto" />
       ) : (
         <>
-          <QuizList data={quizData?.content || []} className="mt-4" />
+          <QuizList data={quizData?.content || []} className="mt-4 -mx-2" />
           <PaginationBar
             disableItemsSelector
             initialState={{maxItems: 5, pageIndex: 0}}
