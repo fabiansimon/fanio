@@ -17,6 +17,7 @@ import InputField from '../components/InputField';
 import {UI} from '../utils/common';
 import PageContainer from '../components/PageContainer';
 import AddQuizModal from '../components/AddQuizModal';
+import ValidationChip from '../components/ValidationChip';
 
 export enum InputType {
   TITLE,
@@ -138,8 +139,9 @@ function CreateScreen(): JSX.Element {
       />
       <PageContainer
         title="Create quiz"
+        className="bg-slate-950/95"
         description="Make sure to only use youtube links at the moment.">
-        <div className="flex space-x-4 mx-40 border my-auto border-neutral-500/50 p-5 shadow-md shadow-black bg-black/20 rounded-xl">
+        <div className="flex max-h-[40%] space-x-4 mx-40 border my-auto border-neutral-500/50 p-5 shadow-md shadow-black bg-slate-950 rounded-xl">
           {/* <div className="flex h-full w-[1px] bg-blue-500/50" /> */}
           <div className="flex flex-col w-full">
             {/* <div className="mr-auto mt-10 mb-2">
@@ -153,6 +155,11 @@ function CreateScreen(): JSX.Element {
                 value={quizInput?.title}
                 placeholder="Title"
                 className="text-2xl"
+                trailing={
+                  <ValidationChip
+                    text={!quizInput?.title ? 'Missing title' : ''}
+                  />
+                }
                 onInput={({currentTarget: {value}}) =>
                   handleInput(value, InputType.TITLE)
                 }
@@ -178,20 +185,19 @@ function CreateScreen(): JSX.Element {
                 handleInput(value, InputType.DESCRIPTION)
               }
             />
-            <div className="mr-auto mt-10">
+            <div className="mr-auto mt-4 mb-3">
               {(quizInput?.questions.length || 0) && (
                 <Text className="text-white" size={'3'}>
                   <Strong className="mr-1">
                     {quizInput?.questions.length}
                   </Strong>
-                  Songs Added
+                  {`Song${
+                    (quizInput?.questions.length || 0) > 1 ? 's' : ''
+                  } added`}
                 </Text>
               )}
             </div>
-            <ScrollArea
-              type="always"
-              scrollbars="vertical"
-              className="max-h-[100%]">
+            <ScrollArea type="always" scrollbars="vertical">
               {quizInput?.questions.map((question, index) => {
                 return (
                   <QuestionPreviewContainer
@@ -258,7 +264,9 @@ function QuestionPreviewContainer({
       <div>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
-            <DotsVerticalIcon className="text-white size-4" />
+            <div className="p-2 -mr-2">
+              <DotsVerticalIcon className="text-white size-4" />
+            </div>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content>
             {/* <DropdownMenu.Item onClick={onEdit}>Edit</DropdownMenu.Item> */}

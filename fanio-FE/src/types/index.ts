@@ -104,3 +104,11 @@ export enum AchievementType {
   WEEK,
   MONTHLY,
 }
+
+export enum BreakPoint {
+  SM,
+  MD,
+  LG,
+  XL,
+  XXL,
+}

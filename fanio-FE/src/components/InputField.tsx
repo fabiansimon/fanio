@@ -6,13 +6,14 @@ import KeyBinding from './KeyBinding';
 
 export interface InputFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
+  trailing?: React.ReactNode;
   isLoading?: boolean;
   showSimple?: boolean;
   hotkey?: string;
 }
 
 const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
-  (props, ref) => (
+  ({isLoading, trailing, ...props}, ref) => (
     <div className="flex relative">
       <input
         {...props}
@@ -23,7 +24,10 @@ const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
           props.className,
         )}
       />
-      {props.isLoading && <Loading className="absolute right-1 size-5 " />}
+      <div className="absolute right-0 flex">
+        {!isLoading && trailing && trailing}
+        {isLoading && <Loading className="size-5" />}
+      </div>
     </div>
   ),
 );
@@ -35,6 +39,7 @@ function InputField(
     type,
     hotkey,
     isLoading = false,
+    trailing,
     ...props
   }: InputFieldProps,
   ref: any,
@@ -72,6 +77,7 @@ function InputField(
     return (
       <SimpleInputField
         {...props}
+        trailing={trailing}
         isLoading={isLoading}
         className={className}
       />

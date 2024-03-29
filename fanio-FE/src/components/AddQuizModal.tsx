@@ -2,14 +2,14 @@ import {useState, useMemo, useEffect, useRef} from 'react';
 import {AnimatePresence, motion} from 'framer-motion';
 import {InputType} from '../pages/CreateScreen';
 import {ButtonType, ModalProps, QuestionInput} from '../types';
-import {CrossCircledIcon} from '@radix-ui/react-icons';
 import {fetchMetaData} from '../utils/api';
 import {REGEX} from '../constants/Regex';
-import {Heading, Slider, Strong, Text} from '@radix-ui/themes';
+import {Slider, Strong, Text} from '@radix-ui/themes';
 import InputField from './InputField';
 import ThumbnailPreview from './ThumbnailPreview';
 import Button from './Button';
 import useKeyShortcut from '../hooks/useKeyShortcut';
+import ValidationChip from './ValidationChip';
 
 interface AddQuizModalProps extends ModalProps {
   onSave: (quiz: QuestionInput) => void;
@@ -29,7 +29,9 @@ function AddQuizModal({
   onSave,
 }: AddQuizModalProps): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    'Invalid url',
+  );
   const defaultMaxValue = 100;
   const [question, setQuestion] = useState<QuestionInput>({
     answer: '',
@@ -45,7 +47,7 @@ function AddQuizModal({
     if (isVisible) return;
     setTimeout(() => {
       setQuestion({answer: '', url: ''});
-      setErrorMessage(null);
+      setErrorMessage('Invalid url');
     }, ANIMATION_DURATION);
   }, [isVisible]);
 
@@ -156,14 +158,10 @@ function AddQuizModal({
             !isValid ? 'border-red-800/50' : 'border-neutral-500/50'
           } ${!isValid && 'shadow-red-500'}`}>
           <div className="flex">
-            {errorMessage && !isLoading && (
-              <div className="absolute flex right-0 -top-8 bg-red-700 space-x-1 px-2 py-1 items-center rounded-md">
-                <CrossCircledIcon className="text-white" />
-                <Text size={'1'} weight={'medium'} className="text-white">
-                  {errorMessage}
-                </Text>
-              </div>
-            )}
+            <ValidationChip
+              text={errorMessage || ''}
+              className="absolute right-0 -top-8 "
+            />
             <div className="flex flex-col space-y-1 flex-1">
               {validUrl && (
                 <InputField

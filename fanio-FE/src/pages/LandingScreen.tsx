@@ -7,11 +7,12 @@ import Marquee from 'react-fast-marquee';
 import Container from '../components/Container';
 import {useMemo, useRef, useState} from 'react';
 import {motion} from 'framer-motion';
-import {Quiz} from '../types';
+import {BreakPoint, Quiz} from '../types';
 import SearchResultsContainer from '../components/SearchResultsContainer';
 import TopQuizListContainer from '../components/TopQuizListContainer';
 import AllGamesContainer from '../components/AllGamesContainer';
 import LeaderboardContainer from '../components/LeaderboardContainer';
+import useWindowSize from '../hooks/useWindowSize';
 
 interface MenuOptions {
   title: string;
@@ -20,15 +21,19 @@ interface MenuOptions {
   hotkey?: string;
   className?: string;
   content?: React.ReactNode;
+  isHidden?: boolean;
 }
 
 const ANIMATION_DURATION = 0.15; // in second
 
 function LandingScreen(): JSX.Element {
+  const {breakTriggered} = useWindowSize({breakpoint: BreakPoint.SM});
   const searchRef = useRef<any>();
   const [searchResults, setSearchResult] = useState<Quiz[] | null>(null);
 
   const navigation = useNavigate();
+
+  console.log(breakTriggered);
 
   const transition = {
     duration: ANIMATION_DURATION,
@@ -76,6 +81,7 @@ function LandingScreen(): JSX.Element {
         className:
           'bg-gradient-to-b from-red-600 to-red-500 border-red-900 col-span-2 row-span-6',
         content: <LeaderboardContainer />,
+        // isHidden: true,
       },
     ],
     [navigation],
@@ -112,22 +118,25 @@ function LandingScreen(): JSX.Element {
           className={MENU_OPTIONS[0].className}
           content={MENU_OPTIONS[0].content}
         />
-        <div className="grid grid-cols-2 gap-2 w-full">
-          {MENU_OPTIONS.slice(1).map((option, index) => {
-            const {hotkey, title, description, onPress, className, content} =
-              option;
-            return (
-              <Container
-                hotkey={hotkey}
-                key={index}
-                title={title}
-                description={description}
-                onClick={onPress}
-                className={className}
-                content={content}
-              />
-            );
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+          {MENU_OPTIONS.slice(1)
+            .filter(c => !c.isHidden)
+            .map((option, index) => {
+              const {hotkey, title, description, onPress, className, content} =
+                option;
+
+              return (
+                <Container
+                  hotkey={hotkey}
+                  key={index}
+                  title={title}
+                  description={description}
+                  onClick={onPress}
+                  className={className}
+                  content={content}
+                />
+              );
+            })}
         </div>
       </motion.div>
     </div>
