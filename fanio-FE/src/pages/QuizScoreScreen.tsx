@@ -8,15 +8,17 @@ import PageContainer from '../components/PageContainer';
 import PaginationBar from '../components/PaginationBar';
 import EmptyContainer from '../components/EmptyContainer';
 import ROUTES from '../constants/Routes';
-import {UI} from '../utils/common';
 
 function QuizScoreScreen(): JSX.Element {
   const [scoreData, setScoreData] = useState<{
     content: Score[];
     totalElements: number;
   } | null>(null);
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [localScores, setLocalScores] = useState<Set<string> | null>(null);
   const [quizData, setQuizData] = useState<Quiz | null>();
+
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     maxItems: 30,
@@ -27,8 +29,8 @@ function QuizScoreScreen(): JSX.Element {
   const {id} = useParams();
 
   const emptyList = useMemo(() => {
-    return !scoreData || scoreData.totalElements === 0;
-  }, [scoreData]);
+    return !isLoading && (!scoreData || scoreData.totalElements === 0);
+  }, [scoreData, isLoading]);
 
   const loadScores = useCallback(async () => {
     try {
@@ -45,6 +47,8 @@ function QuizScoreScreen(): JSX.Element {
       setScoreData(scores);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   }, [pagination, id]);
 

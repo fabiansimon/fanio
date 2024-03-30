@@ -33,7 +33,7 @@ function Container({
     <div
       onClick={onClick}
       className={UI.cn(
-        'rounded-3xl shadow-2xl flex border-2 flex-col px-5 py-4',
+        'rounded-3xl flex shadow-2xl border-2 flex-col px-5 py-4',
         onClick &&
           'hover:scale-[98%] transition-transform duration-150 ease-in-out cursor-pointer',
         className,

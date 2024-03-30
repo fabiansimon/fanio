@@ -12,7 +12,7 @@ import SearchResultsContainer from '../components/SearchResultsContainer';
 import TopQuizListContainer from '../components/TopQuizListContainer';
 import AllGamesContainer from '../components/AllGamesContainer';
 import LeaderboardContainer from '../components/LeaderboardContainer';
-import useWindowSize from '../hooks/useWindowSize';
+import useBreakingPoints from '../hooks/useBreakingPoints';
 
 interface MenuOptions {
   title: string;
@@ -27,13 +27,12 @@ interface MenuOptions {
 const ANIMATION_DURATION = 0.15; // in second
 
 function LandingScreen(): JSX.Element {
-  const {breakTriggered} = useWindowSize({breakpoint: BreakPoint.SM});
+  const breakActive = useBreakingPoints(BreakPoint.SM);
   const searchRef = useRef<any>();
   const [searchResults, setSearchResult] = useState<Quiz[] | null>(null);
 
+  console.log(breakActive);
   const navigation = useNavigate();
-
-  console.log(breakTriggered);
 
   const transition = {
     duration: ANIMATION_DURATION,
@@ -71,7 +70,7 @@ function LandingScreen(): JSX.Element {
         onPress: () => navigation(ROUTES.createQuiz),
         hotkey: 'C',
         className:
-          'bg-gradient-to-b from-violet-700 to-violet-500 border-violet-900 ',
+          'bg-gradient-to-b from-violet-700 to-violet-500 border-violet-900',
       },
       {
         title: 'Leaderboard',
@@ -81,10 +80,10 @@ function LandingScreen(): JSX.Element {
         className:
           'bg-gradient-to-b from-red-600 to-red-500 border-red-900 col-span-2 row-span-6',
         content: <LeaderboardContainer />,
-        // isHidden: true,
+        isHidden: breakActive,
       },
     ],
-    [navigation],
+    [navigation, breakActive],
   );
 
   return (

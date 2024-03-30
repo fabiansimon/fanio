@@ -47,11 +47,11 @@ function InputField(
   const radius = 100;
   const internalRef = useRef<any>();
   const [visible, setVisible] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const setRefs = (element: any) => {
-    internalRef.current = element; // Assign to internal ref
+    internalRef.current = element;
 
-    // Assign to forwarded ref
     if (typeof ref === 'function') {
       ref(element);
     } else if (ref) {
@@ -98,15 +98,18 @@ function InputField(
       onMouseEnter={() => setVisible(true)}
       onMouseLeave={() => setVisible(false)}
       className={UI.cn(
-        'p-[2px] flex rounded-lg transition duration-300 w-full group/input',
+        'p-[1px] flex rounded-lg border border-transparent transition duration-300 w-full group/input',
+        isFocused && 'border-white/90',
         className,
       )}>
       <div
-        className="flex items-center h-10 w-full border-none bg-gray-500 dark:bg-zinc-800 text-black dark:text-white shadow-input rounded-md text-sm  file:border-0 file:bg-transparent 
+        className="flex items-center h-10 w-full  bg-gray-500 dark:bg-zinc-800 text-black dark:text-white shadow-input rounded-md text-sm file:border-0 file:bg-transparent 
       file:text-sm file:font-medium placeholder:text-neutral-400 dark:placeholder-text-neutral-600 
        group-hover/input:shadow-none transition duration-400
        ">
         <input
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           type={type}
           className={UI.cn(
             'flex px-3 py-2 h-10 w-full bg-transparent outline-none',

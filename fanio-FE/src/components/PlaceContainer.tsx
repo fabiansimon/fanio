@@ -7,7 +7,7 @@ import {UI} from '../utils/common';
 interface PlaceContainerProps {
   achievement?: AchievementType;
   showSimple?: boolean;
-  position: number;
+  position?: number;
   className?: string;
 }
 
@@ -23,7 +23,7 @@ function PlaceContainer({
   return (
     <div className={UI.cn('flex p-2 min-w-10', className)}>
       <Text weight={'medium'} className="text-white/80" size={'2'}>
-        {position}#
+        {position && `${position}#`}
       </Text>
     </div>
   );

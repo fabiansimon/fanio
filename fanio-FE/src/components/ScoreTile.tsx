@@ -7,8 +7,8 @@ import PlaceContainer from './PlaceContainer';
 interface ScoreTileProps extends React.HTMLProps<HTMLDivElement> {
   score: Score;
   isLocal?: boolean;
-  achievement: AchievementType | undefined;
-  position: number;
+  achievement?: AchievementType | undefined;
+  position?: number;
   showSimple?: boolean;
   hoverContent?: React.ReactNode;
 }

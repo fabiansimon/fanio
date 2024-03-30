@@ -18,6 +18,7 @@ import {UI} from '../utils/common';
 import PageContainer from '../components/PageContainer';
 import AddQuizModal from '../components/AddQuizModal';
 import ValidationChip from '../components/ValidationChip';
+import {sanitizeTerm} from '../utils/logic';
 
 export enum InputType {
   TITLE,
@@ -50,6 +51,18 @@ function CreateScreen(): JSX.Element {
 
     return false;
   }, [quizInput]);
+
+  const containsDuplicated = useMemo(() => {
+    if (!quizInput?.questions) return false;
+    const usedTitles = new Set();
+    for (const question of quizInput?.questions) {
+      const cleanAnswer = sanitizeTerm(question.answer);
+      if (usedTitles.has(cleanAnswer)) return true;
+      usedTitles.add(cleanAnswer);
+    }
+
+    return false;
+  }, [quizInput?.questions]);
 
   const handleInput = (value: string | number, type: InputType) => {
     if (typeof value === 'string' && type === InputType.URL) {
@@ -139,9 +152,9 @@ function CreateScreen(): JSX.Element {
       />
       <PageContainer
         title="Create quiz"
-        className="bg-slate-950/95"
+        className="bg-slate-950"
         description="Make sure to only use youtube links at the moment.">
-        <div className="flex max-h-[40%] space-x-4 mx-40 border my-auto border-neutral-500/50 p-5 shadow-md shadow-black bg-slate-950 rounded-xl">
+        <div className="flex max-h-[40%] space-x-4 mx-40 border my-auto border-neutral-500/50 p-5 shadow-md shadow-black bg-neutral-900 rounded-xl">
           {/* <div className="flex h-full w-[1px] bg-blue-500/50" /> */}
           <div className="flex flex-col w-full">
             {/* <div className="mr-auto mt-10 mb-2">
@@ -180,14 +193,14 @@ function CreateScreen(): JSX.Element {
               showSimple
               value={quizInput?.description}
               placeholder="Description (optional)"
-              className="text-1xl mt-1 mb-2"
+              className="text-1xl mt-1 mb-2 text-white/70"
               onInput={({currentTarget: {value}}) =>
                 handleInput(value, InputType.DESCRIPTION)
               }
             />
-            <div className="mr-auto mt-4 mb-3">
-              {(quizInput?.questions.length || 0) && (
-                <Text className="text-white" size={'3'}>
+            {(quizInput?.questions.length || 0) && (
+              <div className="mr-auto mt-4 mb-0 flex justify-between w-full">
+                <Text className="text-white" size={'2'}>
                   <Strong className="mr-1">
                     {quizInput?.questions.length}
                   </Strong>
@@ -195,8 +208,9 @@ function CreateScreen(): JSX.Element {
                     (quizInput?.questions.length || 0) > 1 ? 's' : ''
                   } added`}
                 </Text>
-              )}
-            </div>
+                <ValidationChip text={containsDuplicated ? 'Duplicates' : ''} />
+              </div>
+            )}
             <ScrollArea type="always" scrollbars="vertical">
               {quizInput?.questions.map((question, index) => {
                 return (
@@ -254,10 +268,10 @@ function QuestionPreviewContainer({
         className,
       )}>
       <div className="flex flex-col">
-        <Heading size="3" className="text-white">
+        <Heading size="2" className="text-white">
           {answer}
         </Heading>
-        <Text size="2" className="text-slate-200">
+        <Text size="2" className="text-white/80">
           Start offset: <Strong>{startOffset || 0}</Strong> sec.
         </Text>
       </div>

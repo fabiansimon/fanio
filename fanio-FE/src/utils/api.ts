@@ -37,6 +37,27 @@ export async function fetchQuizById({id}: {id: string}): Promise<Quiz> {
   }
 }
 
+export async function fetchPlayableQuizById({
+  id,
+}: {
+  id: string;
+  showScore?: boolean;
+}): Promise<{quiz: Quiz; topScore: Score}> {
+  try {
+    const response = await _axios.get<{quiz: Quiz; topScore: Score}>(
+      `/quiz/${id}?includeScore=true`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch quiz by ID:', error);
+    ToastController.showErrorToast(
+      ERROR_MESSAGE.title,
+      ERROR_MESSAGE.description,
+    );
+    throw error;
+  }
+}
+
 export async function uploadQuiz(quiz: QuizInput): Promise<Quiz> {
   try {
     const response = await _axios.post<Quiz>('/create-quiz', quiz);

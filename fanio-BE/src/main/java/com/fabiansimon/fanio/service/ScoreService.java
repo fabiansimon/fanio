@@ -23,6 +23,8 @@ public class ScoreService {
         return scoreRepository.findByQuizId(pageable, quizId);
     }
 
+    public Score getTopScoreFromQuiz(UUID quizId) { return scoreRepository.findQuizTopScore(quizId); }
+
     public Page<Score> getTopScores(Pageable pageable, TimeFrame timeFrame) {
         switch (timeFrame) {
             case day -> { return scoreRepository.findDailyTopScores(pageable); }

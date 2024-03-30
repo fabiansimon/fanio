@@ -1,7 +1,10 @@
 package com.fabiansimon.fanio.controller;
 
+import com.fabiansimon.fanio.DTO.PlayableQuizDTO;
 import com.fabiansimon.fanio.model.Quiz;
+import com.fabiansimon.fanio.model.Score;
 import com.fabiansimon.fanio.service.QuizService;
+import com.fabiansimon.fanio.service.ScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +21,8 @@ import java.util.UUID;
 public class QuizController {
     @Autowired
     private QuizService quizService;
+    @Autowired
+    private ScoreService scoreService;
 
     @GetMapping("/quizzes")
     public ResponseEntity<Page<Quiz>> getAllQuizzes(
@@ -44,10 +49,16 @@ public class QuizController {
 
 
     @GetMapping("/quiz/{id}")
-    public ResponseEntity<Quiz> getQuiz(@PathVariable UUID id) {
-        Optional<Quiz> quiz = quizService.getQuiz(id);
-        if (quiz.isPresent()) {
-            return ResponseEntity.ok(quiz.get());
+    public ResponseEntity<?> getQuizById(@PathVariable UUID id,
+                                         @RequestParam(defaultValue = "false") boolean includeScore
+    ) {
+        Optional<Quiz> rawQuiz = quizService.getQuiz(id);
+        if (rawQuiz.isPresent()) {
+            if (!includeScore) return ResponseEntity.ok(rawQuiz.get());
+
+            Score topScore = scoreService.getTopScoreFromQuiz(id);
+            PlayableQuizDTO quiz = new PlayableQuizDTO(rawQuiz.get(), topScore);
+            return ResponseEntity.ok(quiz);
         }
 
         return ResponseEntity.notFound().build();

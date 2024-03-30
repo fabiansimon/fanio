@@ -15,6 +15,7 @@ import LandingScreen from './pages/LandingScreen';
 import QuizScoreScreen from './pages/QuizScoreScreen';
 import PlayScreen from './pages/PlayScreen';
 import LeaderboardScreen from './pages/LeaderboardScreen';
+import PlayQuizScreen from './pages/PlayQuizScreen';
 
 function App(): JSX.Element {
   return (
@@ -24,7 +25,11 @@ function App(): JSX.Element {
           <Routes>
             <Route path="*" element={<Navigate to="/" replace={true} />} />
             <Route path="/" element={<LandingScreen />} />
-            <Route path={`${ROUTES.playQuiz}/:id`} element={<PlayScreen />} />
+            {/* <Route path={`${ROUTES.playQuiz}/:id`} element={<PlayScreen />} /> */}
+            <Route
+              path={`${ROUTES.playQuiz}/:id`}
+              element={<PlayQuizScreen />}
+            />
             <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
             <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
             <Route path={ROUTES.leaderboard} element={<LeaderboardScreen />} />
