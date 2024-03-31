@@ -1,3 +1,4 @@
+import {GAME_OPTIONS} from '../constants/Game';
 import {Question} from '../types';
 
 export function shuffle(questions: Question[]) {
@@ -31,6 +32,13 @@ export function sanitizeTerm(input: string) {
   }
 
   return clean;
+}
+
+export function rateScore(currScore: number, topScore: number) {
+  const maxRating = GAME_OPTIONS.POST_GAME_TITLES.length - 1;
+  const scaledRatio = Math.round((currScore / topScore) * maxRating);
+
+  return maxRating - Math.max(0, Math.min(scaledRatio, maxRating));
 }
 
 function cleanSpecialCharacters(c: string) {

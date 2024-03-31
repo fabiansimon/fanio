@@ -3,6 +3,7 @@ import {UI} from '../utils/common';
 import {forwardRef, useEffect, useRef, useState} from 'react';
 import Loading from './Loading';
 import KeyBinding from './KeyBinding';
+import useKeyShortcut from '../hooks/useKeyShortcut';
 
 export interface InputFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -48,6 +49,14 @@ function InputField(
   const internalRef = useRef<any>();
   const [visible, setVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
+  useKeyShortcut(
+    'Escape',
+    () => {
+      if (isFocused) internalRef.current?.blur();
+    },
+    true,
+  );
 
   const setRefs = (element: any) => {
     internalRef.current = element;

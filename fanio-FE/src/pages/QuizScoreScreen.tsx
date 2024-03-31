@@ -73,7 +73,7 @@ function QuizScoreScreen(): JSX.Element {
           />
         ) : (
           <>
-            <div className="mt-6 space-y-3">
+            <div className="mt-6 space-y-3 overflow-hidden h-full">
               {scoreData?.content?.map((s, i) => {
                 const {pageIndex, maxItems} = pagination;
                 const position = i + 1 + pageIndex * maxItems;
@@ -92,7 +92,6 @@ function QuizScoreScreen(): JSX.Element {
                     position={position}
                     achievement={achievement}
                     isLocal={localScores?.has(s.id)}
-                    key={i}
                     score={s}
                   />
                 );
