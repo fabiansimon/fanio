@@ -2,7 +2,7 @@ import {Heading, Text} from '@radix-ui/themes';
 import Button from './Button';
 import {MinusIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useMemo} from 'react';
-import {AchievementType, Score} from '../types';
+import {AchievementType, LocalScore, Score} from '../types';
 import ScoreTile from './ScoreTile';
 import {DateUtils, UI} from '../utils/common';
 
@@ -12,7 +12,7 @@ function PreGameScene({
   onStart,
 }: {
   topScore?: Score;
-  lastAttempt?: Score;
+  lastAttempt?: LocalScore;
   onStart: () => void;
 }): JSX.Element {
   const isWinner = useMemo(() => {
@@ -50,12 +50,12 @@ function PreGameScene({
               <div className="w-full border-[.2px] border-white/30" />
               <div className="flex items-center justify-end relative">
                 <div className="flex flex-col text-right ml-2">
-                  <Heading weight={'medium'} className={textColor} size={'3'}>
+                  <Heading weight={'bold'} className={textColor} size={'3'}>
                     {UI.formatPoints(
                       topScore.totalScore - lastAttempt.totalScore,
                     )}
                   </Heading>
-                  <Text className={textColor} size={'2'}>
+                  <Text className={textColor} size={'2'} weight={'medium'}>
                     {DateUtils.formatTime(
                       Math.abs(topScore.timeElapsed - lastAttempt.timeElapsed),
                       'sec',

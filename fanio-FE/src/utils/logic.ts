@@ -56,6 +56,24 @@ function cleanSpecialCharacters(c: string) {
   }
 }
 
+export function calculatePoints({
+  currTime,
+  length,
+  offset = 0,
+}: {
+  currTime: number;
+  length: number;
+  offset?: number;
+}) {
+  const delta = currTime - offset;
+  const points = length - delta;
+
+  return {
+    delta,
+    points,
+  };
+}
+
 function levenshteinDistance(a: string, b: string) {
   const matrix = [];
 

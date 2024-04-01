@@ -1,11 +1,12 @@
 import {Heading, HoverCard, Text} from '@radix-ui/themes';
-import {AchievementType, Score} from '../types';
+import {AchievementType, LocalScore, Score} from '../types';
 import {DateUtils, UI} from '../utils/common';
 import {PersonIcon} from '@radix-ui/react-icons';
 import PlaceContainer from './PlaceContainer';
+import {isLocalScore} from '../types/typeGuards';
 
 interface ScoreTileProps extends React.HTMLProps<HTMLDivElement> {
-  score: Score;
+  score: Score | LocalScore;
   isLocal?: boolean;
   achievement?: AchievementType | undefined;
   position?: number;
@@ -22,7 +23,7 @@ function ScoreTile({
   hoverContent,
   className,
 }: ScoreTileProps): JSX.Element {
-  const {userName, timeElapsed, totalScore, createdAt} = score;
+  const {timeElapsed, totalScore, createdAt} = score;
   return (
     <HoverCard.Root>
       <HoverCard.Trigger>
@@ -43,7 +44,7 @@ function ScoreTile({
             )}
             <div className="flex ml-2 flex-col justify-between">
               <Heading weight={'medium'} className="text-white" size={'3'}>
-                {userName}
+                {isLocalScore(score) ? 'Last Attempt' : score.userName}
               </Heading>
               <Text size={'2'} className="text-white/70">
                 {DateUtils.formatDate(createdAt, true)}

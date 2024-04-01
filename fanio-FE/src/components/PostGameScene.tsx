@@ -1,6 +1,6 @@
 import {useMemo, useState} from 'react';
 import {motion} from 'framer-motion';
-import {ButtonType, Score} from '../types';
+import {ButtonType, LocalScore, Score} from '../types';
 import {uploadScore} from '../utils/api';
 import {LocalStorage} from '../utils/localStorage';
 import {GAME_OPTIONS} from '../constants/Game';
@@ -25,13 +25,16 @@ function PostGameScene({
   quizId,
 }: {
   topScore?: Score;
-  lastAttempt: Score;
+  lastAttempt: LocalScore;
   quizId: string;
   onRestart: () => void;
 }): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUploaded, setIsUploaded] = useState<boolean>(false);
-  const [attempt, setAttempt] = useState<Score>({...lastAttempt, userName: ''});
+  const [attempt, setAttempt] = useState<LocalScore & {userName: string}>({
+    ...lastAttempt,
+    userName: '',
+  });
 
   const uploadGameScore = async () => {
     setIsLoading(true);
@@ -56,8 +59,8 @@ function PostGameScene({
     const {POST_GAME_SUBTITLES, POST_GAME_TITLES} = GAME_OPTIONS;
     if (!topScore)
       return {
-        title: POST_GAME_TITLES[2],
-        subtitle: POST_GAME_SUBTITLES[2],
+        title: POST_GAME_TITLES[0],
+        subtitle: POST_GAME_SUBTITLES[0],
       };
 
     const {totalScore: _currScore} = lastAttempt;
@@ -131,11 +134,10 @@ function PostGameScene({
         </div>
       </div>
       <Button
-        text="Start Quiz"
+        text="Try again"
         className="mx-auto mt-4"
-        hotkey="Enter"
+        hotkey="R"
         onClick={onRestart}
-        ignoreMetaKey
       />
     </div>
   );

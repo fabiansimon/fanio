@@ -40,6 +40,8 @@ export interface Score {
   totalScore: number;
 }
 
+export type LocalScore = Omit<Score, 'id' | 'userName'> & {isUploaded: boolean};
+
 export interface QuestionInput {
   url: string;
   answer: string;

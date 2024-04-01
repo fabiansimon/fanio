@@ -1,18 +1,29 @@
 import {motion, useAnimation} from 'framer-motion';
-import {forwardRef, useImperativeHandle, useState} from 'react';
+import {forwardRef, useImperativeHandle, useState, Ref} from 'react';
 import {UI} from '../utils/common';
 import AnimatedText from './AnimatedText';
 import {GAME_OPTIONS} from '../constants/Game';
 
-function PointsBar({className}: {className?: string}, ref: any): JSX.Element {
+interface PointsBarProps {
+  className?: string;
+}
+
+export interface PointsBarRef {
+  startAnimation: (length?: number) => void;
+  setSongLength: (length: number) => void;
+  clear: () => void;
+}
+
+function PointsBar(props: PointsBarProps, ref: Ref<PointsBarRef>) {
+  const {className} = props;
   const [songLength, setSongLength] = useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const controls = useAnimation();
 
-  const triggerAnimation = (length: number) => {
-    setSongLength(length);
-
+  const triggerAnimation = (length?: number) => {
+    if (length) setSongLength(length);
+    setIsPlaying(true);
     controls.set({width: '100%'});
-
     controls.start({
       width: 0,
       transition: {duration: length},
@@ -25,7 +36,8 @@ function PointsBar({className}: {className?: string}, ref: any): JSX.Element {
   };
 
   useImperativeHandle(ref, () => ({
-    startAnimation: (length: number) => triggerAnimation(length),
+    startAnimation: (length?: number) => triggerAnimation(length),
+    setSongLength: (length: number) => setSongLength(length),
     clear: () => clear(),
   }));
 
@@ -35,7 +47,7 @@ function PointsBar({className}: {className?: string}, ref: any): JSX.Element {
         'h-4 w-full relative overflow-hidden rounded-xl items-end justify-center flex flex-col px-1 bg-slate-950',
         className,
       )}>
-      {songLength && (
+      {isPlaying && songLength && (
         <AnimatedText
           className="text-white"
           start={GAME_OPTIONS.MAX_POINTS_PER_ROUND}
@@ -50,4 +62,4 @@ function PointsBar({className}: {className?: string}, ref: any): JSX.Element {
   );
 }
 
-export default forwardRef(PointsBar);
+export default forwardRef<PointsBarRef, PointsBarProps>(PointsBar);

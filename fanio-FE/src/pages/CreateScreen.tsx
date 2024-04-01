@@ -44,14 +44,6 @@ function CreateScreen(): JSX.Element {
     questions: [],
   });
 
-  const inputValid = useMemo(() => {
-    if (!quizInput) return false;
-    const {title, questions} = quizInput;
-    if (title.trim() && questions.length > 1) return true;
-
-    return false;
-  }, [quizInput]);
-
   const containsDuplicated = useMemo(() => {
     if (!quizInput?.questions) return false;
     const usedTitles = new Set();
@@ -63,6 +55,14 @@ function CreateScreen(): JSX.Element {
 
     return false;
   }, [quizInput?.questions]);
+
+  const inputValid = useMemo(() => {
+    if (!quizInput || containsDuplicated) return false;
+    const {title, questions} = quizInput;
+    if (title.trim() && questions.length > 1) return true;
+
+    return false;
+  }, [quizInput, containsDuplicated]);
 
   const handleInput = (value: string | number, type: InputType) => {
     if (typeof value === 'string' && type === InputType.URL) {

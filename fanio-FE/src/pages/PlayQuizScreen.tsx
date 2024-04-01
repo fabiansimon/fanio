@@ -2,16 +2,18 @@ import {useParams} from 'react-router-dom';
 import PageContainer from '../components/PageContainer';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import ReactPlayer from 'react-player';
-import {Quiz, Score} from '../types';
+import {LocalScore, Quiz, Score} from '../types';
 import {fetchPlayableQuizById} from '../utils/api';
 import {shuffle} from 'lodash';
 import Button from '../components/Button';
 import {Heading, Text} from '@radix-ui/themes';
 import {DateUtils, UI} from '../utils/common';
-import {similarity} from '../utils/logic';
+import {calculatePoints, similarity} from '../utils/logic';
 import InputField from '../components/InputField';
 import PostGameScene from '../components/PostGameScene';
 import PreGameScene from '../components/PreGameScene';
+import PointsBar, {PointsBarRef} from '../components/PointsBar';
+import {LocalStorage} from '../utils/localStorage';
 
 interface ScoreState {
   totalScore: number;
@@ -43,6 +45,7 @@ function PlayQuizScreen({}): JSX.Element {
 
   const videoRef = useRef<ReactPlayer>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const barRef = useRef<PointsBarRef>(null);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [gameState, setGameState] = useState<GameState>(GameState.PRE);
@@ -50,7 +53,7 @@ function PlayQuizScreen({}): JSX.Element {
 
   const [quizData, setQuizData] = useState<Quiz | null>(null);
   const [topScore, setTopScore] = useState<Score | undefined>();
-  const [lastAttempt, setLastAttempt] = useState<Score | undefined>();
+  const [lastAttempt, setLastAttempt] = useState<LocalScore | undefined>();
 
   const [input, setInput] = useState<string>('');
   const [score, setScore] = useState<ScoreState>(INIT_SCORE);
@@ -73,19 +76,28 @@ function PlayQuizScreen({}): JSX.Element {
     setScore(INIT_SCORE);
   };
 
+  const lastStoredAttempt = LocalStorage.fetchLastAttempt(id!);
+
   useEffect(() => {
     if (questionIndex === quizData?.questions.length) {
-      setLastAttempt({
+      const _lastAttempt: LocalScore = {
         createdAt: new Date(),
-        id: '',
-        quizId: '',
+        quizId: id!,
         timeElapsed: score.totalTime,
         totalScore: score.totalScore,
-        userName: 'Last attempt',
-      });
+        isUploaded: false,
+      };
+      LocalStorage.saveLastAttempt(id!, _lastAttempt!);
+      setLastAttempt(_lastAttempt);
       setGameState(GameState.POST);
     }
-  }, [questionIndex, score.totalScore, score.totalTime, quizData?.questions]);
+  }, [
+    questionIndex,
+    score.totalScore,
+    score.totalTime,
+    quizData?.questions,
+    id,
+  ]);
 
   useEffect(() => {
     if (!id) return;
@@ -106,9 +118,7 @@ function PlayQuizScreen({}): JSX.Element {
   useEffect(() => {
     switch (gameState) {
       case GameState.PLAYING:
-        setTimeout(() => {
-          handlePlay();
-        }, 1000);
+        // handlePlay();
         break;
 
       default:
@@ -117,18 +127,21 @@ function PlayQuizScreen({}): JSX.Element {
   }, [gameState, inputRef, handlePlay]);
 
   const handleSubmitGuess = () => {
-    if (!input || !question?.answer) return;
+    if (!input || !question?.answer || !videoRef.current) return;
 
     console.log(similarity(input, question?.answer)); // DEBUG ONLY
 
     const isCorrect = similarity(input, question?.answer) >= ANSWER_THRESHOLD;
     setInput('');
 
-    const delta = videoRef.current?.getCurrentTime() || 0;
-    // (videoRef.current?.getCurrentTime() || 0) - (question?.startOffset || 0);
-    const points = videoRef.current?.getDuration()! - delta;
+    const {delta, points} = calculatePoints({
+      currTime: videoRef.current?.getCurrentTime(),
+      length: videoRef.current?.getDuration(),
+      offset: question?.startOffset,
+    });
 
     if (isCorrect) {
+      barRef.current?.clear();
       setScore(prev => {
         return {
           totalScore: (prev.totalScore += points),
@@ -154,7 +167,7 @@ function PlayQuizScreen({}): JSX.Element {
         {gameState === GameState.PRE && (
           <PreGameScene
             topScore={topScore}
-            lastAttempt={lastAttempt}
+            lastAttempt={lastAttempt || lastStoredAttempt}
             onStart={() => setGameState(GameState.PLAYING)}
           />
         )}
@@ -171,15 +184,16 @@ function PlayQuizScreen({}): JSX.Element {
             {question && (
               <ReactPlayer
                 playing={isPlaying}
-                // onReady={e => {
-                // setIsReady(true);
-                // barRef.current?.startAnimation(e.getDuration());
-                // if (questionIndex === 0) return;
-                // if (question.startOffset) {
-                //   videoRef.current?.seekTo(question.startOffset, 'seconds');
-                // }
-                // handlePlay();
-                // }}
+                onReady={e => {
+                  barRef.current?.setSongLength(e.getDuration());
+                  if (question.startOffset) {
+                    videoRef.current?.seekTo(question.startOffset, 'seconds');
+                  }
+                  handlePlay();
+                }}
+                onPlay={() => {
+                  barRef.current?.startAnimation();
+                }}
                 controls
                 width={0}
                 height={0}
@@ -188,6 +202,7 @@ function PlayQuizScreen({}): JSX.Element {
               />
             )}
             <div className="mx-[10%]">
+              <PointsBar ref={barRef} />
               <InputField
                 showSimple
                 onInput={handleInput}
