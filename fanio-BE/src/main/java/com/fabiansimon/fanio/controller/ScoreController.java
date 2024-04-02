@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -55,7 +57,12 @@ public class ScoreController {
     }
 
     @PostMapping("/upload-score")
-    public ResponseEntity<Score> createScore(@RequestBody Score score) {
+    public ResponseEntity<?> createScore(@RequestBody Score score) {
+        if (scoreService.usesProfanity(score.getUserName())) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("Profanity detected", "The username contains inappropriate content.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         Score savedScore = scoreService.saveScore(score);
         return new ResponseEntity<>(savedScore, HttpStatus.CREATED);
     }

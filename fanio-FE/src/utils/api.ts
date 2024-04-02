@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 import {
   GameStatistic,
   MetaData,
@@ -18,7 +18,7 @@ const _axios = axios.create({
   headers: {'Access-Control-Allow-Origin': '*'},
 });
 
-const ERROR_MESSAGE = {
+const FALLBACK_ERROR_MESSAGE = {
   title: 'Sorry, something went wrong',
   description: 'This is on us. Please try again later.',
 };
@@ -28,11 +28,7 @@ export async function fetchQuizById({id}: {id: string}): Promise<Quiz> {
     const response = await _axios.get<Quiz>(`/quiz/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Failed to fetch quiz by ID:', error);
-    ToastController.showErrorToast(
-      ERROR_MESSAGE.title,
-      ERROR_MESSAGE.description,
-    );
+    handleError({error, callName: 'fetchQuizById'});
     throw error;
   }
 }
@@ -49,11 +45,7 @@ export async function fetchPlayableQuizById({
     );
     return response.data;
   } catch (error) {
-    console.error('Failed to fetch quiz by ID:', error);
-    ToastController.showErrorToast(
-      ERROR_MESSAGE.title,
-      ERROR_MESSAGE.description,
-    );
+    handleError({error, callName: 'fetchPlayableQuizById'});
     throw error;
   }
 }
@@ -63,11 +55,7 @@ export async function uploadQuiz(quiz: QuizInput): Promise<Quiz> {
     const response = await _axios.post<Quiz>('/create-quiz', quiz);
     return response.data;
   } catch (error) {
-    console.error('Failed to create quiz:', error);
-    ToastController.showErrorToast(
-      ERROR_MESSAGE.title,
-      ERROR_MESSAGE.description,
-    );
+    handleError({error, callName: 'uploadQuiz'});
     throw error;
   }
 }
@@ -77,11 +65,7 @@ export async function uploadScore(score: ScoreInput): Promise<Score> {
     const res = await _axios.post<Score>('/upload-score', score);
     return res.data;
   } catch (error) {
-    console.error('Failed to upload score:', error);
-    ToastController.showErrorToast(
-      ERROR_MESSAGE.title,
-      ERROR_MESSAGE.description,
-    );
+    handleError({error, callName: 'uploadScore'});
     throw error;
   }
 }
@@ -99,11 +83,7 @@ export async function fetchScoresFromQuiz({
     const res = await _axios.get(`/scores/${quizId}?page=${page}&size=${size}`);
     return res.data;
   } catch (error) {
-    console.error('Failed to fetch scores:', error);
-    ToastController.showErrorToast(
-      ERROR_MESSAGE.title,
-      ERROR_MESSAGE.description,
-    );
+    handleError({error, callName: 'fetchScoresFromQuiz'});
     throw error;
   }
 }
@@ -116,11 +96,7 @@ export async function fetchAllQuizzes(
     const res = await _axios.get(`/quizzes?page=${page}&size=${size}`);
     return res.data;
   } catch (error) {
-    console.error('Failed to fetch all quizzes:', error);
-    ToastController.showErrorToast(
-      ERROR_MESSAGE.title,
-      ERROR_MESSAGE.description,
-    );
+    handleError({error, callName: 'fetchAllQuizzes'});
     throw error;
   }
 }
@@ -133,7 +109,7 @@ export async function fetchMetaData(url: string): Promise<MetaData> {
     });
     return res.data;
   } catch (error) {
-    console.warn('Failed to fetch suggested title:', error);
+    handleError({error, callName: 'fetchMetaData', showError: false});
     throw error;
   }
 }
@@ -144,11 +120,7 @@ export async function searchQuizByTerm(term: string): Promise<Quiz[] | []> {
     const res = await _axios.get(`/search-quiz?term=${term}`);
     return res.data.content;
   } catch (error) {
-    console.error('Failed to fetch all quizzes:', error);
-    ToastController.showErrorToast(
-      ERROR_MESSAGE.title,
-      ERROR_MESSAGE.description,
-    );
+    handleError({error, callName: 'searchQuizByTerm'});
     throw error;
   }
 }
@@ -161,11 +133,7 @@ export async function fetchTopQuizzes(
     const res = await _axios.get(`/quizzes?page=${page}&size=${size}`);
     return res.data;
   } catch (error) {
-    console.error('Failed to fetch all quizzes:', error);
-    ToastController.showErrorToast(
-      ERROR_MESSAGE.title,
-      ERROR_MESSAGE.description,
-    );
+    handleError({error, callName: 'fetchTopQuizzes'});
     throw error;
   }
 }
@@ -185,11 +153,7 @@ export async function fetchTopScores({
     );
     return res.data;
   } catch (error) {
-    console.error('Failed to fetch top scores:', error);
-    ToastController.showErrorToast(
-      ERROR_MESSAGE.title,
-      ERROR_MESSAGE.description,
-    );
+    handleError({error, callName: 'fetchTopScores'});
     throw error;
   }
 }
@@ -199,11 +163,32 @@ export async function fetchGameStatistic(): Promise<GameStatistic> {
     const res = await _axios.get('/statistic');
     return res.data;
   } catch (error) {
-    console.error('Failed to fetch all quizzes:', error);
-    ToastController.showErrorToast(
-      ERROR_MESSAGE.title,
-      ERROR_MESSAGE.description,
-    );
+    handleError({error, callName: 'fetchGameStatistic'});
     throw error;
   }
+}
+
+function handleError({
+  error,
+  callName,
+  showError = true,
+}: {
+  error: unknown;
+  callName: string;
+  showError?: boolean;
+}) {
+  console.error(`Failed request at function [${callName}]`, error);
+
+  if (!showError) return;
+
+  let errorTitle = FALLBACK_ERROR_MESSAGE.title;
+  let errorDescription = FALLBACK_ERROR_MESSAGE.description;
+
+  if (axios.isAxiosError(error) && error.response) {
+    const [title, description] = Object.entries(error.response.data)[0];
+    errorTitle = title;
+    errorDescription = description as string;
+  }
+
+  ToastController.showErrorToast(errorTitle, errorDescription);
 }
