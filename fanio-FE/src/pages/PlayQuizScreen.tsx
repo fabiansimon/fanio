@@ -48,7 +48,7 @@ function PlayQuizScreen({}): JSX.Element {
   const barRef = useRef<PointsBarRef>(null);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [gameState, setGameState] = useState<GameState>(GameState.PRE);
+  const [gameState, setGameState] = useState<GameState>(GameState.PLAYING);
   const [questionIndex, setQuestionIndex] = useState<number>(0);
 
   const [quizData, setQuizData] = useState<Quiz | null>(null);
@@ -157,6 +157,10 @@ function PlayQuizScreen({}): JSX.Element {
     }
   };
 
+  const handleSongStart = () => {
+    barRef.current?.startAnimation();
+  };
+
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
@@ -191,9 +195,7 @@ function PlayQuizScreen({}): JSX.Element {
                   }
                   handlePlay();
                 }}
-                onPlay={() => {
-                  barRef.current?.startAnimation();
-                }}
+                onPlay={handleSongStart}
                 controls
                 width={0}
                 height={0}
@@ -241,6 +243,7 @@ function InfoContainer({
   totalQuestion?: number;
 }): JSX.Element {
   const {totalScore, totalTime, guesses} = data;
+  const [time, setTime] = useState(totalTime);
 
   return (
     <div className={UI.cn('flex w-full justify-between', className)}>
@@ -254,7 +257,7 @@ function InfoContainer({
       </div>
       <div className="flex flex-col">
         <Heading size={'4'} className="text-white text-center">
-          {DateUtils.formatSeconds(totalTime, 'sec')}
+          {DateUtils.formatSeconds(time, 'sec')}
         </Heading>
         <Text size={'2'} className="text-white text-center">
           Total Time

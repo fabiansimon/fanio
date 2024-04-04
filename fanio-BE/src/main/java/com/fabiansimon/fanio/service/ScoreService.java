@@ -3,6 +3,7 @@ package com.fabiansimon.fanio.service;
 import com.fabiansimon.fanio.enums.TimeFrame;
 import com.fabiansimon.fanio.model.Score;
 import com.fabiansimon.fanio.repository.ScoreRepository;
+import com.fabiansimon.fanio.utils.PythonScriptRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,40 +51,46 @@ public class ScoreService {
 
     public boolean usesProfanity(String username) {
         try {
-            String homeDirectory = System.getProperty("user.home");
-            String path = homeDirectory + "/Developer/python_scripts/profanity_filter.py";
-
-            /*  TODO:
-                Handle Command Injection Vulnerability
-             */
-
-            username = cleanUserNameInput(username);
-
-            List<String> commands = List.of("/Users/fabiansimon/opt/anaconda3/bin/python3", path, username);
-            ProcessBuilder processBuilder = new ProcessBuilder(commands);
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            StringBuilder output = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line);
+            for (String variant : usernameVariants(username)) {
+                if (Boolean.parseBoolean(PythonScriptRunner.run("profanity_filter", variant))) return true;
             }
 
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                return false;
-            }
-
-            return Boolean.parseBoolean(output.toString().trim());
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    String cleanUserNameInput(String username) {
+    private List<String> usernameVariants(String src) {
+        List<String> variants = new ArrayList<>();
+        variants.add(src);
+
+        String cleanUsername = cleanUserNameInput(src);
+
+        variants.add(cleanUsername);
+        variants.add(removeConsecutiveDuplicates(cleanUsername));
+
+        return variants;
+    }
+
+    private String removeConsecutiveDuplicates(String username) {
+        if (username == null || username.isEmpty()) {
+            return username;
+        }
+
+        StringBuilder result = new StringBuilder();
+        result.append(username.charAt(0));
+
+        for (int i = 1; i < username.length(); i++) {
+            if (username.charAt(i) != username.charAt(i - 1))
+                result.append(username.charAt(i));
+        }
+
+        return result.toString();
+    }
+    private String cleanUserNameInput(String username) {
+
         StringBuilder stringBuilder = new StringBuilder();
         for (Character c : username.toCharArray()) {
             if (Character.isLetter(c)) stringBuilder.append(c);

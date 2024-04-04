@@ -31,6 +31,7 @@ function PointsBar(props: PointsBarProps, ref: Ref<PointsBarRef>) {
   };
 
   const clear = () => {
+    setIsPlaying(false);
     setSongLength(null);
     controls.set({width: '100%'});
   };
