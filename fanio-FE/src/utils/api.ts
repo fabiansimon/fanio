@@ -168,6 +168,22 @@ export async function fetchGameStatistic(): Promise<GameStatistic> {
   }
 }
 
+export async function fetchScorePlacement({
+  quizId,
+  score,
+}: {
+  quizId: string;
+  score: number;
+}): Promise<number> {
+  try {
+    const res = await _axios.get(`'/score-placement/${quizId}/${score}`);
+    return res.data;
+  } catch (error) {
+    handleError({error, callName: 'fetchGameStatistic'});
+    throw error;
+  }
+}
+
 function handleError({
   error,
   callName,

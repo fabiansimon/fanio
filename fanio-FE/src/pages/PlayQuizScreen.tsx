@@ -40,7 +40,7 @@ const INIT_SCORE = {
   guesses: [],
 };
 
-function PlayQuizScreen({}): JSX.Element {
+function PlayQuizScreen(): JSX.Element {
   const {id} = useParams();
 
   const videoRef = useRef<ReactPlayer>(null);
@@ -130,8 +130,9 @@ function PlayQuizScreen({}): JSX.Element {
       offset: question?.startOffset,
     });
     backgroundRef.current?.flashColor(
-      isCorrect ? 'bg-green-400' : 'bg-red-400',
+      isCorrect ? 'bg-green-600' : 'bg-red-700',
     );
+    !isCorrect && backgroundRef.current?.shakeContent();
 
     if (isCorrect) {
       barRef.current?.clear();
@@ -238,7 +239,6 @@ function PlayQuizScreen({}): JSX.Element {
 function InfoContainer({
   className,
   data,
-  time,
   totalQuestion = 0,
   topScore,
 }: {
@@ -248,24 +248,24 @@ function InfoContainer({
   time: number;
   totalQuestion?: number;
 }): JSX.Element {
-  const {totalScore, guesses} = data;
+  const {totalScore, guesses, totalTime} = data;
 
   return (
     <div className={UI.cn('flex flex-col w-full justify-between', className)}>
       {topScore && (
-        <div className="flex justify-end">
+        <div className="flex justify-center">
           <div className="flex flex-col mb-4">
-            <Text size={'2'} className="text-white/70 text-right">
+            <Text size={'2'} className="text-white/70 text-center">
               Score to beat
             </Text>
-            <Heading size={'2'} className="text-white/70 text-right">
+            <Heading size={'2'} className="text-white/70 text-center">
               {UI.formatPoints(topScore.totalScore)}
             </Heading>
           </div>
         </div>
       )}
-      <div className="flex justify-between">
-        <div className="flex flex-col">
+      <div className="flex justify-between items-center">
+        <div className="flex w-full flex-grow flex-col">
           <Heading size={'4'} className="text-white">
             {guesses.length} out of {totalQuestion}
           </Heading>
@@ -273,15 +273,15 @@ function InfoContainer({
             Current Question
           </Text>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-grow w-full flex-col">
           <Heading size={'4'} className="text-white text-center">
-            {DateUtils.formatTime(time, 'sec')}
+            {DateUtils.formatTime(totalTime)}
           </Heading>
           <Text size={'2'} className="text-white text-center">
             Total Time
           </Text>
         </div>
-        <div className="flex flex-col">
+        <div className="flex w-full flex-grow flex-col">
           <Heading size={'4'} className="text-white text-right">
             {UI.formatPoints(totalScore)}
           </Heading>

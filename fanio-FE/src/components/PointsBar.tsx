@@ -43,11 +43,7 @@ function PointsBar(props: PointsBarProps, ref: Ref<PointsBarRef>) {
   }));
 
   return (
-    <div
-      className={UI.cn(
-        'h-4 w-full relative overflow-hidden rounded-xl items-end justify-center flex flex-col px-1 bg-slate-950',
-        className,
-      )}>
+    <div className={UI.cn(className)}>
       {isPlaying && songLength && (
         <AnimatedText
           className="text-white"
@@ -55,10 +51,6 @@ function PointsBar(props: PointsBarProps, ref: Ref<PointsBarRef>) {
           duration={songLength}
         />
       )}
-      <motion.div
-        animate={controls}
-        className="absolute left-0 top-0 h-4 movingGradient"
-      />
     </div>
   );
 }

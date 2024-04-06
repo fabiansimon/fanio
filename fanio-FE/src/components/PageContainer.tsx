@@ -3,6 +3,10 @@ import {UI} from '../utils/common';
 import {ArrowLeftIcon} from '@radix-ui/react-icons';
 import {useNavigate} from 'react-router-dom';
 import {forwardRef, Ref, useImperativeHandle, useRef, useState} from 'react';
+import {motion} from 'framer-motion';
+
+const BACKGROUND_ANIMATION_DURATION = 170;
+const SHAKE_ANIMATION_DURATION = 50;
 
 interface PageContainerProps {
   className?: string;
@@ -14,6 +18,7 @@ interface PageContainerProps {
 
 interface PageContainerRef {
   flashColor: (color: string) => void;
+  shakeContent: () => void;
 }
 
 function PageContainer(
@@ -22,20 +27,40 @@ function PageContainer(
 ): JSX.Element {
   const [backgroundColor, setBackgroundColor] =
     useState<string>('bg-slate-950');
+  const [isShaking, setIsShaking] = useState<boolean>(false);
+
   const divRef = useRef<HTMLDivElement>(null);
+
   const navigation = useNavigate();
+
+  const shakeAnimation = {
+    shake: {
+      x: [0, -40, 40, -40, 40, 0],
+      transition: {
+        duration: 1,
+        repeat: 0,
+      },
+    },
+  };
 
   const flashColor = (color: string) => {
     setBackgroundColor(color);
     setTimeout(() => {
       setBackgroundColor('bg-slate-950');
-    }, 200);
+    }, BACKGROUND_ANIMATION_DURATION);
+  };
+
+  const shakeContent = () => {
+    console.log('called');
+    setIsShaking(true);
+    setTimeout(() => setIsShaking(false), SHAKE_ANIMATION_DURATION);
   };
 
   useImperativeHandle(
     ref,
     () => ({
       flashColor,
+      shakeContent,
     }),
     [],
   );
@@ -44,11 +69,15 @@ function PageContainer(
     <div
       ref={divRef}
       className={UI.cn(
-        'flex items-center justify-center transition-colors duration-200 ease-in-out',
+        'flex items-center justify-center transition-colors ease-in-out',
+        `duration-${BACKGROUND_ANIMATION_DURATION}`,
         backgroundColor,
         className,
       )}>
-      <div className="flex flex-col max-w-screen-xl w-full h-screen pb-12 px-10">
+      <motion.div
+        variants={shakeAnimation}
+        animate={isShaking ? 'shake' : ''}
+        className="flex flex-col max-w-screen-xl w-full h-screen pb-12 px-10">
         <div className="flex items-end">
           <div className="mt-12 w-full">
             <ArrowLeftIcon
@@ -65,7 +94,7 @@ function PageContainer(
           {trailing}
         </div>
         {children}
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -56,6 +56,13 @@ public class ScoreController {
         return ResponseEntity.ok(scores);
     }
 
+    @GetMapping("/score-placement/{quizId}/{score}")
+    public ResponseEntity<?> getScorePlacement(@RequestParam UUID quizId,
+                                               @RequestParam Integer score) {
+        System.out.println(scoreService.getScorePlacement(quizId, score));
+        return ResponseEntity.ok(scoreService.getScorePlacement(quizId, score));
+    }
+
     @PostMapping("/upload-score")
     public ResponseEntity<?> createScore(@RequestBody Score score) {
         if (scoreService.usesProfanity(score.getUserName())) {

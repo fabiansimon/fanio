@@ -1,10 +1,11 @@
 import {Heading, Text} from '@radix-ui/themes';
 import Button from './Button';
 import {MinusIcon, PlusIcon} from '@radix-ui/react-icons';
-import {useMemo} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {AchievementType, LocalScore, Score} from '../types';
 import ScoreTile from './ScoreTile';
 import {DateUtils, UI} from '../utils/common';
+import {fetchScorePlacement} from '../utils/api';
 
 function PreGameScene({
   topScore,
@@ -15,6 +16,8 @@ function PreGameScene({
   lastAttempt?: LocalScore;
   onStart: () => void;
 }): JSX.Element {
+  const [placement, setPlacement] = useState<number>(-1);
+
   const isWinner = useMemo(() => {
     if (!topScore || !lastAttempt) return false;
     return topScore?.totalScore < lastAttempt?.totalScore;
@@ -31,6 +34,23 @@ function PreGameScene({
       ),
     };
   }, [isWinner]);
+
+  useEffect(() => {
+    if (!lastAttempt) return;
+    (async () => {
+      try {
+        const {quizId, totalScore: score} = lastAttempt;
+        console.log(quizId, score);
+        const res = await fetchScorePlacement({
+          quizId,
+          score,
+        });
+        setPlacement(res);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, [lastAttempt]);
 
   return (
     <div className="border border-white/20 rounded-lg py-3 px-3 mx-[10%] my-auto">

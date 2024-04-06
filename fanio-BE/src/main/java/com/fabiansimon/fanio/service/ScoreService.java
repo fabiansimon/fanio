@@ -9,8 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,6 +45,10 @@ public class ScoreService {
 
     public Score saveScore(Score score) {
         return scoreRepository.save(score);
+    }
+
+    public Integer getScorePlacement(UUID quizId, Integer score) {
+        return scoreRepository.findScorePlacement(quizId, score) + 1; // Query gets the amount on top;
     }
 
     public boolean usesProfanity(String username) {
