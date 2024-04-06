@@ -23,5 +23,5 @@ public interface ScoreRepository extends JpaRepository<Score, UUID> {
     @Query(value = "SELECT * FROM scores WHERE quiz_id = :quizId ORDER BY total_score DESC LIMIT 1", nativeQuery = true)
     Score findQuizTopScore(UUID quizId);
     @Query(value = "SELECT COUNT(*) FROM scores WHERE quiz_id = :quizId AND total_score > :score", nativeQuery = true)
-    Integer findScorePlacement(UUID quizId, Integer score);
+    Integer findScorePlacement(UUID quizId, Double score);
 }

@@ -10,6 +10,7 @@ import ThumbnailPreview from './ThumbnailPreview';
 import Button from './Button';
 import useKeyShortcut from '../hooks/useKeyShortcut';
 import ValidationChip from './ValidationChip';
+import {DateUtils} from '../utils/common';
 
 interface AddQuizModalProps extends ModalProps {
   onSave: (quiz: QuestionInput) => void;
@@ -196,7 +197,8 @@ function AddQuizModal({
           {validUrl && (
             <div className="px-1 py-4 space-y-2">
               <Text size="1" className="text-white/90">
-                Start offset: <Strong>{startOffset || 0}</Strong> sec
+                Start offset:{' '}
+                <Strong>{DateUtils.formatSeconds(startOffset || 0)}</Strong> sec
               </Text>
               <Slider
                 onValueChange={(e: number[]) => {

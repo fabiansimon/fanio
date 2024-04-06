@@ -56,10 +56,9 @@ public class ScoreController {
         return ResponseEntity.ok(scores);
     }
 
-    @GetMapping("/score-placement/{quizId}/{score}")
+    @GetMapping("/score-placement")
     public ResponseEntity<?> getScorePlacement(@RequestParam UUID quizId,
-                                               @RequestParam Integer score) {
-        System.out.println(scoreService.getScorePlacement(quizId, score));
+                                               @RequestParam Double score) {
         return ResponseEntity.ok(scoreService.getScorePlacement(quizId, score));
     }
 

@@ -275,18 +275,18 @@ function InfoContainer({
         </div>
         <div className="flex flex-grow w-full flex-col">
           <Heading size={'4'} className="text-white text-center">
-            {DateUtils.formatTime(totalTime)}
+            {UI.formatPoints(totalScore)}
           </Heading>
           <Text size={'2'} className="text-white text-center">
-            Total Time
+            Points
           </Text>
         </div>
         <div className="flex w-full flex-grow flex-col">
           <Heading size={'4'} className="text-white text-right">
-            {UI.formatPoints(totalScore)}
+            {DateUtils.formatTime(totalTime)}
           </Heading>
           <Text size={'2'} className="text-white text-right">
-            Points
+            Total Time
           </Text>
         </div>
       </div>

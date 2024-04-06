@@ -176,7 +176,9 @@ export async function fetchScorePlacement({
   score: number;
 }): Promise<number> {
   try {
-    const res = await _axios.get(`'/score-placement/${quizId}/${score}`);
+    const res = await _axios.get(
+      `/score-placement?quizId=${quizId}&score=${score}`,
+    );
     return res.data;
   } catch (error) {
     handleError({error, callName: 'fetchGameStatistic'});

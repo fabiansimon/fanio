@@ -47,7 +47,7 @@ public class ScoreService {
         return scoreRepository.save(score);
     }
 
-    public Integer getScorePlacement(UUID quizId, Integer score) {
+    public Integer getScorePlacement(UUID quizId, Double score) {
         return scoreRepository.findScorePlacement(quizId, score) + 1; // Query gets the amount on top;
     }
 

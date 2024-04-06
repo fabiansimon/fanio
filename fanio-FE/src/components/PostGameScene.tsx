@@ -1,7 +1,7 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {motion} from 'framer-motion';
-import {ButtonType, LocalScore, Score} from '../types';
-import {uploadScore} from '../utils/api';
+import {AchievementType, ButtonType, LocalScore, Score} from '../types';
+import {fetchScorePlacement, uploadScore} from '../utils/api';
 import {LocalStorage} from '../utils/localStorage';
 import {GAME_OPTIONS} from '../constants/Game';
 import {rateScore} from '../utils/logic';
@@ -31,10 +31,27 @@ function PostGameScene({
 }): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUploaded, setIsUploaded] = useState<boolean>(false);
+  const [placement, setPlacement] = useState<number | undefined>();
   const [attempt, setAttempt] = useState<LocalScore & {userName: string}>({
     ...lastAttempt,
     userName: '',
   });
+
+  useEffect(() => {
+    if (!lastAttempt) return;
+    (async () => {
+      try {
+        const {quizId, totalScore: score} = lastAttempt;
+        const res = await fetchScorePlacement({
+          quizId,
+          score,
+        });
+        setPlacement(res);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, [lastAttempt]);
 
   const uploadGameScore = async () => {
     setIsLoading(true);
@@ -54,6 +71,20 @@ function PostGameScene({
       setIsLoading(false);
     }
   };
+
+  const achievement = useMemo(() => {
+    if (!placement) return;
+    let a;
+    if (placement < 4) {
+      a = [
+        AchievementType.FIRST,
+        AchievementType.SECOND,
+        AchievementType.THIRD,
+      ][placement - 1];
+    }
+
+    return a;
+  }, [placement]);
 
   const {title, subtitle} = useMemo(() => {
     const {POST_GAME_SUBTITLES, POST_GAME_TITLES} = GAME_OPTIONS;
@@ -94,8 +125,9 @@ function PostGameScene({
       </div>
       <div className="border border-white/20 overflow-hidden rounded-lg py-3 px-3">
         <ScoreTile
+          achievement={achievement}
           score={attempt.userName ? attempt : lastAttempt}
-          position={3}
+          position={placement}
         />
         <div className="relative">
           <motion.div
@@ -119,15 +151,17 @@ function PostGameScene({
               value={attempt.userName}
               onInput={handleInput}
               placeholder="Enter your name"
-              className="flex"
+              className="flex flex-grow w-1/2"
             />
             <Button
               type={ButtonType.outline}
               text="Upload Score"
               textSize="2"
+              hotkey={!isUploaded && 'Enter'}
+              ignoreMetaKey
               loading={isLoading}
               onClick={uploadGameScore}
-              className="flex w-1/2"
+              className="flex flex-grow w-1/2"
               disabled={attempt.userName.trim().length === 0}
             />
           </motion.div>
@@ -135,8 +169,9 @@ function PostGameScene({
       </div>
       <Button
         text="Try again"
+        ignoreMetaKey
+        hotkey={isUploaded && 'Enter'}
         className="mx-auto mt-4"
-        hotkey="R"
         onClick={onRestart}
       />
     </div>

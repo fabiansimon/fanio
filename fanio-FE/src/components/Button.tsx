@@ -52,12 +52,13 @@ function Button({
       ) : (
         <>
           {icon && icon}
-          <Text size={textSize} className="text-white">
+          <Text size={textSize} className="text-white line-clamp-1">
             {text}
           </Text>
           {children}
-          {hotkey && !disabled && (
+          {hotkey && (
             <KeyBinding
+              disabled={disabled}
               className="ml-2"
               onActivate={rest.onClick}
               hotkey={hotkey}

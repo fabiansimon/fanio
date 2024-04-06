@@ -51,7 +51,6 @@ function PageContainer(
   };
 
   const shakeContent = () => {
-    console.log('called');
     setIsShaking(true);
     setTimeout(() => setIsShaking(false), SHAKE_ANIMATION_DURATION);
   };

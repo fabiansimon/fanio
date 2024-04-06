@@ -154,7 +154,7 @@ function CreateScreen(): JSX.Element {
         title="Create quiz"
         className="bg-slate-950"
         description="Make sure to only use youtube links at the moment.">
-        <div className="flex max-h-[40%] space-x-4 mx-40 border my-auto border-neutral-500/50 p-5 shadow-md shadow-black bg-neutral-900 rounded-xl">
+        <div className="flex max-h-[40%] space-x-4 mx-40 border my-auto border-neutral-500/50 p-5 shadow-md shadow-black bg-slate-950 rounded-xl">
           {/* <div className="flex h-full w-[1px] bg-blue-500/50" /> */}
           <div className="flex flex-col w-full">
             {/* <div className="mr-auto mt-10 mb-2">
@@ -198,7 +198,7 @@ function CreateScreen(): JSX.Element {
                 handleInput(value, InputType.DESCRIPTION)
               }
             />
-            {(quizInput?.questions.length || 0) && (
+            {quizInput?.questions && quizInput?.questions.length > 0 && (
               <div className="mr-auto mt-4 mb-0 flex justify-between w-full">
                 <Text className="text-white" size={'2'}>
                   <Strong className="mr-1">
@@ -261,6 +261,7 @@ function QuestionPreviewContainer({
   onDelete: () => void;
 }): JSX.Element {
   const {answer, startOffset} = question;
+
   return (
     <div
       className={UI.cn(

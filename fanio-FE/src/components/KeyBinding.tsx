@@ -5,17 +5,23 @@ import {useMemo} from 'react';
 import {OperationSystem} from '../types';
 
 function KeyBinding({
+  disabled,
   hotkey,
   onActivate,
   ignoreMetaKey,
   className,
 }: {
+  disabled?: boolean;
   hotkey: string;
   onActivate?: () => void;
   ignoreMetaKey?: boolean;
   className?: string;
 }): JSX.Element {
-  useKeyShortcut(hotkey, () => onActivate && onActivate(), ignoreMetaKey);
+  useKeyShortcut(
+    hotkey,
+    () => onActivate && !disabled && onActivate(),
+    ignoreMetaKey,
+  );
   const OS = useDetectOS();
 
   const metaKey = useMemo(() => {
