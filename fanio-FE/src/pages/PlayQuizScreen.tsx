@@ -46,9 +46,10 @@ function PlayQuizScreen({}): JSX.Element {
   const videoRef = useRef<ReactPlayer>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const barRef = useRef<PointsBarRef>(null);
+  const backgroundRef = useRef<any>(null);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [gameState, setGameState] = useState<GameState>(GameState.PLAYING);
+  const [gameState, setGameState] = useState<GameState>(GameState.PRE);
   const [questionIndex, setQuestionIndex] = useState<number>(0);
 
   const [quizData, setQuizData] = useState<Quiz | null>(null);
@@ -115,17 +116,6 @@ function PlayQuizScreen({}): JSX.Element {
     })();
   }, [id]);
 
-  useEffect(() => {
-    switch (gameState) {
-      case GameState.PLAYING:
-        // handlePlay();
-        break;
-
-      default:
-        break;
-    }
-  }, [gameState, inputRef, handlePlay]);
-
   const handleSubmitGuess = () => {
     if (!input || !question?.answer || !videoRef.current) return;
 
@@ -139,6 +129,9 @@ function PlayQuizScreen({}): JSX.Element {
       length: videoRef.current?.getDuration(),
       offset: question?.startOffset,
     });
+    backgroundRef.current?.flashColor(
+      isCorrect ? 'bg-green-400' : 'bg-red-400',
+    );
 
     if (isCorrect) {
       barRef.current?.clear();
@@ -157,6 +150,15 @@ function PlayQuizScreen({}): JSX.Element {
     }
   };
 
+  const onPlayerReady = (e: ReactPlayer) => {
+    if (!question) return;
+    barRef.current?.setSongLength(e.getDuration());
+    if (question.startOffset) {
+      videoRef.current?.seekTo(question.startOffset, 'seconds');
+    }
+    handlePlay();
+  };
+
   const handleSongStart = () => {
     barRef.current?.startAnimation();
   };
@@ -166,7 +168,10 @@ function PlayQuizScreen({}): JSX.Element {
   };
 
   return (
-    <PageContainer title={quizData?.title} description={quizData?.description}>
+    <PageContainer
+      ref={backgroundRef}
+      title={quizData?.title}
+      description={quizData?.description}>
       <div className="w-full h-full flex flex-col">
         {gameState === GameState.PRE && (
           <PreGameScene
@@ -188,13 +193,7 @@ function PlayQuizScreen({}): JSX.Element {
             {question && (
               <ReactPlayer
                 playing={isPlaying}
-                onReady={e => {
-                  barRef.current?.setSongLength(e.getDuration());
-                  if (question.startOffset) {
-                    videoRef.current?.seekTo(question.startOffset, 'seconds');
-                  }
-                  handlePlay();
-                }}
+                onReady={onPlayerReady}
                 onPlay={handleSongStart}
                 controls
                 width={0}
@@ -203,6 +202,7 @@ function PlayQuizScreen({}): JSX.Element {
                 url={question.url}
               />
             )}
+
             <div className="mx-[10%]">
               <PointsBar ref={barRef} />
               <InputField
@@ -222,7 +222,9 @@ function PlayQuizScreen({}): JSX.Element {
               />
             </div>
             <InfoContainer
+              topScore={topScore}
               data={score}
+              time={100}
               totalQuestion={quizData?.questions.length}
               className="mt-14"
             />
@@ -236,40 +238,57 @@ function PlayQuizScreen({}): JSX.Element {
 function InfoContainer({
   className,
   data,
+  time,
   totalQuestion = 0,
+  topScore,
 }: {
   className?: string;
   data: ScoreState;
+  topScore?: Score;
+  time: number;
   totalQuestion?: number;
 }): JSX.Element {
-  const {totalScore, totalTime, guesses} = data;
-  const [time, setTime] = useState(totalTime);
+  const {totalScore, guesses} = data;
 
   return (
-    <div className={UI.cn('flex w-full justify-between', className)}>
-      <div className="flex flex-col">
-        <Heading size={'4'} className="text-white">
-          {guesses.length} out of {totalQuestion}
-        </Heading>
-        <Text size={'2'} className="text-white">
-          Current Question
-        </Text>
-      </div>
-      <div className="flex flex-col">
-        <Heading size={'4'} className="text-white text-center">
-          {DateUtils.formatSeconds(time, 'sec')}
-        </Heading>
-        <Text size={'2'} className="text-white text-center">
-          Total Time
-        </Text>
-      </div>
-      <div className="flex flex-col">
-        <Heading size={'4'} className="text-white text-right">
-          {UI.formatPoints(totalScore)}
-        </Heading>
-        <Text size={'2'} className="text-white text-right">
-          Points
-        </Text>
+    <div className={UI.cn('flex flex-col w-full justify-between', className)}>
+      {topScore && (
+        <div className="flex justify-end">
+          <div className="flex flex-col mb-4">
+            <Text size={'2'} className="text-white/70 text-right">
+              Score to beat
+            </Text>
+            <Heading size={'2'} className="text-white/70 text-right">
+              {UI.formatPoints(topScore.totalScore)}
+            </Heading>
+          </div>
+        </div>
+      )}
+      <div className="flex justify-between">
+        <div className="flex flex-col">
+          <Heading size={'4'} className="text-white">
+            {guesses.length} out of {totalQuestion}
+          </Heading>
+          <Text size={'2'} className="text-white">
+            Current Question
+          </Text>
+        </div>
+        <div className="flex flex-col">
+          <Heading size={'4'} className="text-white text-center">
+            {DateUtils.formatTime(time, 'sec')}
+          </Heading>
+          <Text size={'2'} className="text-white text-center">
+            Total Time
+          </Text>
+        </div>
+        <div className="flex flex-col">
+          <Heading size={'4'} className="text-white text-right">
+            {UI.formatPoints(totalScore)}
+          </Heading>
+          <Text size={'2'} className="text-white text-right">
+            Points
+          </Text>
+        </div>
       </div>
     </div>
   );

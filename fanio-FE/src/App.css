@@ -43,3 +43,7 @@
     transform: rotate(360deg);
   }
 }
+
+.transition-background-color {
+  transition: background-color 50ms ease-in-out;
+}

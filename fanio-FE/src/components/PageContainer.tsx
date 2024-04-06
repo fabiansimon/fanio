@@ -2,6 +2,7 @@ import {Heading, Text} from '@radix-ui/themes';
 import {UI} from '../utils/common';
 import {ArrowLeftIcon} from '@radix-ui/react-icons';
 import {useNavigate} from 'react-router-dom';
+import {forwardRef, Ref, useImperativeHandle, useRef, useState} from 'react';
 
 interface PageContainerProps {
   className?: string;
@@ -11,18 +12,40 @@ interface PageContainerProps {
   trailing?: React.ReactNode;
 }
 
-function PageContainer({
-  className,
-  children,
-  title,
-  description,
-  trailing,
-}: PageContainerProps): JSX.Element {
+interface PageContainerRef {
+  flashColor: (color: string) => void;
+}
+
+function PageContainer(
+  {className, children, title, description, trailing}: PageContainerProps,
+  ref: Ref<PageContainerRef>,
+): JSX.Element {
+  const [backgroundColor, setBackgroundColor] =
+    useState<string>('bg-slate-950');
+  const divRef = useRef<HTMLDivElement>(null);
   const navigation = useNavigate();
+
+  const flashColor = (color: string) => {
+    setBackgroundColor(color);
+    setTimeout(() => {
+      setBackgroundColor('bg-slate-950');
+    }, 200);
+  };
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      flashColor,
+    }),
+    [],
+  );
+
   return (
     <div
+      ref={divRef}
       className={UI.cn(
-        'bg-slate-950 flex items-center justify-center',
+        'flex items-center justify-center transition-colors duration-200 ease-in-out',
+        backgroundColor,
         className,
       )}>
       <div className="flex flex-col max-w-screen-xl w-full h-screen pb-12 px-10">
@@ -47,4 +70,4 @@ function PageContainer({
   );
 }
 
-export default PageContainer;
+export default forwardRef(PageContainer);
