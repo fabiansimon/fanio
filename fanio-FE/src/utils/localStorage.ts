@@ -1,4 +1,4 @@
-import {LocalScore, Quiz, Score} from '../types';
+import {LocalScore, Quiz} from '../types';
 
 const KEYS = {
   scoreIds: 'scoreIds',

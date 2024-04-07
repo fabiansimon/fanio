@@ -74,10 +74,14 @@ function PlayQuizScreen(): JSX.Element {
 
   const resetGame = () => {
     setGameState(GameState.PRE);
+    setQuestionIndex(0);
     setScore(INIT_SCORE);
   };
 
-  const lastStoredAttempt = LocalStorage.fetchLastAttempt(id!);
+  const lastStoredAttempt = useMemo(
+    () => LocalStorage.fetchLastAttempt(id!),
+    [id],
+  );
 
   useEffect(() => {
     if (questionIndex === quizData?.questions.length) {
@@ -225,7 +229,6 @@ function PlayQuizScreen(): JSX.Element {
             <InfoContainer
               topScore={topScore}
               data={score}
-              time={100}
               totalQuestion={quizData?.questions.length}
               className="mt-14"
             />
@@ -245,7 +248,6 @@ function InfoContainer({
   className?: string;
   data: ScoreState;
   topScore?: Score;
-  time: number;
   totalQuestion?: number;
 }): JSX.Element {
   const {totalScore, guesses, totalTime} = data;

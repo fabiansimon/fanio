@@ -97,7 +97,7 @@ function LandingScreen(): JSX.Element {
       <SearchContainer
         ref={searchRef}
         setSearchResult={setSearchResult}
-        className="flex h-[50%] justify-center"
+        className="flex flex-grow h-full justify-center"
       />
       <SearchResultsContainer
         onBack={() => searchRef.current?.clearSearch()}

@@ -13,7 +13,7 @@ function getWindowSize(): WindowSize {
   };
 }
 
-export default function useWindowSize(): WindowSize {
+function useWindowSize(): WindowSize {
   const [windowSize, setWindowSize] = useState<WindowSize>(getWindowSize());
 
   useEffect(() => {
@@ -28,3 +28,5 @@ export default function useWindowSize(): WindowSize {
 
   return windowSize;
 }
+
+export default useWindowSize;

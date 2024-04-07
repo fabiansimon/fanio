@@ -48,13 +48,10 @@ function AllGamesContainer({className}: {className?: string}): JSX.Element {
         {statistic &&
           Object.entries(statistic).map(([key, val]) => (
             <div key={key} className="mr-6 w-12">
-              <Heading size={'4'} className="text-white" key={key}>
+              <Heading size="4" className="text-white">
                 {val}
               </Heading>
-              <Text
-                size={'2'}
-                className="text-white/80 flex pt-[1.5pt]"
-                key={key}>
+              <Text size="2" className="text-white/80">
                 {statisticTerm(key)}
               </Text>
             </div>

@@ -14,7 +14,7 @@ import ROUTES from '../constants/Routes';
 import {uploadQuiz} from '../utils/api';
 import {REGEX} from '../constants/Regex';
 import InputField from '../components/InputField';
-import {UI} from '../utils/common';
+import {DateUtils, UI} from '../utils/common';
 import PageContainer from '../components/PageContainer';
 import AddQuizModal from '../components/AddQuizModal';
 import ValidationChip from '../components/ValidationChip';
@@ -154,7 +154,7 @@ function CreateScreen(): JSX.Element {
         title="Create quiz"
         className="bg-slate-950"
         description="Make sure to only use youtube links at the moment.">
-        <div className="flex max-h-[40%] space-x-4 mx-40 border my-auto border-neutral-500/50 p-5 shadow-md shadow-black bg-slate-950 rounded-xl">
+        <div className="flex max-h-[40%] space-x-4 min-w-[70vw] mx-auto border my-auto border-neutral-500/50 p-5 shadow-md shadow-black bg-slate-950 rounded-xl">
           {/* <div className="flex h-full w-[1px] bg-blue-500/50" /> */}
           <div className="flex flex-col w-full">
             {/* <div className="mr-auto mt-10 mb-2">
@@ -273,7 +273,8 @@ function QuestionPreviewContainer({
           {answer}
         </Heading>
         <Text size="2" className="text-white/80">
-          Start offset: <Strong>{startOffset || 0}</Strong> sec.
+          Start offset:{' '}
+          <Strong>{DateUtils.formatSeconds(startOffset || 0)}</Strong> min
         </Text>
       </div>
       <div>

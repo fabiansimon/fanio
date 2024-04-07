@@ -4,6 +4,7 @@ import {ArrowLeftIcon} from '@radix-ui/react-icons';
 import {useNavigate} from 'react-router-dom';
 import {forwardRef, Ref, useImperativeHandle, useRef, useState} from 'react';
 import {motion} from 'framer-motion';
+import useIsMobile from '../hooks/useIsMobile';
 
 const BACKGROUND_ANIMATION_DURATION = 170;
 const SHAKE_ANIMATION_DURATION = 50;
@@ -25,13 +26,14 @@ function PageContainer(
   {className, children, title, description, trailing}: PageContainerProps,
   ref: Ref<PageContainerRef>,
 ): JSX.Element {
+  const [isShaking, setIsShaking] = useState<boolean>(false);
   const [backgroundColor, setBackgroundColor] =
     useState<string>('bg-slate-950');
-  const [isShaking, setIsShaking] = useState<boolean>(false);
 
   const divRef = useRef<HTMLDivElement>(null);
 
   const navigation = useNavigate();
+  const isMobile = useIsMobile();
 
   const shakeAnimation = {
     shake: {
@@ -76,7 +78,10 @@ function PageContainer(
       <motion.div
         variants={shakeAnimation}
         animate={isShaking ? 'shake' : ''}
-        className="flex flex-col max-w-screen-xl w-full h-screen pb-12 px-10">
+        className={UI.cn(
+          'flex flex-col max-w-screen-xl w-full h-screen pb-12',
+          isMobile ? 'px-6' : 'px-10',
+        )}>
         <div className="flex items-end">
           <div className="mt-12 w-full">
             <ArrowLeftIcon

@@ -3,6 +3,7 @@ import useKeyShortcut from '../hooks/useKeyShortcut';
 import useDetectOS from '../hooks/useDetectOS';
 import {useMemo} from 'react';
 import {OperationSystem} from '../types';
+import useIsMobile from '../hooks/useIsMobile';
 
 function KeyBinding({
   disabled,
@@ -17,6 +18,8 @@ function KeyBinding({
   ignoreMetaKey?: boolean;
   className?: string;
 }): JSX.Element {
+  const isMobile = useIsMobile();
+
   useKeyShortcut(
     hotkey,
     () => onActivate && !disabled && onActivate(),
@@ -31,6 +34,7 @@ function KeyBinding({
     return 'Ctrl';
   }, [OS, ignoreMetaKey]);
 
+  if (isMobile) return <div />;
   return <Kbd className={className}>{`${metaKey}${hotkey}`}</Kbd>;
 }
 

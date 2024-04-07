@@ -7,6 +7,7 @@ import BackgroundLight from './BackgroundLight';
 import useMouseEntered from '../hooks/useMouseEntered';
 import {useMemo, useRef} from 'react';
 import {DateUtils, UI} from '../utils/common';
+import PlaceContainer from './PlaceContainer';
 
 interface QuizPreviewProps {
   quiz: Quiz;

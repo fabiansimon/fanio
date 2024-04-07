@@ -9,10 +9,11 @@ const breakpointsData = {
   [BreakPoint.XXL]: 1536,
 };
 
-export default function useBreakingPoints(breakpoint: BreakPoint): boolean {
-  const [breakActive, setBreakActive] = useState<boolean>(
-    window.innerWidth < breakpointsData[breakpoint],
-  );
+function useBreakingPoints(breakpoint: BreakPoint): boolean {
+  const [breakActive, setBreakActive] = useState<boolean>(() => {
+    console.log(window.innerWidth);
+    return window.innerWidth < breakpointsData[breakpoint];
+  });
 
   useEffect(() => {
     const handleResize = () => {
@@ -26,3 +27,5 @@ export default function useBreakingPoints(breakpoint: BreakPoint): boolean {
 
   return breakActive;
 }
+
+export default useBreakingPoints;
