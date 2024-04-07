@@ -82,7 +82,7 @@ function QuizPreview({
         onClick={_onClickScores}
         className={UI.cn(
           'rounded-md border ml-1 cursor-pointer w-16 flex flex-col items-center align-middle justify-center',
-          'hover:scale-[105%] transition-transform duration-150 ease-in-out cursor-pointer',
+          'hover:scale-[103%] transition-transform duration-150 ease-in-out cursor-pointer',
           backgroundColor,
           borderColor,
         )}>

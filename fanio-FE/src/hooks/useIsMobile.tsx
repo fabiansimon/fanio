@@ -1,14 +1,10 @@
 import {useEffect, useState} from 'react';
 
-const MAX_MOBILE_WIDTH = 768;
-
-function checkMobile(agent: string, width: number) {
-  return (
-    Boolean(
-      agent.match(
-        /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i,
-      ),
-    ) || width < MAX_MOBILE_WIDTH
+function checkMobile(agent: string) {
+  return Boolean(
+    agent.match(
+      /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i,
+    ),
   );
 }
 
@@ -17,10 +13,9 @@ function useIsMobile() {
 
   useEffect(() => {
     const agent = window.navigator.userAgent;
-    setIsMobile(checkMobile(agent, window.innerWidth));
+    setIsMobile(checkMobile(agent));
 
-    const handleResize = () =>
-      setIsMobile(checkMobile(agent, window.innerWidth));
+    const handleResize = () => setIsMobile(checkMobile(agent));
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);

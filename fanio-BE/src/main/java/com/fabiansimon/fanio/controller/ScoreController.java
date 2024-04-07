@@ -67,7 +67,7 @@ public class ScoreController {
         if (scoreService.usesProfanity(score.getUserName())) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("Profanity detected", "The username contains inappropriate content.");
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_ACCEPTABLE);
         }
         Score savedScore = scoreService.saveScore(score);
         return new ResponseEntity<>(savedScore, HttpStatus.CREATED);

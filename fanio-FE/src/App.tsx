@@ -13,7 +13,6 @@ import CreateScreen from './pages/CreateScreen';
 import QuizListScreen from './pages/QuizListScreen';
 import LandingScreen from './pages/LandingScreen';
 import QuizScoreScreen from './pages/QuizScoreScreen';
-import PlayScreen from './pages/PlayScreen';
 import LeaderboardScreen from './pages/LeaderboardScreen';
 import PlayQuizScreen from './pages/PlayQuizScreen';
 

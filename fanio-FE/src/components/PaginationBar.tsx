@@ -56,7 +56,10 @@ function PaginationBar({
       {!disableItemsSelector ? (
         <MaxItemsSelector
           defaultValue={maxItems.toString()}
-          onValueChange={setMaxItems}
+          onValueChange={(val: number) => {
+            setMaxItems(val);
+            setPageIndex(0);
+          }}
         />
       ) : (
         <div />

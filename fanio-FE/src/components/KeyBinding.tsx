@@ -4,6 +4,7 @@ import useDetectOS from '../hooks/useDetectOS';
 import {useMemo} from 'react';
 import {OperationSystem} from '../types';
 import useIsMobile from '../hooks/useIsMobile';
+import {UI} from '../utils/common';
 
 function KeyBinding({
   disabled,
@@ -35,7 +36,7 @@ function KeyBinding({
   }, [OS, ignoreMetaKey]);
 
   if (isMobile) return <div />;
-  return <Kbd className={className}>{`${metaKey}${hotkey}`}</Kbd>;
+  return <Kbd className={UI.cn(className)}>{`${metaKey}${hotkey}`}</Kbd>;
 }
 
 export default KeyBinding;

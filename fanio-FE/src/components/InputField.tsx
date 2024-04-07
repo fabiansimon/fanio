@@ -10,6 +10,7 @@ export interface InputFieldProps
   trailing?: React.ReactNode;
   isLoading?: boolean;
   showSimple?: boolean;
+  autoFocus?: boolean;
   hotkey?: string;
 }
 
@@ -41,6 +42,7 @@ function InputField(
     hotkey,
     isLoading = false,
     trailing,
+    autoFocus,
     ...props
   }: InputFieldProps,
   ref: any,
@@ -72,6 +74,10 @@ function InputField(
   let mouseY = useMotionValue(0);
 
   useEffect(() => {
+    if (autoFocus) internalRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
     if (props.value) setVisible(false);
   }, [props.value]);
 
@@ -86,6 +92,7 @@ function InputField(
     return (
       <SimpleInputField
         {...props}
+        ref={setRefs}
         trailing={trailing}
         isLoading={isLoading}
         className={className}

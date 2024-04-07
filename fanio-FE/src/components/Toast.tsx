@@ -103,7 +103,7 @@ function Toast(): JSX.Element {
         mass: 1,
       }}
       className={UI.cn(
-        'absolute z-10 right-10 bottom-10 p-4 rounded-md flex items-center space-x-3',
+        'absolute right-10 bottom-10 p-4 rounded-md flex items-center space-x-3',
         backgroundColor,
       )}>
       {icon}

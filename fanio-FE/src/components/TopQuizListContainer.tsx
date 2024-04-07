@@ -6,6 +6,9 @@ import {ButtonType, PaginatedData, PaginationState, Quiz} from '../types';
 import {fetchTopQuizzes} from '../utils/api';
 import Loading from './Loading';
 import Button from './Button';
+import {useNavigate} from 'react-router-dom';
+import ROUTES from '../constants/Routes';
+import useIsMobile from '../hooks/useIsMobile';
 
 interface TopQuizListProps {
   className?: string;
@@ -18,6 +21,9 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
     pageIndex: 0,
     maxItems: 5,
   });
+
+  const navigation = useNavigate();
+  const isMobile = useIsMobile();
 
   const loadQuizzes = useCallback(async () => {
     try {
@@ -52,7 +58,7 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
       ) : (
         <>
           <QuizList
-            showPlacement
+            showPlacement={!isMobile}
             data={quizData?.content || []}
             className="mt-4 -mx-2"
           />
@@ -71,6 +77,7 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
         className="border-white/30"
         hotkey="A"
         text="See All"
+        onClick={() => navigation(ROUTES.listQuizzes)}
       />
     </div>
   );

@@ -17,7 +17,7 @@ function QuizList({
   showPlacement,
 }: QuizListProps): JSX.Element {
   return (
-    <div className={UI.cn('flex space-y-2 pt-3 flex-col h-full', className)}>
+    <div className={UI.cn('flex flex-grow space-y-2 pt-3 flex-col', className)}>
       {data.map((quiz, index) => {
         return (
           <div key={quiz.id} className="flex space-x-2">

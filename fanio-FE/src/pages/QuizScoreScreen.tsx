@@ -89,6 +89,7 @@ function QuizScoreScreen(): JSX.Element {
 
                 return (
                   <ScoreTile
+                    key={s.id}
                     position={position}
                     achievement={achievement}
                     isLocal={localScores?.has(s.id)}

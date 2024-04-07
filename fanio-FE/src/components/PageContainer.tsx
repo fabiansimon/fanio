@@ -7,7 +7,7 @@ import {motion} from 'framer-motion';
 import useIsMobile from '../hooks/useIsMobile';
 
 const BACKGROUND_ANIMATION_DURATION = 170;
-const SHAKE_ANIMATION_DURATION = 50;
+const SHAKE_ANIMATION_DURATION = 20;
 
 interface PageContainerProps {
   className?: string;
@@ -37,9 +37,8 @@ function PageContainer(
 
   const shakeAnimation = {
     shake: {
-      x: [0, -40, 40, -40, 40, 0],
+      x: [0, -20, 20, -20, 22, 0],
       transition: {
-        duration: 1,
         repeat: 0,
       },
     },
@@ -70,7 +69,7 @@ function PageContainer(
     <div
       ref={divRef}
       className={UI.cn(
-        'flex items-center justify-center transition-colors ease-in-out',
+        'flex items-center justify-center transition-colors ease-in-out fixed w-full',
         `duration-${BACKGROUND_ANIMATION_DURATION}`,
         backgroundColor,
         className,
@@ -79,8 +78,8 @@ function PageContainer(
         variants={shakeAnimation}
         animate={isShaking ? 'shake' : ''}
         className={UI.cn(
-          'flex flex-col max-w-screen-xl w-full h-screen pb-12',
-          isMobile ? 'px-6' : 'px-10',
+          'flex flex-col max-w-screen-xl w-full h-screen ',
+          isMobile ? 'px-4 pb-6' : 'px-10 pb-12',
         )}>
         <div className="flex items-end">
           <div className="mt-12 w-full">

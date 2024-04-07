@@ -87,7 +87,7 @@ function LandingScreen(): JSX.Element {
   );
 
   return (
-    <div className="flex flex-col space-y-2 bg-slate-950 items-center w-full h-screen">
+    <div className="flex flex-col space-y-2 bg-slate-950 items-center w-full h-screen fixed">
       <div className="mt-12 flex w-full px-12">
         <Heading size={'9'} className="text-white ">
           Fan.io 🎤

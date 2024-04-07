@@ -1,7 +1,7 @@
 import {Heading, Text} from '@radix-ui/themes';
 import Button from './Button';
 import {MinusIcon, PlusIcon} from '@radix-ui/react-icons';
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 import {AchievementType, LocalScore, Score} from '../types';
 import ScoreTile from './ScoreTile';
 import {DateUtils, UI} from '../utils/common';

@@ -6,6 +6,7 @@ import PaginationBar from '../components/PaginationBar';
 import QuizList from '../components/QuizList';
 import {PAGE_DATA} from '../constants/Data';
 import PageContainer from '../components/PageContainer';
+import {ScrollArea} from '@radix-ui/themes';
 
 function QuizListScreen(): JSX.Element {
   const [quizData, setQuizData] = useState<PaginatedData<Quiz> | null>();
@@ -41,17 +42,19 @@ function QuizListScreen(): JSX.Element {
       title="All Quizzes"
       description="If you can't find something that you like, just go ahead and create
     it.">
-      <div className="flex flex-col h-full justify-between">
-        <div>
-          <SearchInput
-            title=""
-            subtitle="Filter Results"
-            setSearchResult={setSearchResult}
-            className="mt-5"
-          />
-          <QuizList data={searchResults || quizData?.content || []} />
-        </div>
+      <div className="flex flex-col h-full">
+        <SearchInput
+          title=""
+          subtitle="Filter Results"
+          setSearchResult={setSearchResult}
+          className="mt-5"
+        />
+        <QuizList
+          className="h-0 my-2 overflow-auto"
+          data={searchResults || quizData?.content || []}
+        />
         <PaginationBar
+          className="flex"
           totalElements={quizData?.totalElements || 0}
           onValueChange={handlePaginationChange}
         />
