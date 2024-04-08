@@ -17,4 +17,5 @@ export const GAME_OPTIONS = {
     "I don't want to lie to you, that wasn't great.",
   ],
   MAX_SCORE_USERNAME_LENGTH: 20,
+  SONG_TIMEOUT: 3000,
 };

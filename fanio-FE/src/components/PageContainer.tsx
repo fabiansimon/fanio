@@ -69,7 +69,7 @@ function PageContainer(
     <div
       ref={divRef}
       className={UI.cn(
-        'flex items-center justify-center transition-colors ease-in-out fixed w-full',
+        'flex items-center justify-center transition-colors ease-in-out w-full',
         `duration-${BACKGROUND_ANIMATION_DURATION}`,
         backgroundColor,
         className,
@@ -79,9 +79,9 @@ function PageContainer(
         animate={isShaking ? 'shake' : ''}
         className={UI.cn(
           'flex flex-col max-w-screen-xl w-full h-screen ',
-          isMobile ? 'px-4 pb-6' : 'px-10 pb-12',
+          isMobile ? 'px-4 pb-6' : 'px-12 pb-12',
         )}>
-        <div className="flex items-end">
+        <div className="flex items-end z-10">
           <div className="mt-12 w-full">
             <ArrowLeftIcon
               onClick={() => navigation(-1)}

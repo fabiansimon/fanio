@@ -260,7 +260,7 @@ function QuestionPreviewContainer({
   className?: string;
   onDelete: () => void;
 }): JSX.Element {
-  const {answer, startOffset} = question;
+  const {answer, startOffset, sourceTitle, url} = question;
 
   return (
     <div
@@ -269,14 +269,26 @@ function QuestionPreviewContainer({
         className,
       )}>
       <div className="flex flex-col">
-        <Heading size="2" className="text-white">
-          {answer}
-        </Heading>
-        <Text size="2" className="text-white/80">
-          Start offset:{' '}
-          <Strong>{DateUtils.formatSeconds(startOffset || 0)}</Strong> min
+        <div className="flex">
+          <Heading size="2" className="text-white">
+            {answer}
+          </Heading>
+          <Text size="1" className="line-clamp-1 ">
+            <a
+              href={url}
+              className="pl-1 text-blue-500 flex line-clamp-1"
+              target="_blank"
+              rel="noopener noreferrer">
+              {sourceTitle}
+            </a>
+          </Text>
+        </div>
+        <Text size="1" className="text-white/80">
+          Offset: <Strong>{DateUtils.formatSeconds(startOffset || 0)}</Strong>{' '}
+          min
         </Text>
       </div>
+
       <div>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>

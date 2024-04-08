@@ -57,19 +57,15 @@ function cleanSpecialCharacters(c: string) {
 }
 
 export function calculatePoints({
-  currTime,
   length,
-  offset = 0,
+  delta,
 }: {
-  currTime: number;
   length: number;
-  offset?: number;
+  delta: number;
 }) {
-  const delta = currTime - offset;
   const points = length - delta;
 
   return {
-    delta,
     points,
   };
 }

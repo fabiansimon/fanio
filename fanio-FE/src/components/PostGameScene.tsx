@@ -10,6 +10,8 @@ import ScoreTile from './ScoreTile';
 import {CheckIcon} from '@radix-ui/react-icons';
 import InputField from './InputField';
 import Button from './Button';
+import {useNavigate} from 'react-router-dom';
+import ROUTES from '../constants/Routes';
 
 const ANIMATION_DURATION = 0.15; // in secon
 const transition = {
@@ -36,6 +38,8 @@ function PostGameScene({
     ...lastAttempt,
     userName: '',
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!lastAttempt) return;
@@ -167,13 +171,23 @@ function PostGameScene({
           </motion.div>
         </div>
       </div>
-      <Button
-        text="Try again"
-        ignoreMetaKey
-        hotkey={isUploaded && 'Enter'}
-        className="mx-auto mt-4"
-        onClick={onRestart}
-      />
+      <div className="flex w-full justify-between space-x-2">
+        <Button
+          text="See Leaderboard"
+          type={ButtonType.outline}
+          textSize="2"
+          className="flex-grow w-full"
+          onClick={() => navigate(`${ROUTES.quizScores}/${quizId}`)}
+        />
+        <Button
+          textSize="2"
+          text="Try again"
+          className="flex-grow w-full"
+          ignoreMetaKey
+          hotkey={isUploaded && 'Enter'}
+          onClick={onRestart}
+        />
+      </div>
     </div>
   );
 }

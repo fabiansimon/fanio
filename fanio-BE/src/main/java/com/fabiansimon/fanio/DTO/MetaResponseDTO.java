@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MetaResponseDTO {
     private String title;
+    private String sourceTitle;
     private String imageUri;
     private Integer length;
 }

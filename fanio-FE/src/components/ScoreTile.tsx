@@ -43,19 +43,19 @@ function ScoreTile({
               </div>
             )}
             <div className="flex ml-2 flex-col justify-between">
-              <Heading weight={'medium'} className="text-white" size={'3'}>
+              <Heading weight={'regular'} className="text-white" size={'3'}>
                 {isLocalScore(score) ? 'Last Attempt' : score.userName}
               </Heading>
-              <Text size={'2'} className="text-white/70">
+              <Text size={'2'} className="text-white/60">
                 {DateUtils.formatDate(createdAt, true)}
               </Text>
             </div>
           </div>
           <div className="flex flex-col text-right">
-            <Heading weight={'medium'} className="text-white" size={'3'}>
+            <Heading weight={'regular'} className="text-white" size={'3'}>
               {UI.formatPoints(totalScore)}
             </Heading>
-            <Text className="text-white/70" size={'2'}>
+            <Text className="text-white/60" size={'2'}>
               {DateUtils.formatTime(timeElapsed, 'sec')}
             </Text>
           </div>

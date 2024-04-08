@@ -44,11 +44,14 @@ public class MetaDataController {
             String body = res.getBody();
 
             MetaResponseDTO metaData = new MetaResponseDTO();
-            String title = cleanRawTitle(stripTitle(body));
+
+            String sourceTitle = stripTitle(body);
+            String title = cleanRawTitle(sourceTitle);
             String imageUri = extractThumbnail(body);
             Integer length = extractLength(body);
 
             metaData.setTitle(title);
+            metaData.setSourceTitle(sourceTitle);
             metaData.setLength(length);
             metaData.setImageUri(imageUri);
 

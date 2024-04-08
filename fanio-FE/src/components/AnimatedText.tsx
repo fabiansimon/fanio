@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import {motion} from 'framer-motion';
 import {UI} from '../utils/common';
 import {Text} from '@radix-ui/themes';
 

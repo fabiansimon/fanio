@@ -50,7 +50,7 @@ function QuizListScreen(): JSX.Element {
           className="mt-5"
         />
         <QuizList
-          className="h-0 my-2 overflow-auto"
+          className="h-0 my-2 overflow-y-auto"
           data={searchResults || quizData?.content || []}
         />
         <PaginationBar

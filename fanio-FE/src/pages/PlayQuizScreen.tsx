@@ -2,7 +2,7 @@ import {useParams} from 'react-router-dom';
 import PageContainer from '../components/PageContainer';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import ReactPlayer from 'react-player';
-import {LocalScore, Quiz, Score} from '../types';
+import {GuessResult, LocalScore, Quiz, Score} from '../types';
 import {fetchPlayableQuizById} from '../utils/api';
 import {shuffle} from 'lodash';
 import Button from '../components/Button';
@@ -14,6 +14,18 @@ import PostGameScene from '../components/PostGameScene';
 import PreGameScene from '../components/PreGameScene';
 import PointsBar, {PointsBarRef} from '../components/PointsBar';
 import {LocalStorage} from '../utils/localStorage';
+import AnimatedResult from '../components/AnimatedResult';
+import {motion} from 'framer-motion';
+import {GAME_OPTIONS} from '../constants/Game';
+import AnimatedText from '../components/AnimatedText';
+
+const ANIMATION_DURATION = 200;
+
+const transition = {
+  duration: ANIMATION_DURATION,
+  type: 'spring',
+  mass: 0.05,
+};
 
 interface ScoreState {
   totalScore: number;
@@ -49,7 +61,7 @@ function PlayQuizScreen(): JSX.Element {
   const backgroundRef = useRef<any>(null);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [gameState, setGameState] = useState<GameState>(GameState.PRE);
+  const [gameState, setGameState] = useState<GameState>(GameState.PLAYING);
   const [questionIndex, setQuestionIndex] = useState<number>(0);
 
   const [quizData, setQuizData] = useState<Quiz | null>(null);
@@ -58,12 +70,19 @@ function PlayQuizScreen(): JSX.Element {
 
   const [input, setInput] = useState<string>('');
   const [score, setScore] = useState<ScoreState>(INIT_SCORE);
+  const [timestamp, setTimestamp] = useState<number>(0);
+  const [result, setResult] = useState<GuessResult | undefined>();
 
   const question = useMemo(() => {
     if (quizData) return quizData.questions[questionIndex];
 
     return null;
   }, [quizData, questionIndex]);
+
+  const disableInput = useMemo(
+    () => result !== undefined || !isPlaying,
+    [result, isPlaying],
+  );
 
   const handlePlay = useCallback(() => {
     if (!isPlaying) setIsPlaying(true);
@@ -122,24 +141,28 @@ function PlayQuizScreen(): JSX.Element {
 
   const handleSubmitGuess = () => {
     if (!input || !question?.answer || !videoRef.current) return;
-
-    console.log(similarity(input, question?.answer)); // DEBUG ONLY
-
-    const isCorrect = similarity(input, question?.answer) >= ANSWER_THRESHOLD;
     setInput('');
 
-    const {delta, points} = calculatePoints({
-      currTime: videoRef.current?.getCurrentTime(),
-      length: videoRef.current?.getDuration(),
-      offset: question?.startOffset,
-    });
+    // console.log(similarity(input, question?.answer)); // DEBUG ONLY
+
+    const isCorrect = similarity(input, question?.answer) >= ANSWER_THRESHOLD;
+
     backgroundRef.current?.flashColor(
       isCorrect ? 'bg-green-600' : 'bg-red-700',
     );
     !isCorrect && backgroundRef.current?.shakeContent();
 
+    const now = performance.now();
+    const delta = (now - timestamp) / 1000;
     if (isCorrect) {
+      const {points} = calculatePoints({
+        length: videoRef.current?.getDuration(),
+        delta,
+      });
+
+      setTimestamp(now);
       barRef.current?.clear();
+
       setScore(prev => {
         return {
           totalScore: (prev.totalScore += points),
@@ -150,7 +173,11 @@ function PlayQuizScreen(): JSX.Element {
           }),
         };
       });
-      setQuestionIndex(prev => (prev += 1));
+      setResult({correct: true, delta, points});
+      setTimeout(() => {
+        setResult(undefined);
+        setQuestionIndex(prev => (prev += 1));
+      }, GAME_OPTIONS.SONG_TIMEOUT);
       return;
     }
   };
@@ -165,7 +192,17 @@ function PlayQuizScreen(): JSX.Element {
   };
 
   const handleSongStart = () => {
+    inputRef.current?.focus();
+    setTimestamp(performance.now());
     barRef.current?.startAnimation();
+  };
+
+  const handleSongEnd = () => {
+    setResult(prev => {
+      if (!prev) return;
+      return {...prev, correct: false};
+    });
+    barRef.current?.clear();
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,21 +233,37 @@ function PlayQuizScreen(): JSX.Element {
         {gameState === GameState.PLAYING && (
           <div className="flex flex-col h-full justify-between">
             {question && (
-              <ReactPlayer
-                playing={isPlaying}
-                onReady={onPlayerReady}
-                onPlay={handleSongStart}
-                controls
-                width={0}
-                height={0}
-                ref={videoRef}
-                url={question.url}
+              <motion.div
+                style={{pointerEvents: 'none'}}
+                variants={{visible: {opacity: 1}, hidden: {opacity: 0}}}
+                animate={result !== undefined ? 'visible' : 'hidden'}>
+                <ReactPlayer
+                  playing={isPlaying}
+                  onReady={onPlayerReady}
+                  onPlay={handleSongStart}
+                  controls={false}
+                  width={'250%'}
+                  height={'250%'}
+                  className="absolute -left-[75%] -top-[75%] opacity-40"
+                  onEnded={handleSongEnd}
+                  ref={videoRef}
+                  url={question.url}
+                />
+              </motion.div>
+            )}
+
+            {question && (
+              <AnimatedResult
+                className="absolute left-0 top-[22%]"
+                question={question}
+                result={result}
               />
             )}
 
-            <div className="mx-[10%]">
+            <div className="mx-[10%] z-10">
               <PointsBar ref={barRef} />
               <InputField
+                disabled={disableInput}
                 showSimple
                 onInput={handleInput}
                 value={input}
@@ -223,6 +276,7 @@ function PlayQuizScreen(): JSX.Element {
                 text="Submit"
                 hotkey="Enter"
                 ignoreMetaKey
+                disabled={disableInput}
                 onClick={handleSubmitGuess}
               />
             </div>
@@ -230,7 +284,7 @@ function PlayQuizScreen(): JSX.Element {
               topScore={topScore}
               data={score}
               totalQuestion={quizData?.questions.length}
-              className="mt-14"
+              className="mt-14 z-10"
             />
           </div>
         )}
@@ -250,7 +304,14 @@ function InfoContainer({
   topScore?: Score;
   totalQuestion?: number;
 }): JSX.Element {
-  const {totalScore, guesses, totalTime} = data;
+  const [score, setScore] = useState<number>(0);
+  const {guesses, totalTime} = data;
+
+  useEffect(() => {
+    setTimeout(() => {
+      setScore(data.totalScore);
+    }, 1000);
+  }, [data.totalScore]);
 
   return (
     <div className={UI.cn('flex flex-col w-full justify-between', className)}>
@@ -277,7 +338,7 @@ function InfoContainer({
         </div>
         <div className="flex flex-grow w-full flex-col">
           <Heading size={'4'} className="text-white text-center">
-            {UI.formatPoints(totalScore)}
+            {UI.formatPoints(score)}
           </Heading>
           <Text size={'2'} className="text-white text-center">
             Points

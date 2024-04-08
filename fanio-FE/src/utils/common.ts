@@ -39,12 +39,12 @@ export class UI {
     return twMerge(clsx(inputs));
   }
 
-  static formatPoints(points: number) {
+  static formatPoints(points: number, postfix = 'pts') {
     const formattedPoints = new Intl.NumberFormat('de-DE', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(points);
 
-    return `${formattedPoints} pts`;
+    return `${formattedPoints} ${postfix}`;
   }
 }

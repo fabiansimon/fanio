@@ -32,6 +32,7 @@ public class Question {
     private Date updatedAt;
     private String url;
     private String answer;
+    private String sourceTitle;
     private Double startOffset;
 
 }

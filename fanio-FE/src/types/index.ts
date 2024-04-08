@@ -28,6 +28,7 @@ export interface Question {
   addedAt: Date;
   updatedAt: Date;
   answer: string;
+  sourceTitle?: string;
   startOffset?: number;
 }
 
@@ -45,6 +46,7 @@ export type LocalScore = Omit<Score, 'id' | 'userName'> & {isUploaded: boolean};
 export interface QuestionInput {
   url: string;
   answer: string;
+  sourceTitle?: string;
   startOffset?: number;
   maxLength?: number;
   imageUri?: string;
@@ -65,6 +67,7 @@ export interface ScoreInput {
 }
 
 export interface MetaData {
+  sourceTitle: string;
   title: string;
   length: number;
   imageUri: string;
@@ -96,6 +99,12 @@ export enum ButtonType {
 export interface ModalProps {
   isVisible: boolean;
   onRequestClose: () => void;
+}
+
+export interface GuessResult {
+  correct: boolean;
+  delta: number;
+  points: number;
 }
 
 export enum AchievementType {
