@@ -3,10 +3,15 @@ import {
   Heading,
   ScrollArea,
   Strong,
+  Switch,
   Text,
 } from '@radix-ui/themes';
 import Button from '../components/Button';
-import {PlusIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
+import {
+  PlusIcon,
+  DotsVerticalIcon,
+  LockClosedIcon,
+} from '@radix-ui/react-icons';
 import {useMemo, useState} from 'react';
 import {ButtonType, QuestionInput, QuizInput} from '../types';
 import {useNavigate} from 'react-router-dom';
@@ -28,6 +33,8 @@ export enum InputType {
   ERROR,
   ANSWER,
   OFFSET,
+  RANDOM_TIMESTAMP,
+  PRIVATE_QUIZ,
 }
 
 const MAX_QUESTIONS = 15;
@@ -42,6 +49,10 @@ function CreateScreen(): JSX.Element {
     description: '',
     artists: [],
     questions: [],
+    options: {
+      privateAccess: false,
+      randomOffsets: false,
+    },
   });
 
   const containsDuplicated = useMemo(() => {
@@ -64,7 +75,7 @@ function CreateScreen(): JSX.Element {
     return false;
   }, [quizInput, containsDuplicated]);
 
-  const handleInput = (value: string | number, type: InputType) => {
+  const handleInput = (value: string | number | boolean, type: InputType) => {
     if (typeof value === 'string' && type === InputType.URL) {
       value = value.trim();
     }
@@ -77,6 +88,18 @@ function CreateScreen(): JSX.Element {
 
         case InputType.DESCRIPTION:
           return {...prev, description: value as string};
+
+        case InputType.PRIVATE_QUIZ:
+          return {
+            ...prev,
+            options: {...prev.options, privateAccess: value as boolean},
+          };
+
+        case InputType.RANDOM_TIMESTAMP:
+          return {
+            ...prev,
+            options: {...prev.options, randomOffsets: value as boolean},
+          };
 
         default:
           console.error('Unhandled input type:', type);
@@ -146,6 +169,7 @@ function CreateScreen(): JSX.Element {
   return (
     <>
       <AddQuizModal
+        ignoreOffset={quizInput?.options.randomOffsets}
         isVisible={questionVisible}
         onRequestClose={() => setQuestionVisible(false)}
         onSave={addQuestion}
@@ -154,7 +178,7 @@ function CreateScreen(): JSX.Element {
         title="Create quiz"
         className="bg-slate-950"
         description="Make sure to only use youtube links at the moment.">
-        <div className="flex max-h-[40%] space-x-4 min-w-[70vw] mx-auto border my-auto border-neutral-500/50 p-5 shadow-md shadow-black bg-slate-950 rounded-xl">
+        <div className="flex flex-col bg-black/20 border shadow-md shadow-black rounded-xl px-5 py-4 border-neutral-500/20 w-40vw space-x-4 mx-auto  w-full my-auto">
           {/* <div className="flex h-full w-[1px] bg-blue-500/50" /> */}
           <div className="flex flex-col w-full">
             {/* <div className="mr-auto mt-10 mb-2">
@@ -162,7 +186,8 @@ function CreateScreen(): JSX.Element {
                 1. Add a Title and description
               </Text>
             </div> */}
-            <div className="flex flex-col mr-auto mb-4">
+
+            <div className="flex mr-auto mb-4 justify-between w-full">
               <InputField
                 showSimple
                 value={quizInput?.title}
@@ -177,52 +202,73 @@ function CreateScreen(): JSX.Element {
                   handleInput(value, InputType.TITLE)
                 }
               />
+              {quizInput?.options.privateAccess && (
+                <div className="bg-neutral-700 p-1.5 rounded-lg items-center flex mb-auto space-x-1.5">
+                  <LockClosedIcon className="text-white size-3" />
+                  <Text size={'1'} weight={'medium'} className="text-white">
+                    Private
+                  </Text>
+                </div>
+              )}
             </div>
 
-            {/* <InputField
+            <InputField
               showSimple
-              value={quizInput?.description}
-              placeholder="Add Artists Names"
-              className="text-md mt-4"
+              value={quizInput?.artists}
+              placeholder="Artists seperated by a ','"
+              className="text-md "
               onInput={({currentTarget: {value}}) =>
                 handleInput(value, InputType.ARTISTS)
               }
-            /> */}
+            />
 
             <InputField
               showSimple
               value={quizInput?.description}
               placeholder="Description (optional)"
-              className="text-1xl mt-1 mb-2 text-white/70"
+              className="text-1xl mt-4 mb-2 text-white/70"
               onInput={({currentTarget: {value}}) =>
                 handleInput(value, InputType.DESCRIPTION)
               }
             />
-            {quizInput?.questions && quizInput?.questions.length > 0 && (
-              <div className="mr-auto mt-4 mb-0 flex justify-between w-full">
-                <Text className="text-white" size={'2'}>
-                  <Strong className="mr-1">
-                    {quizInput?.questions.length}
-                  </Strong>
-                  {`Song${
-                    (quizInput?.questions.length || 0) > 1 ? 's' : ''
-                  } added`}
-                </Text>
-                <ValidationChip text={containsDuplicated ? 'Duplicates' : ''} />
-              </div>
-            )}
-            <ScrollArea type="always" scrollbars="vertical">
-              {quizInput?.questions.map((question, index) => {
-                return (
-                  <QuestionPreviewContainer
-                    key={index}
-                    className="my-4"
-                    question={question}
-                    onDelete={() => deleteQuestion(index)}
+
+            <OptionsContainer
+              className="mt-2"
+              onInput={(value: boolean, type: InputType) =>
+                handleInput(value, type)
+              }
+            />
+
+            <div className="mx-2 mt-4">
+              {quizInput?.questions && quizInput?.questions.length > 0 && (
+                <div className="mr-auto flex justify-between w-full">
+                  <Text className="text-white" size={'2'}>
+                    <Strong className="mr-1">
+                      {quizInput?.questions.length}
+                    </Strong>
+                    {`Song${
+                      (quizInput?.questions.length || 0) > 1 ? 's' : ''
+                    } added`}
+                  </Text>
+                  <ValidationChip
+                    text={containsDuplicated ? 'Duplicates' : ''}
                   />
-                );
-              })}
-            </ScrollArea>
+                </div>
+              )}
+              <ScrollArea type="always" scrollbars="vertical">
+                {quizInput?.questions.map((question, index) => {
+                  return (
+                    <QuestionPreviewContainer
+                      ignoreOffset={quizInput.options.randomOffsets}
+                      key={index}
+                      className="my-4"
+                      question={question}
+                      onDelete={() => deleteQuestion(index)}
+                    />
+                  );
+                })}
+              </ScrollArea>
+            </div>
             {quizInput && quizInput?.questions.length < MAX_QUESTIONS && (
               <Button
                 text="Add Song"
@@ -230,7 +276,7 @@ function CreateScreen(): JSX.Element {
                 ignoreMetaKey
                 onClick={() => setQuestionVisible(true)}
                 icon={<PlusIcon className="text-white mr-2 size-5" />}
-                className="flex mt-4 mx-auto"
+                className="flex mt-6 mx-auto"
                 type={ButtonType.outline}
                 textSize="2"
               />
@@ -255,8 +301,10 @@ function QuestionPreviewContainer({
   question,
   onDelete,
   className,
+  ignoreOffset,
 }: {
   question: QuestionInput;
+  ignoreOffset: boolean;
   className?: string;
   onDelete: () => void;
 }): JSX.Element {
@@ -269,24 +317,27 @@ function QuestionPreviewContainer({
         className,
       )}>
       <div className="flex flex-col">
-        <div className="flex">
+        <div
+          className={UI.cn('flex', ignoreOffset ? 'flex-col' : 'space-x-1.5')}>
           <Heading size="2" className="text-white">
             {answer}
           </Heading>
-          <Text size="1" className="line-clamp-1 ">
+          <Text size="1" className="line-clamp-1">
             <a
               href={url}
-              className="pl-1 text-blue-500 flex line-clamp-1"
+              className="text-blue-500 flex line-clamp-1"
               target="_blank"
               rel="noopener noreferrer">
               {sourceTitle}
             </a>
           </Text>
         </div>
-        <Text size="1" className="text-white/80">
-          Offset: <Strong>{DateUtils.formatSeconds(startOffset || 0)}</Strong>{' '}
-          min
-        </Text>
+        {!ignoreOffset && (
+          <Text size="1" className="text-white/80">
+            Offset: <Strong>{DateUtils.formatSeconds(startOffset || 0)}</Strong>{' '}
+            min
+          </Text>
+        )}
       </div>
 
       <div>
@@ -306,4 +357,52 @@ function QuestionPreviewContainer({
   );
 }
 
+function OptionsContainer({
+  className,
+  onInput,
+}: {
+  className?: string;
+  onInput: (value: boolean, type: InputType) => void;
+}): JSX.Element {
+  return (
+    <div
+      className={UI.cn(
+        'flex border-neutral-500/20 border shadow-mdshadow-black rounded-xl p-3',
+        className,
+      )}>
+      <div className="flex-col flex-grow w-full">
+        <div className="flex space-x-2">
+          <Heading className="text-white/80" size={'2'}>
+            Random Song Start
+          </Heading>
+          <Switch
+            size="1"
+            className="bg-white/20"
+            onCheckedChange={value =>
+              onInput(value, InputType.RANDOM_TIMESTAMP)
+            }
+          />
+        </div>
+        <Text className="text-white/50" size={'2'}>
+          Each Song will start at a random timestamp
+        </Text>
+      </div>
+      <div className="flex-col flex-grow w-full border-l-neutral-500/20 border-l-[1px] pl-4">
+        <div className="flex space-x-2">
+          <Heading className="text-white/80" size={'2'}>
+            Private Quiz
+          </Heading>
+          <Switch
+            size="1"
+            className="bg-white/20"
+            onCheckedChange={value => onInput(value, InputType.PRIVATE_QUIZ)}
+          />
+        </div>
+        <Text className="text-white/50" size={'2'}>
+          Quiz can only be accessed through a shared URL
+        </Text>
+      </div>
+    </div>
+  );
+}
 export default CreateScreen;

@@ -28,6 +28,8 @@ public class Quiz {
     private String title;
     private String description;
     private Long creatorId;
+    private Boolean isPrivate;
+    private Boolean randomOffsets;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "quiz_id")
     private List<Question> questions;

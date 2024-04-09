@@ -3,7 +3,7 @@ import {Question} from '../types';
 
 export function shuffle(questions: Question[]) {
   for (var i = questions.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = randomNumber({max: i});
     [questions[i], questions[j]] = [questions[j], questions[i]];
   }
 
@@ -54,6 +54,10 @@ function cleanSpecialCharacters(c: string) {
     default:
       return '';
   }
+}
+
+export function randomNumber({min = 0, max}: {min?: number; max: number}) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export function calculatePoints({

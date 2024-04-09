@@ -20,6 +20,8 @@ export interface Quiz {
   createdAt: Date;
   creatorId: string;
   questions: Question[];
+  isPrivate: boolean;
+  randomOffsets: true;
 }
 
 export interface Question {
@@ -57,6 +59,7 @@ export interface QuizInput {
   description?: string;
   questions: QuestionInput[];
   artists?: string[];
+  options: QuizOptions;
 }
 
 export interface ScoreInput {
@@ -133,4 +136,9 @@ export interface ScoreState {
 interface Guess {
   elapsedTime: number; // in milliseconds
   score: number;
+}
+
+interface QuizOptions {
+  randomOffsets: boolean;
+  privateAccess: boolean;
 }

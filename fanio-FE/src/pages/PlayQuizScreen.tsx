@@ -5,7 +5,7 @@ import ReactPlayer from 'react-player';
 import {GuessResult, LocalScore, Quiz, Score, ScoreState} from '../types';
 import {fetchPlayableQuizById} from '../utils/api';
 import {shuffle} from 'lodash';
-import {calculatePoints, similarity} from '../utils/logic';
+import {calculatePoints, randomNumber, similarity} from '../utils/logic';
 import InputField from '../components/InputField';
 import PostGameScene from '../components/PostGameScene';
 import PreGameScene from '../components/PreGameScene';
@@ -78,10 +78,28 @@ function PlayQuizScreen(): JSX.Element {
 
   const handlePlay = useCallback(() => {
     if (!isPlaying) setIsPlaying(true);
-    if (question?.startOffset) {
-      videoRef.current?.seekTo(question.startOffset, 'seconds');
-    }
+    handleSongOffset();
   }, []);
+
+  const handleSongOffset = () => {
+    if (
+      !question ||
+      !quizData ||
+      !(question.startOffset || quizData.randomOffsets) ||
+      !videoRef.current
+    )
+      return;
+
+    let offset: number;
+
+    if (quizData.randomOffsets) {
+      offset = randomNumber({min: 10, max: videoRef.current.getDuration()});
+    } else {
+      offset = question.startOffset!;
+    }
+
+    videoRef.current?.seekTo(offset, 'seconds');
+  };
 
   const resetGame = () => {
     setGameState(GameState.PRE);
@@ -216,9 +234,7 @@ function PlayQuizScreen(): JSX.Element {
   const onPlayerReady = (e: ReactPlayer) => {
     if (!question) return;
     barRef.current?.setSongLength(e.getDuration());
-    if (question.startOffset) {
-      videoRef.current?.seekTo(question.startOffset, 'seconds');
-    }
+    handleSongOffset();
     handlePlay();
   };
 
@@ -292,7 +308,7 @@ function PlayQuizScreen(): JSX.Element {
             )}
 
             <div className="mx-[10%] z-10">
-              <PointsBar ref={barRef} />
+              {/* <PointsBar ref={barRef} /> */}
               <InputField
                 disabled={disableInput}
                 showSimple

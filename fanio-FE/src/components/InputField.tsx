@@ -22,7 +22,7 @@ const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
         ref={ref}
         type="text"
         className={UI.cn(
-          'relative bg-transparent pb-1 flex w-full text-2xl text-white font-medium text-left focus:outline-none focus:border-b-2 focus:border-white/70 border-b-2 border-b-white/10 placeholder-neutral-600',
+          'relative bg-transparent pb-1 flex w-full text-2xl text-white font-medium text-left focus:outline-none focus:border-b-1 focus:border-white/70 border-b-[1.5px] border-b-white/10 placeholder-neutral-600',
           props.className,
         )}
       />

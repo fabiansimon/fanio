@@ -13,6 +13,7 @@ import ValidationChip from './ValidationChip';
 import {DateUtils} from '../utils/common';
 
 interface AddQuizModalProps extends ModalProps {
+  ignoreOffset?: boolean;
   onSave: (quiz: QuestionInput) => void;
 }
 
@@ -27,6 +28,7 @@ const transition = {
 function AddQuizModal({
   isVisible,
   onRequestClose,
+  ignoreOffset,
   onSave,
 }: AddQuizModalProps): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -195,7 +197,7 @@ function AddQuizModal({
             )}
           </div>
 
-          {validUrl && (
+          {!ignoreOffset && validUrl && (
             <div className="px-1 py-4 space-y-2">
               <Text size="1" className="text-white/90">
                 Start offset:{' '}
@@ -219,7 +221,7 @@ function AddQuizModal({
               <Button
                 textSize={'2'}
                 type={ButtonType.outline}
-                hotkey="R"
+                hotkey="C"
                 text="Cancel"
                 onClick={() => onRequestClose()}
                 className="flex w-full"
