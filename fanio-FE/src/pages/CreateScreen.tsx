@@ -105,7 +105,7 @@ function CreateScreen(): JSX.Element {
       const {id} = await uploadQuiz(cleanInput(quizInput!));
       navigation(`${ROUTES.playQuiz}/${id}`);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }

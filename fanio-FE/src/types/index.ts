@@ -123,3 +123,14 @@ export enum BreakPoint {
   XL,
   XXL,
 }
+
+export interface ScoreState {
+  totalScore: number;
+  totalTime: number;
+  guesses: Guess[];
+}
+
+interface Guess {
+  elapsedTime: number; // in milliseconds
+  score: number;
+}

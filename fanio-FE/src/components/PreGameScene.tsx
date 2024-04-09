@@ -5,6 +5,7 @@ import {useMemo} from 'react';
 import {AchievementType, LocalScore, Score} from '../types';
 import ScoreTile from './ScoreTile';
 import {DateUtils, UI} from '../utils/common';
+import EmptyContainer from './EmptyContainer';
 
 function PreGameScene({
   topScore,
@@ -32,63 +33,70 @@ function PreGameScene({
     };
   }, [isWinner]);
 
+  if (!topScore)
+    return (
+      <EmptyContainer
+        className="my-auto"
+        title="Get the ball rolling ⚽️"
+        description="Be the first one to submit a highscore">
+        <Button
+          onClick={onStart}
+          hotkey="Enter"
+          ignoreMetaKey
+          text="Start Quiz"
+          className="flex flex-grow w-full mt-4"
+          textSize="2"
+        />
+      </EmptyContainer>
+    );
+
   return (
-    <div className="border border-white/20 rounded-lg py-3 px-3 mx-[10%] my-auto">
-      {topScore ? (
-        <div className="space-y-3 -mt-1">
-          <Heading className="text-white" size={'3'}>
-            Highscore to beat
-          </Heading>
-          <ScoreTile
-            score={topScore}
-            achievement={AchievementType.FIRST}
-            position={1}
-          />
-          {lastAttempt && (
-            <div className="space-y-2">
-              <ScoreTile score={lastAttempt} />
-              <div className="w-full border-[.2px] border-white/30" />
-              <div className="flex items-center justify-end relative">
-                <div className="flex flex-col text-right ml-2">
-                  <Heading weight={'bold'} className={textColor} size={'3'}>
-                    {UI.formatPoints(
-                      topScore.totalScore - lastAttempt.totalScore,
-                    )}
-                  </Heading>
-                  <Text className={textColor} size={'2'} weight={'medium'}>
-                    {DateUtils.formatTime(
-                      Math.abs(topScore.timeElapsed - lastAttempt.timeElapsed),
-                      'sec',
-                    )}
-                  </Text>
-                </div>
-                <div
-                  className={UI.cn(
-                    'absolute -right-11 flex size-5 ml-3 items-center justify-center rounded-full',
-                    backgroundColor,
-                  )}>
-                  {icon}
-                </div>
+    <div className="flex flex-col my-auto bg-black/20 border shadow-md shadow-black rounded-lg px-4 py-4 mx-[20%] border-neutral-500/20  items-center justify-center">
+      <div className="space-y-3 w-full -mt-1">
+        <Heading className="text-white" size={'3'}>
+          Highscore to beat
+        </Heading>
+        <ScoreTile
+          score={topScore}
+          achievement={AchievementType.FIRST}
+          position={1}
+        />
+        {lastAttempt && (
+          <div className="space-y-2">
+            <ScoreTile score={lastAttempt} />
+            <div className="w-full border-[.2px] border-white/30" />
+            <div className="flex items-center justify-end relative">
+              <div className="flex flex-col text-right ml-2">
+                <Heading weight={'bold'} className={textColor} size={'3'}>
+                  {UI.formatPoints(
+                    topScore.totalScore - lastAttempt.totalScore,
+                  )}
+                </Heading>
+                <Text className={textColor} size={'2'} weight={'medium'}>
+                  {DateUtils.formatTime(
+                    Math.abs(topScore.timeElapsed - lastAttempt.timeElapsed),
+                    'sec',
+                  )}
+                </Text>
+              </div>
+              <div
+                className={UI.cn(
+                  'absolute -right-11 flex size-5 ml-3 items-center justify-center rounded-full',
+                  backgroundColor,
+                )}>
+                {icon}
               </div>
             </div>
-          )}
-        </div>
-      ) : (
-        <div className="px-auto w-full items-center flex flex-col">
-          <Heading className="text-white" size={'3'}>
-            Get the ball rolling
-          </Heading>
-          <Text className="text-white/70" size={'2'}>
-            by setting a new highscore
-          </Text>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
       <Button
-        text="Start Quiz"
-        className="mx-auto mt-4"
-        hotkey="Enter"
         onClick={onStart}
+        hotkey="Enter"
         ignoreMetaKey
+        text="Start Quiz"
+        className="flex flex-grow w-full mt-4"
+        textSize="2"
       />
     </div>
   );

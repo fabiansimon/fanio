@@ -3,6 +3,7 @@ import {motion} from 'framer-motion';
 import {GuessResult, Question} from '../types';
 import {useEffect, useState} from 'react';
 import {UI} from '../utils/common';
+import {GAME_OPTIONS} from '../constants/Game';
 
 const ANIMATION_DURATION = 200;
 
@@ -31,7 +32,7 @@ function AnimatedResult({
     if (result?.correct)
       setTimeout(() => {
         setAnimatePoints(true);
-      }, 1000);
+      }, GAME_OPTIONS.POINTS_UPDATE_TIMEOUT);
 
     setTimeout(
       () => {
@@ -74,7 +75,7 @@ function AnimatedResult({
       </div>
       <motion.div
         initial="fixed"
-        variants={{fixed: {y: 0}, move: {y: 1000}}}
+        variants={{fixed: {y: 0, scale: 1}, move: {y: 1000, scale: 0.3}}}
         transition={{...transition, duration: ANIMATION_DURATION + 2000}}
         animate={animatedPoints ? 'move' : 'fixed'}>
         <Text size={'3'} className="text-white/60">

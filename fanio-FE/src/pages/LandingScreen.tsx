@@ -31,7 +31,6 @@ function LandingScreen(): JSX.Element {
   const searchRef = useRef<any>();
   const [searchResults, setSearchResult] = useState<Quiz[] | null>(null);
 
-  console.log(breakActive);
   const navigation = useNavigate();
 
   const transition = {

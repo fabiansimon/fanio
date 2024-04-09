@@ -2,12 +2,9 @@ import {useParams} from 'react-router-dom';
 import PageContainer from '../components/PageContainer';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import ReactPlayer from 'react-player';
-import {GuessResult, LocalScore, Quiz, Score} from '../types';
+import {GuessResult, LocalScore, Quiz, Score, ScoreState} from '../types';
 import {fetchPlayableQuizById} from '../utils/api';
 import {shuffle} from 'lodash';
-import Button from '../components/Button';
-import {Heading, Text} from '@radix-ui/themes';
-import {DateUtils, UI} from '../utils/common';
 import {calculatePoints, similarity} from '../utils/logic';
 import InputField from '../components/InputField';
 import PostGameScene from '../components/PostGameScene';
@@ -17,31 +14,18 @@ import {LocalStorage} from '../utils/localStorage';
 import AnimatedResult from '../components/AnimatedResult';
 import {motion} from 'framer-motion';
 import {GAME_OPTIONS} from '../constants/Game';
-import AnimatedText from '../components/AnimatedText';
-
-const ANIMATION_DURATION = 200;
-
-const transition = {
-  duration: ANIMATION_DURATION,
-  type: 'spring',
-  mass: 0.05,
-};
-
-interface ScoreState {
-  totalScore: number;
-  totalTime: number;
-  guesses: Guess[];
-}
-
-interface Guess {
-  elapsedTime: number; // in milliseconds
-  score: number;
-}
+import QuizStatsContainer from '../components/QuizStatsContainer';
+import useKeyShortcut from '../hooks/useKeyShortcut';
 
 enum GameState {
   PRE,
   PLAYING,
   POST,
+}
+
+enum UIState {
+  CORRECT,
+  INCORRECT,
 }
 
 const ANSWER_THRESHOLD = 70;
@@ -53,6 +37,14 @@ const INIT_SCORE = {
 };
 
 function PlayQuizScreen(): JSX.Element {
+  useKeyShortcut(
+    'Enter',
+    () => {
+      if (!isPlaying || result || gameState !== GameState.PLAYING) return;
+      changeUIState(UIState.INCORRECT);
+    },
+    true,
+  );
   const {id} = useParams();
 
   const videoRef = useRef<ReactPlayer>(null);
@@ -61,7 +53,7 @@ function PlayQuizScreen(): JSX.Element {
   const backgroundRef = useRef<any>(null);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [gameState, setGameState] = useState<GameState>(GameState.PLAYING);
+  const [gameState, setGameState] = useState<GameState>(GameState.PRE);
   const [questionIndex, setQuestionIndex] = useState<number>(0);
 
   const [quizData, setQuizData] = useState<Quiz | null>(null);
@@ -103,6 +95,10 @@ function PlayQuizScreen(): JSX.Element {
   );
 
   useEffect(() => {
+    handleSubmitGuess();
+  }, [input]);
+
+  useEffect(() => {
     if (questionIndex === quizData?.questions.length) {
       const _lastAttempt: LocalScore = {
         createdAt: new Date(),
@@ -140,46 +136,81 @@ function PlayQuizScreen(): JSX.Element {
   }, [id]);
 
   const handleSubmitGuess = () => {
-    if (!input || !question?.answer || !videoRef.current) return;
-    setInput('');
+    if (!isValidInput()) return;
 
-    // console.log(similarity(input, question?.answer)); // DEBUG ONLY
-
-    const isCorrect = similarity(input, question?.answer) >= ANSWER_THRESHOLD;
-
-    backgroundRef.current?.flashColor(
-      isCorrect ? 'bg-green-600' : 'bg-red-700',
-    );
-    !isCorrect && backgroundRef.current?.shakeContent();
+    changeUIState(UIState.CORRECT);
 
     const now = performance.now();
     const delta = (now - timestamp) / 1000;
-    if (isCorrect) {
-      const {points} = calculatePoints({
-        length: videoRef.current?.getDuration(),
-        delta,
-      });
+    const {points} = calculatePoints({
+      length: videoRef.current!.getDuration(),
+      delta,
+    });
 
-      setTimestamp(now);
-      barRef.current?.clear();
+    updateResult(now, delta, points);
 
+    setTimeouts(points);
+  };
+
+  const isValidInput = () => {
+    return (
+      input &&
+      question &&
+      videoRef.current &&
+      !result &&
+      Math.abs(question.answer.length - input.length) <= 2 &&
+      similarity(input, question!.answer) > ANSWER_THRESHOLD
+    );
+  };
+
+  const changeUIState = (state: UIState) => {
+    switch (state) {
+      case UIState.CORRECT:
+        setInput(question!.answer);
+        barRef.current?.clear();
+        backgroundRef.current?.flashColor('bg-green-600');
+        break;
+
+      case UIState.INCORRECT:
+        backgroundRef.current?.flashColor('bg-red-700');
+        backgroundRef.current?.shakeContent();
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const updateResult = (now: number, delta: number, points: number) => {
+    setTimestamp(now);
+    setResult({correct: true, delta, points});
+    setScore(prev => {
+      return {
+        ...prev,
+        totalTime: (prev.totalTime += delta),
+        guesses: prev.guesses.concat({
+          elapsedTime: delta,
+          score: points,
+        }),
+      };
+    });
+  };
+
+  const setTimeouts = (points: number) => {
+    setTimeout(() => {
       setScore(prev => {
         return {
+          ...prev,
           totalScore: (prev.totalScore += points),
-          totalTime: (prev.totalTime += delta),
-          guesses: prev.guesses.concat({
-            elapsedTime: delta,
-            score: points,
-          }),
         };
       });
-      setResult({correct: true, delta, points});
-      setTimeout(() => {
-        setResult(undefined);
-        setQuestionIndex(prev => (prev += 1));
-      }, GAME_OPTIONS.SONG_TIMEOUT);
-      return;
-    }
+    }, GAME_OPTIONS.POINTS_UPDATE_TIMEOUT);
+
+    setTimeout(() => {
+      setInput('');
+      setResult(undefined);
+      setQuestionIndex(prev => (prev += 1));
+    }, GAME_OPTIONS.SONG_TIMEOUT);
   };
 
   const onPlayerReady = (e: ReactPlayer) => {
@@ -271,16 +302,16 @@ function PlayQuizScreen(): JSX.Element {
                 className="text-center text-[30px]"
               />
 
-              <Button
+              {/* <Button
                 className="mt-4 w-full"
                 text="Submit"
                 hotkey="Enter"
                 ignoreMetaKey
                 disabled={disableInput}
                 onClick={handleSubmitGuess}
-              />
+              /> */}
             </div>
-            <InfoContainer
+            <QuizStatsContainer
               topScore={topScore}
               data={score}
               totalQuestion={quizData?.questions.length}
@@ -290,70 +321,6 @@ function PlayQuizScreen(): JSX.Element {
         )}
       </div>
     </PageContainer>
-  );
-}
-
-function InfoContainer({
-  className,
-  data,
-  totalQuestion = 0,
-  topScore,
-}: {
-  className?: string;
-  data: ScoreState;
-  topScore?: Score;
-  totalQuestion?: number;
-}): JSX.Element {
-  const [score, setScore] = useState<number>(0);
-  const {guesses, totalTime} = data;
-
-  useEffect(() => {
-    setTimeout(() => {
-      setScore(data.totalScore);
-    }, 1000);
-  }, [data.totalScore]);
-
-  return (
-    <div className={UI.cn('flex flex-col w-full justify-between', className)}>
-      {topScore && (
-        <div className="flex justify-center">
-          <div className="flex flex-col mb-4">
-            <Text size={'2'} className="text-white/70 text-center">
-              Score to beat
-            </Text>
-            <Heading size={'2'} className="text-white/70 text-center">
-              {UI.formatPoints(topScore.totalScore)}
-            </Heading>
-          </div>
-        </div>
-      )}
-      <div className="flex justify-between items-center">
-        <div className="flex w-full flex-grow flex-col">
-          <Heading size={'4'} className="text-white">
-            {guesses.length} out of {totalQuestion}
-          </Heading>
-          <Text size={'2'} className="text-white">
-            Current Question
-          </Text>
-        </div>
-        <div className="flex flex-grow w-full flex-col">
-          <Heading size={'4'} className="text-white text-center">
-            {UI.formatPoints(score)}
-          </Heading>
-          <Text size={'2'} className="text-white text-center">
-            Points
-          </Text>
-        </div>
-        <div className="flex w-full flex-grow flex-col">
-          <Heading size={'4'} className="text-white text-right">
-            {DateUtils.formatTime(totalTime)}
-          </Heading>
-          <Text size={'2'} className="text-white text-right">
-            Total Time
-          </Text>
-        </div>
-      </div>
-    </div>
   );
 }
 

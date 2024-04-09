@@ -1,39 +1,48 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {UI} from '../utils/common';
-import {Text} from '@radix-ui/themes';
+import {Responsive, Text} from '@radix-ui/themes';
 
 interface AnimatedTextProps {
   className?: string;
   stepAmount?: number;
-  start: number;
-  duration: number;
+  to?: number;
+  duration?: number;
+  textSize?: Responsive<
+    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | undefined
+  >;
+  from: number;
 }
 
 function AnimatedText({
   className,
-  start,
+  from,
+  to = 0,
   stepAmount = 1,
-  duration,
+  duration = 2000,
+  textSize = '2',
 }: AnimatedTextProps): JSX.Element {
-  const [count, setCount] = useState<number>(start);
+  const [count, setCount] = useState<number>(from);
+
+  const positiveIncrease = useMemo(() => to > from, [to, from]);
 
   useEffect(() => {
-    setCount(start);
-  }, [duration, start]);
+    setCount(from);
+  }, [duration, from]);
 
   useEffect(() => {
-    if (count <= 0) return;
+    if ((count <= 0 && !positiveIncrease) || (count >= to && positiveIncrease))
+      return;
 
-    const intervalDelay = (duration * 1000) / start;
+    const intervalDelay = (duration * 1000) / from;
     const interval = setInterval(() => {
       setCount(prev => prev - stepAmount);
     }, intervalDelay);
 
     return () => clearInterval(interval);
-  }, [count, duration, start, stepAmount]);
+  }, [count, duration, from, stepAmount, positiveIncrease, to]);
 
   return (
-    <Text size={'1'} className={UI.cn('', className)}>
+    <Text size={textSize} className={UI.cn('', className)}>
       {count}
     </Text>
   );

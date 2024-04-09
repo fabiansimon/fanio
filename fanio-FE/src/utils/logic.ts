@@ -63,10 +63,13 @@ export function calculatePoints({
   length: number;
   delta: number;
 }) {
-  const points = length - delta;
+  const max = GAME_OPTIONS.MAX_POINTS_PER_ROUND;
+  const co = 0.01; // sensitivity
+  const b = max / Math.log10(co * length + 1);
+  const score = max - b * Math.log10(co * delta + 1);
 
   return {
-    points,
+    points: Math.max(0, score),
   };
 }
 

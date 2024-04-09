@@ -119,15 +119,15 @@ function PostGameScene({
 
   return (
     <div className="mx-[10%] my-auto space-y-3">
-      <div>
-        <Heading size={'8'} className="text-white -rotate-3 pb-3">
+      <div className="flex flex-col justify-center">
+        <Heading size={'6'} className="text-white text-center -rotate-2">
           {title}
         </Heading>
-        <Text size={'4'} className="text-white/60">
+        <Text size={'4'} className="text-white/60 text-center">
           {subtitle}
         </Text>
       </div>
-      <div className="border border-white/20 overflow-hidden rounded-lg py-3 px-3">
+      <div className="bg-black/20 border shadow-md shadow-black rounded-lg border-neutral-500/20  items-center justify-center overflow-hidden p-3">
         <ScoreTile
           achievement={achievement}
           score={attempt.userName ? attempt : lastAttempt}

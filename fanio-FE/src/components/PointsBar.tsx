@@ -47,7 +47,7 @@ function PointsBar(props: PointsBarProps, ref: Ref<PointsBarRef>) {
       {isPlaying && songLength && (
         <AnimatedText
           className="text-white"
-          start={GAME_OPTIONS.MAX_POINTS_PER_ROUND}
+          from={GAME_OPTIONS.MAX_POINTS_PER_ROUND}
           duration={songLength}
         />
       )}

@@ -6,12 +6,14 @@ interface EmptyContainerProps extends React.HTMLProps<HTMLDivElement> {
   title?: string;
   description?: string;
   onClick?: () => void;
+  children?: React.ReactNode;
   buttonText?: string;
 }
 function EmptyContainer({
   title = "💨 Hm, it's pretty empty here",
   description,
   className,
+  children,
   onClick,
   buttonText,
 }: EmptyContainerProps): JSX.Element {
@@ -38,6 +40,7 @@ function EmptyContainer({
           onClick={onClick}
         />
       )}
+      {children}
     </div>
   );
 }

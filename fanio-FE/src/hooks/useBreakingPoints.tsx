@@ -11,7 +11,6 @@ const breakpointsData = {
 
 function useBreakingPoints(breakpoint: BreakPoint): boolean {
   const [breakActive, setBreakActive] = useState<boolean>(() => {
-    console.log(window.innerWidth);
     return window.innerWidth < breakpointsData[breakpoint];
   });
 

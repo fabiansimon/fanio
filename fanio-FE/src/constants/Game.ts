@@ -1,5 +1,4 @@
 export const GAME_OPTIONS = {
-  MAX_POINTS_PER_ROUND: 10_000,
   POST_GAME_TITLES: [
     'WOW!!',
     'Well Done!',
@@ -16,6 +15,8 @@ export const GAME_OPTIONS = {
     'I know you can do better than this',
     "I don't want to lie to you, that wasn't great.",
   ],
+  MAX_POINTS_PER_ROUND: 1_000,
   MAX_SCORE_USERNAME_LENGTH: 20,
   SONG_TIMEOUT: 3000,
+  POINTS_UPDATE_TIMEOUT: 1200,
 };
