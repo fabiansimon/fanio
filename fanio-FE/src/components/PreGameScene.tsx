@@ -67,12 +67,12 @@ function PreGameScene({
             <div className="w-full border-[.2px] border-white/30" />
             <div className="flex items-center justify-end relative">
               <div className="flex flex-col text-right ml-2">
-                <Heading weight={'bold'} className={textColor} size={'3'}>
+                <Heading weight={'medium'} className={textColor} size={'3'}>
                   {UI.formatPoints(
                     topScore.totalScore - lastAttempt.totalScore,
                   )}
                 </Heading>
-                <Text className={textColor} size={'2'} weight={'medium'}>
+                <Text className={textColor} size={'2'} weight={'regular'}>
                   {DateUtils.formatTime(
                     Math.abs(topScore.timeElapsed - lastAttempt.timeElapsed),
                     'sec',

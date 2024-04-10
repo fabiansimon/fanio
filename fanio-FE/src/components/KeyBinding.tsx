@@ -1,4 +1,4 @@
-import {Kbd} from '@radix-ui/themes';
+import {Kbd, Text} from '@radix-ui/themes';
 import useKeyShortcut from '../hooks/useKeyShortcut';
 import useDetectOS from '../hooks/useDetectOS';
 import {useMemo} from 'react';
@@ -12,12 +12,14 @@ function KeyBinding({
   onActivate,
   ignoreMetaKey,
   className,
+  textClassName,
 }: {
   disabled?: boolean;
   hotkey: string;
   onActivate?: () => void;
   ignoreMetaKey?: boolean;
   className?: string;
+  textClassName?: string;
 }): JSX.Element {
   const isMobile = useIsMobile();
 
@@ -36,7 +38,11 @@ function KeyBinding({
   }, [OS, ignoreMetaKey]);
 
   if (isMobile) return <div />;
-  return <Kbd className={UI.cn(className)}>{`${metaKey}${hotkey}`}</Kbd>;
+  return (
+    <Kbd className={UI.cn(className)}>
+      <Text className={textClassName}>{`${metaKey}${hotkey}`}</Text>
+    </Kbd>
+  );
 }
 
 export default KeyBinding;

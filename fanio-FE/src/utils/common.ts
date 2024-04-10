@@ -47,4 +47,10 @@ export class UI {
 
     return `${formattedPoints} ${postfix}`;
   }
+
+  static addAlpha(color: string, opacity: number): string {
+    const op = Math.round(opacity * 255);
+    const hexOpacity = op.toString(16).padStart(2, '0').toUpperCase();
+    return color + hexOpacity;
+  }
 }

@@ -150,9 +150,9 @@ function QuizLink({quizId}: {quizId: string}): JSX.Element {
   }, [quizId]);
 
   return (
-    <div className="border bg-neutral-900 border-neutral-500/20 shadow-black rounded-lg py-2 px-3">
+    <div className="border bg-neutral-900 border-neutral-500/20 shadow-black rounded-lg py-2 px-3 -m-4">
       {isLoading ? (
-        <Loading className="size-6" />
+        <Loading className="size-6 text-white" />
       ) : (
         <div className="flex space-x-4 items-center">
           <div>

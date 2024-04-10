@@ -19,4 +19,18 @@ export const GAME_OPTIONS = {
   MAX_SCORE_USERNAME_LENGTH: 20,
   SONG_TIMEOUT: 3000,
   POINTS_UPDATE_TIMEOUT: 1200,
+  GAME_SETTINGS_STRINGS: {
+    autoPlay: {
+      title: 'Auto Play',
+      description: 'Next Song will be played automatically',
+    },
+    autoInput: {
+      title: 'Auto Input',
+      description: 'Guess will be filled in if close enough',
+    },
+    autoDeleteInput: {
+      title: 'Auto Clear',
+      description: 'Input will be cleared after a incorrect Guess',
+    },
+  },
 };

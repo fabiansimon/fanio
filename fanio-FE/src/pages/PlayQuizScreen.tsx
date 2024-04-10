@@ -1,21 +1,40 @@
 import {useParams} from 'react-router-dom';
 import PageContainer from '../components/PageContainer';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ReactPlayer from 'react-player';
-import {GuessResult, LocalScore, Quiz, Score, ScoreState} from '../types';
+import {
+  GameSettingKey,
+  GameSettings,
+  GuessResult,
+  LocalScore,
+  Quiz,
+  Score,
+  ScoreState,
+} from '../types';
 import {fetchPlayableQuizById} from '../utils/api';
 import {shuffle} from 'lodash';
 import {calculatePoints, randomNumber, similarity} from '../utils/logic';
 import InputField from '../components/InputField';
 import PostGameScene from '../components/PostGameScene';
 import PreGameScene from '../components/PreGameScene';
-import PointsBar, {PointsBarRef} from '../components/PointsBar';
+import {PointsBarRef} from '../components/PointsBar';
 import {LocalStorage} from '../utils/localStorage';
 import AnimatedResult from '../components/AnimatedResult';
 import {motion} from 'framer-motion';
 import {GAME_OPTIONS} from '../constants/Game';
 import QuizStatsContainer from '../components/QuizStatsContainer';
 import useKeyShortcut from '../hooks/useKeyShortcut';
+import {Checkbox, Heading, Text} from '@radix-ui/themes';
+import KeyBinding from '../components/KeyBinding';
+import {UI} from '../utils/common';
 
 enum GameState {
   PRE,
@@ -36,12 +55,31 @@ const INIT_SCORE = {
   guesses: [],
 };
 
+const INIT_GAME_SETTINGS = {
+  autoDeleteInput: {
+    title: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoDeleteInput.title,
+    description: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoDeleteInput.description,
+    status: true,
+  },
+  autoInput: {
+    title: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoInput.title,
+    description: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoInput.description,
+    status: true,
+  },
+  autoPlay: {
+    title: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoPlay.title,
+    description: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoPlay.description,
+    status: true,
+  },
+};
+
 function PlayQuizScreen(): JSX.Element {
   useKeyShortcut(
     'Enter',
     () => {
+      if (result && !settings.autoPlay.status) return updateGameRound();
       if (!isPlaying || result || gameState !== GameState.PLAYING) return;
-      changeUIState(UIState.INCORRECT);
+      handleSubmitGuess(true);
     },
     true,
   );
@@ -49,6 +87,7 @@ function PlayQuizScreen(): JSX.Element {
 
   const videoRef = useRef<ReactPlayer>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
   const barRef = useRef<PointsBarRef>(null);
   const backgroundRef = useRef<any>(null);
 
@@ -63,7 +102,11 @@ function PlayQuizScreen(): JSX.Element {
   const [input, setInput] = useState<string>('');
   const [score, setScore] = useState<ScoreState>(INIT_SCORE);
   const [timestamp, setTimestamp] = useState<number>(0);
+
   const [result, setResult] = useState<GuessResult | undefined>();
+  const [settings, setSettings] = useState<GameSettings>(
+    LocalStorage.fetchUserSettings() || INIT_GAME_SETTINGS,
+  );
 
   const question = useMemo(() => {
     if (quizData) return quizData.questions[questionIndex];
@@ -93,7 +136,11 @@ function PlayQuizScreen(): JSX.Element {
     let offset: number;
 
     if (quizData.randomOffsets) {
-      offset = randomNumber({min: 10, max: videoRef.current.getDuration()});
+      const boundary = videoRef.current.getDuration() * 0.1;
+      offset = randomNumber({
+        min: boundary,
+        max: videoRef.current.getDuration() - boundary,
+      });
     } else {
       offset = question.startOffset!;
     }
@@ -113,8 +160,12 @@ function PlayQuizScreen(): JSX.Element {
   );
 
   useEffect(() => {
-    handleSubmitGuess();
-  }, [input]);
+    LocalStorage.saveUserSettings(settings);
+  }, [settings]);
+
+  useEffect(() => {
+    if (settings.autoInput.status) handleSubmitGuess();
+  }, [input, settings]);
 
   useEffect(() => {
     if (questionIndex === quizData?.questions.length) {
@@ -153,8 +204,14 @@ function PlayQuizScreen(): JSX.Element {
     })();
   }, [id]);
 
-  const handleSubmitGuess = () => {
-    if (!isValidInput()) return;
+  const handleSubmitGuess = (onEnter?: boolean) => {
+    if (!isValidInput()) {
+      if (onEnter) {
+        changeUIState(UIState.INCORRECT);
+        if (settings.autoDeleteInput.status) setInput('');
+      }
+      return;
+    }
 
     changeUIState(UIState.CORRECT);
 
@@ -224,11 +281,17 @@ function PlayQuizScreen(): JSX.Element {
       });
     }, GAME_OPTIONS.POINTS_UPDATE_TIMEOUT);
 
+    if (!settings.autoPlay.status) return;
+
     setTimeout(() => {
-      setInput('');
-      setResult(undefined);
-      setQuestionIndex(prev => (prev += 1));
+      updateGameRound();
     }, GAME_OPTIONS.SONG_TIMEOUT);
+  };
+
+  const updateGameRound = () => {
+    setInput('');
+    setResult(undefined);
+    setQuestionIndex(prev => (prev += 1));
   };
 
   const onPlayerReady = (e: ReactPlayer) => {
@@ -245,10 +308,9 @@ function PlayQuizScreen(): JSX.Element {
   };
 
   const handleSongEnd = () => {
-    setResult(prev => {
-      if (!prev) return;
-      return {...prev, correct: false};
-    });
+    if (result) return;
+    changeUIState(UIState.INCORRECT);
+    setResult({correct: false, delta: 0, points: 0});
     barRef.current?.clear();
   };
 
@@ -307,37 +369,97 @@ function PlayQuizScreen(): JSX.Element {
               />
             )}
 
-            <div className="mx-[10%] z-10">
+            <div className="mx-[10%] z-10 my-auto space-y-4">
+              <Heading
+                size={'1'}
+                weight={'regular'}
+                className={UI.cn(
+                  'text-white/90 text-center',
+                  !settings.autoPlay.status && result
+                    ? 'opacity-1'
+                    : 'opacity-0',
+                )}>
+                (Press Enter to continue)
+              </Heading>
               {/* <PointsBar ref={barRef} /> */}
               <InputField
                 disabled={disableInput}
                 showSimple
                 onInput={handleInput}
-                value={input}
+                value={input.toUpperCase()}
                 ref={inputRef}
-                className="text-center text-[30px]"
+                className="text-center font-bold text-[30px]  "
               />
-
-              {/* <Button
-                className="mt-4 w-full"
-                text="Submit"
-                hotkey="Enter"
-                ignoreMetaKey
-                disabled={disableInput}
-                onClick={handleSubmitGuess}
-              /> */}
+              <QuizStatsContainer
+                topScore={topScore}
+                data={score}
+                totalQuestion={quizData?.questions.length}
+                className="mt-14 z-10"
+              />
             </div>
-            <QuizStatsContainer
-              topScore={topScore}
-              data={score}
-              totalQuestion={quizData?.questions.length}
-              className="mt-14 z-10"
-            />
           </div>
         )}
+        <QuickOptionsContainer settings={settings} setSettings={setSettings} />
       </div>
     </PageContainer>
   );
 }
 
+function QuickOptionsContainer({
+  settings,
+  setSettings,
+}: {
+  settings: GameSettings;
+  setSettings: Dispatch<SetStateAction<GameSettings>>;
+}): JSX.Element {
+  const handleChange = (key: GameSettingKey, value: boolean) => {
+    setSettings(prev => {
+      return {
+        ...prev,
+        [key]: {
+          ...prev[key],
+          status: value,
+        },
+      };
+    });
+  };
+
+  return (
+    <div className="flex justify-between">
+      {Object.entries(settings).map(
+        ([key, {title, description, status}], index) => {
+          const optionKey = key as GameSettingKey;
+          return (
+            <div className="flex justify-center space-x-2 px-3" key={key}>
+              <Checkbox
+                checked={status}
+                style={{opacity: status || 0.2}}
+                size={'1'}
+                onCheckedChange={value =>
+                  handleChange(optionKey, value as boolean)
+                }
+              />
+              <div className="flex flex-col -mt-1.5">
+                <div className="space-x-1.5 mb-1">
+                  <Text size={'2'} weight={'medium'} className="text-white/90">
+                    {title}
+                  </Text>
+                  <KeyBinding
+                    className="size-2 mt-1"
+                    textClassName="text-[10px]"
+                    hotkey={['C', 'J', 'B'][index]}
+                    onActivate={() => handleChange(optionKey, !status)}
+                  />
+                </div>
+                <Text size={'1'} className="text-white/50">
+                  {description}
+                </Text>
+              </div>
+            </div>
+          );
+        },
+      )}
+    </div>
+  );
+}
 export default PlayQuizScreen;

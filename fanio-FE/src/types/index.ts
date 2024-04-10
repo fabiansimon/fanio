@@ -142,3 +142,17 @@ interface QuizOptions {
   randomOffsets: boolean;
   privateAccess: boolean;
 }
+
+export interface GameSettings {
+  autoPlay: Setting;
+  autoInput: Setting;
+  autoDeleteInput: Setting;
+}
+
+export type GameSettingKey = 'autoDeleteInput' | 'autoInput' | 'autoPlay';
+
+interface Setting {
+  title: string;
+  description: String;
+  status: boolean;
+}

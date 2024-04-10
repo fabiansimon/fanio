@@ -5,6 +5,7 @@ import {useNavigate} from 'react-router-dom';
 import {forwardRef, Ref, useImperativeHandle, useRef, useState} from 'react';
 import {motion} from 'framer-motion';
 import useIsMobile from '../hooks/useIsMobile';
+import useKeyShortcut from '../hooks/useKeyShortcut';
 
 const BACKGROUND_ANIMATION_DURATION = 170;
 const SHAKE_ANIMATION_DURATION = 20;
@@ -22,18 +23,21 @@ interface PageContainerRef {
   shakeContent: () => void;
 }
 
+const BACKGROUND = 'bg-neutral-950';
+
 function PageContainer(
   {className, children, title, description, trailing}: PageContainerProps,
   ref: Ref<PageContainerRef>,
 ): JSX.Element {
   const [isShaking, setIsShaking] = useState<boolean>(false);
-  const [backgroundColor, setBackgroundColor] =
-    useState<string>('bg-slate-950');
+  const [backgroundColor, setBackgroundColor] = useState<string>(BACKGROUND);
 
   const divRef = useRef<HTMLDivElement>(null);
 
-  const navigation = useNavigate();
   const isMobile = useIsMobile();
+  const navigation = useNavigate();
+
+  useKeyShortcut('Escape', () => navigation(-1), true);
 
   const shakeAnimation = {
     shake: {
@@ -47,7 +51,7 @@ function PageContainer(
   const flashColor = (color: string) => {
     setBackgroundColor(color);
     setTimeout(() => {
-      setBackgroundColor('bg-slate-950');
+      setBackgroundColor(BACKGROUND);
     }, BACKGROUND_ANIMATION_DURATION);
   };
 
@@ -79,7 +83,7 @@ function PageContainer(
         animate={isShaking ? 'shake' : ''}
         className={UI.cn(
           'flex flex-col max-w-screen-xl w-full h-screen ',
-          isMobile ? 'px-4 pb-6' : 'px-12 pb-12',
+          isMobile ? 'px-4 pb-6' : 'px-10 pb-12',
         )}>
         <div className="flex items-end z-10">
           <div className="mt-12 w-full">
@@ -87,10 +91,10 @@ function PageContainer(
               onClick={() => navigation(-1)}
               className="size-6 cursor-pointer text-white mb-1"
             />
-            <Heading size={'7'} className="text-white text-left ">
+            <Heading size={'5'} className="text-white text-left ">
               {title}
             </Heading>
-            <Text size={'4'} weight={'light'} className="text-neutral-500 pr-2">
+            <Text size={'2'} weight={'light'} className="text-neutral-500 pr-2">
               {description}
             </Text>
           </div>

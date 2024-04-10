@@ -1,10 +1,11 @@
-import {LocalScore, Quiz} from '../types';
+import {GameSettings, LocalScore, Quiz} from '../types';
 
 const KEYS = {
   scoreIds: 'scoreIds',
   quizData: 'quizData',
   lastAttempts: 'lastAttempts',
   bestAttempts: 'bestAttempts',
+  userSettings: 'userSettings',
 };
 
 export class LocalStorage {
@@ -63,5 +64,15 @@ export class LocalStorage {
     const storedAttemps = this.fetchLastAttempts();
     storedAttemps.set(quizId, score);
     localStorage.setItem(KEYS.lastAttempts, JSON.stringify([...storedAttemps]));
+  }
+
+  static saveUserSettings(settings: GameSettings) {
+    localStorage.setItem(KEYS.userSettings, JSON.stringify(settings));
+  }
+
+  static fetchUserSettings() {
+    const storedSettings = localStorage.getItem(KEYS.userSettings);
+    if (!storedSettings) return;
+    return JSON.parse(storedSettings);
   }
 }

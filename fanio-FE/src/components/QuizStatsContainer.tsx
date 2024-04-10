@@ -32,11 +32,41 @@ function QuizStatsContainer({
   }, [score, totalScore]);
 
   return (
-    <div className={UI.cn('flex flex-col w-full justify-between', className)}>
+    <div
+      className={UI.cn(
+        'flex flex-col w-full justify-between space-y-3',
+        className,
+      )}>
+      <div className="flex justify-between items-center">
+        <div className="flex w-full flex-grow flex-col">
+          <Heading size={'3'} className="text-white">
+            {guesses.length} out of {totalQuestion}
+          </Heading>
+          <Text size={'1'} className="text-white/70">
+            Current Question
+          </Text>
+        </div>
+        <div className="flex flex-grow w-full flex-col">
+          <Heading size={'3'} className="text-white text-center">
+            {UI.formatPoints(score)}
+          </Heading>
+          <Text size={'1'} className="text-white/70 text-center">
+            Points
+          </Text>
+        </div>
+        <div className="flex w-full flex-grow flex-col">
+          <Heading size={'3'} className="text-white text-right">
+            {DateUtils.formatTime(totalTime)}
+          </Heading>
+          <Text size={'1'} className="text-white/70 text-right">
+            Total Time
+          </Text>
+        </div>
+      </div>
       {topScore && (
         <div className="flex justify-center">
-          <div className="flex flex-col mb-4">
-            <Text size={'2'} className="text-white/70 text-center">
+          <div className="flex flex-col">
+            <Text size={'1'} className="text-white/70 text-center">
               Score to beat
             </Text>
             <Heading size={'2'} className="text-white/70 text-center">
@@ -45,32 +75,6 @@ function QuizStatsContainer({
           </div>
         </div>
       )}
-      <div className="flex justify-between items-center">
-        <div className="flex w-full flex-grow flex-col">
-          <Heading size={'4'} className="text-white">
-            {guesses.length} out of {totalQuestion}
-          </Heading>
-          <Text size={'2'} className="text-white">
-            Current Question
-          </Text>
-        </div>
-        <div className="flex flex-grow w-full flex-col">
-          <Heading size={'4'} className="text-white text-center">
-            {UI.formatPoints(score)}
-          </Heading>
-          <Text size={'2'} className="text-white text-center">
-            Points
-          </Text>
-        </div>
-        <div className="flex w-full flex-grow flex-col">
-          <Heading size={'4'} className="text-white text-right">
-            {DateUtils.formatTime(totalTime)}
-          </Heading>
-          <Text size={'2'} className="text-white text-right">
-            Total Time
-          </Text>
-        </div>
-      </div>
     </div>
   );
 }

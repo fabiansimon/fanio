@@ -75,8 +75,8 @@ function AnimatedResult({
       </div>
       <motion.div
         initial="fixed"
-        variants={{fixed: {y: 0, scale: 1}, move: {y: 1000, scale: 0.3}}}
-        transition={{...transition, duration: ANIMATION_DURATION + 2000}}
+        variants={{fixed: {y: 0, scale: 1}, move: {y: 300, scale: 0.0}}}
+        transition={{...transition, duration: ANIMATION_DURATION + 3000}}
         animate={animatedPoints ? 'move' : 'fixed'}>
         <Text size={'3'} className="text-white/60">
           {`+${UI.formatPoints(result?.points || 0, 'Points')}`}

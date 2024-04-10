@@ -176,9 +176,8 @@ function CreateScreen(): JSX.Element {
       />
       <PageContainer
         title="Create quiz"
-        className="bg-slate-950"
         description="Make sure to only use youtube links at the moment.">
-        <div className="flex flex-col bg-black/20 border shadow-md shadow-black rounded-xl px-5 py-4 border-neutral-500/20 w-40vw space-x-4 mx-auto  w-full my-auto">
+        <div className="flex flex-col bg-neutral-900/20 border shadow-md shadow-black rounded-xl px-5 py-4 border-neutral-500/20 w-40vw space-x-4 mx-auto  w-full my-auto">
           {/* <div className="flex h-full w-[1px] bg-blue-500/50" /> */}
           <div className="flex flex-col w-full">
             {/* <div className="mr-auto mt-10 mb-2">
@@ -203,7 +202,7 @@ function CreateScreen(): JSX.Element {
                 }
               />
               {quizInput?.options.privateAccess && (
-                <div className="bg-neutral-700 p-1.5 rounded-lg items-center flex mb-auto space-x-1.5">
+                <div className="bg-neutral-700/60 p-1.5 rounded-lg items-center flex mb-auto space-x-1.5">
                   <LockClosedIcon className="text-white size-3" />
                   <Text size={'1'} weight={'medium'} className="text-white">
                     Private
@@ -377,7 +376,11 @@ function OptionsContainer({
           </Heading>
           <Switch
             size="1"
-            className="bg-white/20"
+            style={{
+              backgroundColor: UI.addAlpha('#ffffff', 0.2),
+              borderRadius: 100,
+            }}
+            className="text-white"
             onCheckedChange={value =>
               onInput(value, InputType.RANDOM_TIMESTAMP)
             }
@@ -394,7 +397,10 @@ function OptionsContainer({
           </Heading>
           <Switch
             size="1"
-            className="bg-white/20"
+            style={{
+              backgroundColor: UI.addAlpha('#ffffff', 0.2),
+              borderRadius: 100,
+            }}
             onCheckedChange={value => onInput(value, InputType.PRIVATE_QUIZ)}
           />
         </div>

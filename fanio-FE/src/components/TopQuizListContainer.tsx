@@ -54,7 +54,7 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
   return (
     <div className={UI.cn('flex flex-col h-full justify-between', className)}>
       {isLoading ? (
-        <Loading className="size-10 self-center my-auto" />
+        <Loading className="size-10 self-center my-auto text-white" />
       ) : (
         <>
           <QuizList

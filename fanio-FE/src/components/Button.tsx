@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {Button as RadixButton, Kbd, Text, Responsive} from '@radix-ui/themes';
+import {Button as RadixButton, Kbd, Text} from '@radix-ui/themes';
 import useKeyShortcut from '../hooks/useKeyShortcut';
 import KeyBinding from './KeyBinding';
 import {UI} from '../utils/common';
@@ -48,7 +48,7 @@ function Button({
         className,
       )}>
       {loading ? (
-        <Loading className="size-6" />
+        <Loading className="text-white" size={'3'} />
       ) : (
         <>
           {icon && icon}
