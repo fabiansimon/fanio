@@ -4,10 +4,40 @@ import HoverContainer from './HoverContainer';
 import {CopyIcon} from '@radix-ui/react-icons';
 import ToastController from '../providers/ToastController';
 import {useEffect, useState} from 'react';
+import SockJS from 'sockjs-client';
 import Loading from './Loading';
+import {Stomp, Client} from '@stomp/stompjs';
+import {Frame} from 'stompjs';
+
+interface IMessage {
+  message: string;
+}
 
 function LobbyGameScene({}: {}): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [client, setClient] = useState<Client | null>(null);
+  const [messages, setMessages] = useState<IMessage[]>([]);
+
+  useEffect(() => {
+    const sock = new SockJS('http://localhost:8080/ws');
+    const stompClient = Stomp.over(sock);
+
+    const connectCallback = (frame?: Frame) => {
+      console.log('Connected: ' + frame);
+      stompClient.subscribe('/topic/lobby', message => {
+        const receivedMessage: IMessage = JSON.parse(message.body);
+        setMessages(prev => [...prev, receivedMessage]);
+      });
+    };
+
+    const errorCallback = (error: string | Frame) => {
+      console.error('Connection error: ' + error);
+    };
+
+    stompClient.connect({}, connectCallback, errorCallback);
+
+    setClient(stompClient);
+  }, [client]);
 
   useEffect(() => {
     setTimeout(() => {
