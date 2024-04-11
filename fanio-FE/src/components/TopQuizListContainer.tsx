@@ -2,13 +2,21 @@ import {useCallback, useEffect, useState} from 'react';
 import {UI} from '../utils/common';
 import PaginationBar from './PaginationBar';
 import QuizList from './QuizList';
-import {ButtonType, PaginatedData, PaginationState, Quiz} from '../types';
+import {
+  BreakPoint,
+  ButtonType,
+  PaginatedData,
+  PaginationState,
+  Quiz,
+} from '../types';
 import {fetchTopQuizzes} from '../utils/api';
 import Loading from './Loading';
 import Button from './Button';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
 import useIsMobile from '../hooks/useIsMobile';
+import {ScrollArea} from '@radix-ui/themes';
+import useBreakingPoints from '../hooks/useBreakingPoints';
 
 interface TopQuizListProps {
   className?: string;
@@ -19,8 +27,10 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
   const [quizData, setQuizData] = useState<PaginatedData<Quiz> | null>(null);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    maxItems: 5,
+    maxItems: 10,
   });
+
+  const breakTriggered = useBreakingPoints(BreakPoint.SM);
 
   const navigation = useNavigate();
   const isMobile = useIsMobile();
@@ -52,16 +62,19 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
   }, [loadQuizzes]);
 
   return (
-    <div className={UI.cn('flex flex-col h-full justify-between', className)}>
+    <div className={UI.cn('flex flex-col', className)}>
       {isLoading ? (
         <Loading className="size-10 self-center my-auto text-white" />
       ) : (
         <>
-          <QuizList
-            showPlacement={!isMobile}
-            data={quizData?.content || []}
-            className="mt-4 -mx-2"
-          />
+          <div className="">
+            <QuizList
+              showPlacement={!isMobile}
+              showScore={!breakTriggered}
+              data={quizData?.content || []}
+              className="mt-4 -mx-2"
+            />
+          </div>
           {/* <PaginationBar
             disableItemsSelector
             initialState={{maxItems: 5, pageIndex: 0}}

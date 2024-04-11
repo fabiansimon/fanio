@@ -8,6 +8,7 @@ interface QuizListProps {
   className?: string;
   invertColors?: boolean;
   showPlacement?: boolean;
+  showScore?: boolean;
 }
 
 function QuizList({
@@ -15,9 +16,14 @@ function QuizList({
   className,
   invertColors = false,
   showPlacement,
+  showScore,
 }: QuizListProps): JSX.Element {
   return (
-    <div className={UI.cn('flex flex-grow space-y-2 pt-3 flex-col', className)}>
+    <div
+      className={UI.cn(
+        'flex flex-grow h-full space-y-2 pt-3 flex-col',
+        className,
+      )}>
       {data.map((quiz, index) => {
         return (
           <div key={quiz.id} className="flex space-x-2">
@@ -25,6 +31,7 @@ function QuizList({
               <PlaceContainer position={index + 1} className="-mr-3" />
             )}
             <QuizPreview
+              showScore={showScore}
               invertColors={invertColors}
               quiz={quiz}
               defaultNavigation

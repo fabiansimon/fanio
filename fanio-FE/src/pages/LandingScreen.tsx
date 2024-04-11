@@ -51,7 +51,7 @@ function LandingScreen(): JSX.Element {
         description:
           "If you can't see anything you like, you can always search for it or just create it.",
         className:
-          'bg-gradient-to-b from-blue-600 to-blue-500 w-full h-full border-blue-700',
+          'bg-gradient-to-b from-blue-600 to-blue-500 border-blue-700 flex-1',
         content: <TopQuizListContainer />,
       },
       {
@@ -86,28 +86,26 @@ function LandingScreen(): JSX.Element {
   );
 
   return (
-    <div className="flex flex-col space-y-2 bg-neutral-950 items-center w-full h-screen fixed">
+    <div className="flex flex-col space-y-2 bg-neutral-950 items-center w-full h-screen">
       <div className="mt-12 flex w-full px-12">
         <Heading size={'9'} className="text-white ">
           Fan.io 🎤
         </Heading>
       </div>
+
       <MarqueeContainer className="pt-4" />
+
       <SearchContainer
         ref={searchRef}
         setSearchResult={setSearchResult}
-        className="flex flex-grow h-full justify-center"
-      />
-      <SearchResultsContainer
-        onBack={() => searchRef.current?.clearSearch()}
-        searchResults={searchResults}
+        className="flex py-[20%] justify-center"
       />
 
       <motion.div
         animate={searchResults ? 'hidden' : 'shown'}
         variants={animatedStates}
         transition={transition}
-        className="flex justify-center w-full max-w-screen-xl h-full space-x-2 p-2">
+        className="flex flex-1 justify-center w-full bg-blue-500 max-w-screen-xl space-x-2 p-2">
         <Container
           hotkey={MENU_OPTIONS[0].hotkey}
           title={MENU_OPTIONS[0].title}
@@ -116,7 +114,7 @@ function LandingScreen(): JSX.Element {
           className={MENU_OPTIONS[0].className}
           content={MENU_OPTIONS[0].content}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+        <div className="grid grid-cols-1 flex-1 sm:grid-cols-2 gap-2 w-full">
           {MENU_OPTIONS.slice(1)
             .filter(c => !c.isHidden)
             .map((option, index) => {
@@ -137,6 +135,10 @@ function LandingScreen(): JSX.Element {
             })}
         </div>
       </motion.div>
+      <SearchResultsContainer
+        onBack={() => searchRef.current?.clearSearch()}
+        searchResults={searchResults}
+      />
     </div>
   );
 }

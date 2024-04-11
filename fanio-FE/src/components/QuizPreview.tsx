@@ -7,7 +7,6 @@ import BackgroundLight from './BackgroundLight';
 import useMouseEntered from '../hooks/useMouseEntered';
 import {useMemo, useRef} from 'react';
 import {DateUtils, UI} from '../utils/common';
-import PlaceContainer from './PlaceContainer';
 
 interface QuizPreviewProps {
   quiz: Quiz;
@@ -16,6 +15,7 @@ interface QuizPreviewProps {
   onClick?: (id: string) => void;
   onClickScores?: (id: string) => void;
   invertColors?: boolean;
+  showScore?: boolean;
 }
 
 function QuizPreview({
@@ -24,10 +24,12 @@ function QuizPreview({
   className,
   onClick,
   onClickScores,
+  showScore = true,
   invertColors = false,
 }: QuizPreviewProps): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
   const mouseEntered = useMouseEntered(ref);
+
   const navigate = useNavigate();
   const {title, id, questions, createdAt} = quiz;
 
@@ -53,14 +55,13 @@ function QuizPreview({
     }, [invertColors]);
 
   return (
-    <div className="flex w-full">
+    <>
       <BackgroundLight
         ref={ref}
-        containerClassName="w-full"
+        containerClassName="flex-grow"
         animate={!invertColors && mouseEntered}
         className={UI.cn(
-          'flex w-full flex-col min-h-14 cursor-pointer justify-center space-y-1 border px-2 py-1.5 rounded-lg',
-          'hover:scale-[101%] transition-transform duration-150 ease-in-out cursor-pointer',
+          'flex flex-grow flex-col min-h-14 cursor-pointer justify-center space-y-1 border px-2 py-1.5 rounded-lg',
           borderColor,
           backgroundColor,
           className,
@@ -78,20 +79,22 @@ function QuizPreview({
           </Text>
         </div>
       </BackgroundLight>
-      <div
-        onClick={_onClickScores}
-        className={UI.cn(
-          'rounded-md border ml-1 cursor-pointer w-16 flex flex-col items-center align-middle justify-center',
-          'hover:scale-[103%] transition-transform duration-150 ease-in-out cursor-pointer',
-          backgroundColor,
-          borderColor,
-        )}>
-        <BarChartIcon className={textColor} />
-        <Text size={'1'} className={UI.cn('pt-1', subtitleColor)}>
-          scores
-        </Text>
-      </div>
-    </div>
+      {showScore && (
+        <div
+          onClick={_onClickScores}
+          className={UI.cn(
+            'rounded-md border ml-1 cursor-pointer w-16 flex flex-col items-center align-middle justify-center',
+            'hover:scale-[103%] transition-transform duration-150 ease-in-out cursor-pointer',
+            backgroundColor,
+            borderColor,
+          )}>
+          <BarChartIcon className={textColor} />
+          <Text size={'1'} className={UI.cn('pt-1', subtitleColor)}>
+            scores
+          </Text>
+        </div>
+      )}
+    </>
   );
 }
 
