@@ -86,26 +86,27 @@ function LandingScreen(): JSX.Element {
   );
 
   return (
-    <div className="flex flex-col space-y-2 bg-neutral-950 items-center w-full h-screen">
-      <div className="mt-12 flex w-full px-12">
-        <Heading size={'9'} className="text-white ">
-          Fan.io 🎤
-        </Heading>
-      </div>
+    <div className="flex flex-col bg-neutral-950 items-center justify-between w-full h-screen">
+      <>
+        <div className="mt-12 w-full item pl-12">
+          <Heading size={'9'} className="text-white">
+            Fan.io 🎤
+          </Heading>
+        </div>
 
-      <MarqueeContainer className="pt-4" />
+        <MarqueeContainer className="-mt-24" />
 
-      <SearchContainer
-        ref={searchRef}
-        setSearchResult={setSearchResult}
-        className="flex py-[20%] justify-center"
-      />
-
+        <SearchContainer
+          ref={searchRef}
+          setSearchResult={setSearchResult}
+          className="flex min-h-1/3 justify-center"
+        />
+      </>
       <motion.div
         animate={searchResults ? 'hidden' : 'shown'}
         variants={animatedStates}
         transition={transition}
-        className="flex flex-1 justify-center w-full bg-blue-500 max-w-screen-xl space-x-2 p-2">
+        className="flex bottom-0 justify-center w-full max-w-screen-xl space-x-2 p-2 max-h-[50%]">
         <Container
           hotkey={MENU_OPTIONS[0].hotkey}
           title={MENU_OPTIONS[0].title}
@@ -114,6 +115,7 @@ function LandingScreen(): JSX.Element {
           className={MENU_OPTIONS[0].className}
           content={MENU_OPTIONS[0].content}
         />
+
         <div className="grid grid-cols-1 flex-1 sm:grid-cols-2 gap-2 w-full">
           {MENU_OPTIONS.slice(1)
             .filter(c => !c.isHidden)

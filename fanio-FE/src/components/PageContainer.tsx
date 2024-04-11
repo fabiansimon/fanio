@@ -82,7 +82,7 @@ function PageContainer(
         variants={shakeAnimation}
         animate={isShaking ? 'shake' : ''}
         className={UI.cn(
-          'flex flex-col max-w-screen-xl w-full h-screen ',
+          'flex flex-col max-w-screen-xl w-full h-screen',
           isMobile ? 'px-4 pb-6' : 'px-10 pb-12',
         )}>
         <div className="flex items-end z-10">

@@ -47,7 +47,7 @@ function AllGamesContainer({className}: {className?: string}): JSX.Element {
       <Marquee speed={30} className="mb-4">
         {statistic &&
           Object.entries(statistic).map(([key, val]) => (
-            <div key={key} className="mr-6 w-12">
+            <div key={key} className="mr-6 w-14 mt-4">
               <Heading size="4" className="text-white">
                 {val}
               </Heading>

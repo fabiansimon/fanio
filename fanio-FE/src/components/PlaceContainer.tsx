@@ -38,7 +38,7 @@ function AchievementContainer({
     return {
       icon: (
         <div className="flex flex-col">
-          <Text weight={'bold'} className="text-slate-800" size={'2'}>
+          <Text weight={'bold'} className="text-slate-800" size={'1'}>
             {[1, 2, 3][achievement]}#
           </Text>
         </div>

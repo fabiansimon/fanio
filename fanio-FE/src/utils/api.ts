@@ -52,7 +52,14 @@ export async function fetchPlayableQuizById({
 
 export async function uploadQuiz(quiz: QuizInput): Promise<Quiz> {
   try {
-    const response = await _axios.post<Quiz>('/create-quiz', quiz);
+    console.log({
+      ...quiz,
+      ...quiz.options,
+    });
+    const response = await _axios.post<Quiz>('/create-quiz', {
+      ...quiz,
+      ...quiz.options,
+    });
     return response.data;
   } catch (error) {
     handleError({error, callName: 'uploadQuiz'});

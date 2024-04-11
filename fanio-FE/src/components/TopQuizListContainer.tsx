@@ -27,7 +27,7 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
   const [quizData, setQuizData] = useState<PaginatedData<Quiz> | null>(null);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    maxItems: 10,
+    maxItems: 5,
   });
 
   const breakTriggered = useBreakingPoints(BreakPoint.SM);
@@ -62,27 +62,20 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
   }, [loadQuizzes]);
 
   return (
-    <div className={UI.cn('flex flex-col', className)}>
+    <div
+      className={UI.cn(
+        'flex flex-col h-full w-full overflow-y-auto -mx-2 ',
+        className,
+      )}>
       {isLoading ? (
         <Loading className="size-10 self-center my-auto text-white" />
       ) : (
-        <>
-          <div className="">
-            <QuizList
-              showPlacement={!isMobile}
-              showScore={!breakTriggered}
-              data={quizData?.content || []}
-              className="mt-4 -mx-2"
-            />
-          </div>
-          {/* <PaginationBar
-            disableItemsSelector
-            initialState={{maxItems: 5, pageIndex: 0}}
-            totalElements={quizData?.totalElements || 0}
-            onValueChange={handlePaginationChange}
-            className="ml-auto"
-          /> */}
-        </>
+        <QuizList
+          showPlacement={!isMobile}
+          showScore={!breakTriggered}
+          data={quizData?.content || []}
+          className="py-3 mb-10"
+        />
       )}
       <Button
         type={ButtonType.outline}

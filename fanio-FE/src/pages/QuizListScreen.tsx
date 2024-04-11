@@ -40,25 +40,22 @@ function QuizListScreen(): JSX.Element {
   return (
     <PageContainer
       title="All Quizzes"
-      description="If you can't find something that you like, just go ahead and create
-    it.">
-      <div className="flex flex-col h-full">
-        <SearchInput
-          title=""
-          subtitle="Filter Results"
-          setSearchResult={setSearchResult}
-          className="mt-5"
-        />
-        <QuizList
-          className="h-0 my-2 overflow-y-auto"
-          data={searchResults || quizData?.content || []}
-        />
-        <PaginationBar
-          className="flex"
-          totalElements={quizData?.totalElements || 0}
-          onValueChange={handlePaginationChange}
-        />
-      </div>
+      description="If you can't find something that you like, just go ahead and create it.">
+      <SearchInput
+        title=""
+        subtitle="Filter Results"
+        setSearchResult={setSearchResult}
+        className="mt-5"
+      />
+      <QuizList
+        className="flex-grow overflow-y-auto mt-4"
+        data={searchResults || quizData?.content || []}
+      />
+      <PaginationBar
+        className="mt-4"
+        totalElements={quizData?.totalElements || 0}
+        onValueChange={handlePaginationChange}
+      />
     </PageContainer>
   );
 }

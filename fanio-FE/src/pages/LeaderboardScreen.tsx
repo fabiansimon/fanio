@@ -166,9 +166,15 @@ function QuizLink({quizId}: {quizId: string}): JSX.Element {
             )}
           </div>
           <div
-            onClick={() => navigation(`${ROUTES.playQuiz}/${quizId}`)}
+            onClick={() =>
+              !quizData?.isPrivate && navigation(`${ROUTES.playQuiz}/${quizId}`)
+            }
             className="flex cursor-pointer size-10 bg-neutral-300/10 items-center justify-center rounded-full">
-            <PlayIcon className="text-white/50" />
+            {quizData?.isPrivate ? (
+              <Text className="text-white/80 text-[9px]">Private</Text>
+            ) : (
+              <PlayIcon className="text-white/50" />
+            )}
           </div>
         </div>
       )}

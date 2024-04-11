@@ -12,23 +12,19 @@ interface QuizListProps {
 }
 
 function QuizList({
-  data,
   className,
+  data,
   invertColors = false,
-  showPlacement,
   showScore,
+  showPlacement,
 }: QuizListProps): JSX.Element {
   return (
-    <div
-      className={UI.cn(
-        'flex flex-grow h-full space-y-2 pt-3 flex-col',
-        className,
-      )}>
+    <div className={UI.cn('space-y-2 overflow-y-auto px-2 -mx-2', className)}>
       {data.map((quiz, index) => {
         return (
-          <div key={quiz.id} className="flex space-x-2">
+          <div className="flex" key={index}>
             {showPlacement && (
-              <PlaceContainer position={index + 1} className="-mr-3" />
+              <PlaceContainer position={index + 1} className="-mr-2" />
             )}
             <QuizPreview
               showScore={showScore}

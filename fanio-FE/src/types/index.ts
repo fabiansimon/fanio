@@ -140,7 +140,7 @@ interface Guess {
 
 interface QuizOptions {
   randomOffsets: boolean;
-  privateAccess: boolean;
+  isPrivate: boolean;
 }
 
 export interface GameSettings {

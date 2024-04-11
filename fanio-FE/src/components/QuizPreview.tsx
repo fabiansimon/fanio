@@ -62,6 +62,7 @@ function QuizPreview({
         animate={!invertColors && mouseEntered}
         className={UI.cn(
           'flex flex-grow flex-col min-h-14 cursor-pointer justify-center space-y-1 border px-2 py-1.5 rounded-lg',
+          'hover:scale-[101%] transition-transform duration-150 ease-in-out cursor-pointer',
           borderColor,
           backgroundColor,
           className,

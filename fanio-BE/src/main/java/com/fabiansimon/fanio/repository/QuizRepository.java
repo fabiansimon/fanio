@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.UUID;
 
 public interface QuizRepository extends JpaRepository<Quiz, UUID> {
-    @Query(value = "SELECT * FROM quizzes WHERE title ILIKE %:term%", nativeQuery = true)
-    Page<Quiz> findByTitleContainingIgnoreCase(@Param("term") String name, Pageable pageable);
+    @Query(value = "SELECT * FROM quizzes WHERE is_private = false AND title ILIKE %:term%", nativeQuery = true)
+    Page<Quiz> findByTitleContainingIgnoreCaseAndIsPrivateFalse(@Param("term") String term, Pageable pageable);
+
+    Page<Quiz> findAllByIsPrivateFalse(Pageable pageable);
 }

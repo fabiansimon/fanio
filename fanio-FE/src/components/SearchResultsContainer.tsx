@@ -63,7 +63,9 @@ function SearchResultsContainer({
         description={description}
         onBack={onBack}
         className="bg-slate-100 border-neutral-200 w-full"
-        content={<QuizList invertColors data={searchResults || []} />}
+        content={
+          <QuizList className="mt-4" invertColors data={searchResults || []} />
+        }
       />
     </motion.div>
   );

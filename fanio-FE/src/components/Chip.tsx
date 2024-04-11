@@ -22,7 +22,7 @@ function Chip({type}: {type: keyof typeof ChipData}): JSX.Element {
   return (
     <div
       className={UI.cn(
-        'p-1.5 rounded-lg items-center flex mb-auto space-x-1.5',
+        'p-1.5 rounded-lg items-center flex space-x-1.5',
         backgroundColor,
       )}>
       {icon}

@@ -1,17 +1,9 @@
 import {useParams} from 'react-router-dom';
 import PageContainer from '../components/PageContainer';
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import ReactPlayer from 'react-player';
 import {
-  GameSettingKey,
+  ChipType,
   GameSettings,
   GuessResult,
   LocalScore,
@@ -32,9 +24,13 @@ import {motion} from 'framer-motion';
 import {GAME_OPTIONS} from '../constants/Game';
 import QuizStatsContainer from '../components/QuizStatsContainer';
 import useKeyShortcut from '../hooks/useKeyShortcut';
-import {Checkbox, Heading, Text} from '@radix-ui/themes';
-import KeyBinding from '../components/KeyBinding';
+import {Heading} from '@radix-ui/themes';
 import {UI} from '../utils/common';
+import QuickOptionsContainer from '../components/QuickOptionsContainer';
+import {INIT_GAME_SETTINGS, INIT_SCORE} from '../constants/Init';
+import ToastController from '../providers/ToastController';
+import MusicLoader from '../components/MusicLoader';
+import Chip from '../components/Chip';
 
 enum GameState {
   PRE,
@@ -48,30 +44,6 @@ enum UIState {
 }
 
 const ANSWER_THRESHOLD = 70;
-
-const INIT_SCORE = {
-  totalScore: 0,
-  totalTime: 0,
-  guesses: [],
-};
-
-const INIT_GAME_SETTINGS = {
-  autoDeleteInput: {
-    title: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoDeleteInput.title,
-    description: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoDeleteInput.description,
-    status: true,
-  },
-  autoInput: {
-    title: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoInput.title,
-    description: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoInput.description,
-    status: true,
-  },
-  autoPlay: {
-    title: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoPlay.title,
-    description: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoPlay.description,
-    status: true,
-  },
-};
 
 function PlayQuizScreen(): JSX.Element {
   useKeyShortcut(
@@ -102,6 +74,7 @@ function PlayQuizScreen(): JSX.Element {
   const [input, setInput] = useState<string>('');
   const [score, setScore] = useState<ScoreState>(INIT_SCORE);
   const [timestamp, setTimestamp] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [result, setResult] = useState<GuessResult | undefined>();
   const [settings, setSettings] = useState<GameSettings>(
@@ -113,7 +86,6 @@ function PlayQuizScreen(): JSX.Element {
 
     return null;
   }, [quizData, questionIndex]);
-  console.log(question);
 
   const disableInput = useMemo(
     () => result !== undefined || !isPlaying,
@@ -293,6 +265,7 @@ function PlayQuizScreen(): JSX.Element {
     setInput('');
     setResult(undefined);
     setQuestionIndex(prev => (prev += 1));
+    setIsLoading(true);
   };
 
   const onPlayerReady = (e: ReactPlayer) => {
@@ -304,12 +277,18 @@ function PlayQuizScreen(): JSX.Element {
 
   const handleSongStart = () => {
     inputRef.current?.focus();
+    setIsLoading(false);
     setTimestamp(performance.now());
     barRef.current?.startAnimation();
   };
 
-  const handleSongEnd = () => {
+  const handleSongEnd = (showError: boolean = false) => {
     if (result) return;
+    if (showError)
+      ToastController.showErrorToast(
+        'Song unable to play',
+        'Youtube blocked this song, so we skipped it',
+      );
     changeUIState(UIState.INCORRECT);
     setResult({correct: false, delta: 0, points: 0});
     barRef.current?.clear();
@@ -323,7 +302,8 @@ function PlayQuizScreen(): JSX.Element {
     <PageContainer
       ref={backgroundRef}
       title={quizData?.title}
-      description={quizData?.description}>
+      description={quizData?.description}
+      trailing={quizData?.isPrivate && <Chip type={ChipType.PRIVATE} />}>
       <div className="w-full h-full flex flex-col">
         {gameState === GameState.PRE && (
           <PreGameScene
@@ -351,6 +331,7 @@ function PlayQuizScreen(): JSX.Element {
                   playing={isPlaying}
                   onReady={onPlayerReady}
                   onPlay={handleSongStart}
+                  onError={() => handleSongEnd(true)}
                   controls={false}
                   width={'250%'}
                   height={'250%'}
@@ -382,85 +363,40 @@ function PlayQuizScreen(): JSX.Element {
                 )}>
                 (Press Enter to continue)
               </Heading>
-              {/* <PointsBar ref={barRef} /> */}
+              <MusicLoader
+                className={UI.cn(
+                  'opacity-1 absolute left-1/2 -translate-x-[50%]',
+                  isLoading ? 'opacity-1' : 'opacity-0',
+                )}
+              />
               <InputField
                 disabled={disableInput}
                 showSimple
                 onInput={handleInput}
                 value={input.toUpperCase()}
                 ref={inputRef}
-                className="text-center font-bold text-[30px]  "
+                className="text-center font-bold mt-8 text-[30px]"
               />
               <QuizStatsContainer
                 topScore={topScore}
                 data={score}
                 totalQuestion={quizData?.questions.length}
-                className="mt-14 z-10"
+                className={UI.cn(
+                  'mt-14 z-10',
+                  isLoading ? 'opacity-30' : 'opacity-1',
+                )}
               />
             </div>
           </div>
         )}
-        <QuickOptionsContainer settings={settings} setSettings={setSettings} />
+        <QuickOptionsContainer
+          disabled={!!result}
+          settings={settings}
+          setSettings={setSettings}
+        />
       </div>
     </PageContainer>
   );
 }
 
-function QuickOptionsContainer({
-  settings,
-  setSettings,
-}: {
-  settings: GameSettings;
-  setSettings: Dispatch<SetStateAction<GameSettings>>;
-}): JSX.Element {
-  const handleChange = (key: GameSettingKey, value: boolean) => {
-    setSettings(prev => {
-      return {
-        ...prev,
-        [key]: {
-          ...prev[key],
-          status: value,
-        },
-      };
-    });
-  };
-
-  return (
-    <div className="flex justify-between">
-      {Object.entries(settings).map(
-        ([key, {title, description, status}], index) => {
-          const optionKey = key as GameSettingKey;
-          return (
-            <div className="flex justify-center space-x-2 px-3" key={key}>
-              <Checkbox
-                checked={status}
-                style={{opacity: status || 0.2}}
-                size={'1'}
-                onCheckedChange={value =>
-                  handleChange(optionKey, value as boolean)
-                }
-              />
-              <div className="flex flex-col -mt-1.5">
-                <div className="space-x-1.5 mb-1">
-                  <Text size={'2'} weight={'medium'} className="text-white/90">
-                    {title}
-                  </Text>
-                  <KeyBinding
-                    className="size-2 mt-1"
-                    textClassName="text-[10px]"
-                    hotkey={['C', 'J', 'B'][index]}
-                    onActivate={() => handleChange(optionKey, !status)}
-                  />
-                </div>
-                <Text size={'1'} className="text-white/50">
-                  {description}
-                </Text>
-              </div>
-            </div>
-          );
-        },
-      )}
-    </div>
-  );
-}
 export default PlayQuizScreen;

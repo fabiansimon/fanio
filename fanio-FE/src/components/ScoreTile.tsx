@@ -43,7 +43,7 @@ function ScoreTile({
               </div>
             )}
             <div className="flex ml-2 flex-col justify-between">
-              <Heading weight={'regular'} className="text-white" size={'3'}>
+              <Heading weight={'regular'} className="text-white" size={'2'}>
                 {isLocalScore(score) ? 'Last Attempt' : score.userName}
               </Heading>
               <Text size={'2'} className="text-white/60">
@@ -52,7 +52,7 @@ function ScoreTile({
             </div>
           </div>
           <div className="flex flex-col text-right">
-            <Heading weight={'regular'} className="text-white" size={'3'}>
+            <Heading weight={'regular'} className="text-white" size={'2'}>
               {UI.formatPoints(totalScore)}
             </Heading>
             <Text className="text-white/60" size={'2'}>

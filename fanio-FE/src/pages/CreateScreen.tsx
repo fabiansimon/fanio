@@ -43,7 +43,7 @@ const INIT_QUIZ_INPUT = {
   artists: [],
   questions: [],
   options: {
-    privateAccess: false,
+    isPrivate: false,
     randomOffsets: false,
   },
 };
@@ -104,7 +104,7 @@ function CreateScreen(): JSX.Element {
         case InputType.PRIVATE_QUIZ:
           return {
             ...prev,
-            options: {...prev.options, privateAccess: value as boolean},
+            options: {...prev.options, isPrivate: value as boolean},
           };
 
         case InputType.RANDOM_TIMESTAMP:
@@ -231,9 +231,7 @@ function CreateScreen(): JSX.Element {
                   handleInput(value, InputType.TITLE)
                 }
               />
-              {quizInput?.options.privateAccess && (
-                <Chip type={ChipType.PRIVATE} />
-              )}
+              {quizInput?.options.isPrivate && <Chip type={ChipType.PRIVATE} />}
             </div>
 
             <InputField

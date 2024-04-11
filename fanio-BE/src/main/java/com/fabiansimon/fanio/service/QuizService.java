@@ -21,10 +21,10 @@ public class QuizService {
     }
 
     public Page<Quiz> getAllQuizzes(Pageable pageable) {
-        return quizRepository.findAll(pageable);
+        return quizRepository.findAllByIsPrivateFalse(pageable);
     }
     public Page<Quiz> getQuizzesByTerm(Pageable pageable, String term) {
-        return quizRepository.findByTitleContainingIgnoreCase(term, pageable);
+        return quizRepository.findByTitleContainingIgnoreCaseAndIsPrivateFalse(term, pageable);
     }
     public Integer getQuizzesCount() {
         return (int) quizRepository.count();
