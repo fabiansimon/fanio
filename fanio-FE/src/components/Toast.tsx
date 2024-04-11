@@ -15,6 +15,7 @@ import ToastController from '../providers/ToastController';
 import {Heading, Text} from '@radix-ui/themes';
 import {motion} from 'framer-motion';
 import {UI} from '../utils/common';
+import {ToastType} from '../types';
 
 interface ModalInfo {
   title?: string;
@@ -23,13 +24,7 @@ interface ModalInfo {
 }
 
 interface ToastMethods {
-  showErrorToast: (title?: string, description?: string) => void;
-}
-
-enum ToastType {
-  ERROR,
-  WARNING,
-  SUCCESS,
+  showToast: (type: ToastType, title?: string, description?: string) => void;
 }
 
 const AUTOCLOSE_DURATION = 3000; // in milliseconds
@@ -80,8 +75,8 @@ function Toast(): JSX.Element {
   useImperativeHandle(
     ref,
     () => ({
-      showErrorToast: (title?: string, description?: string) => {
-        setInfo({title, description, type: ToastType.ERROR});
+      showToast: (type: ToastType, title?: string, description?: string) => {
+        setInfo({title, description, type});
         setIsVisible(true);
         registerAutoClose();
       },

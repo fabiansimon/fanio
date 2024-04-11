@@ -5,11 +5,13 @@ import ReactPlayer from 'react-player';
 import {
   ChipType,
   GameSettings,
+  GameState,
   GuessResult,
   LocalScore,
   Quiz,
   Score,
   ScoreState,
+  UIState,
 } from '../types';
 import {fetchPlayableQuizById} from '../utils/api';
 import {shuffle} from 'lodash';
@@ -31,17 +33,7 @@ import {INIT_GAME_SETTINGS, INIT_SCORE} from '../constants/Init';
 import ToastController from '../providers/ToastController';
 import MusicLoader from '../components/MusicLoader';
 import Chip from '../components/Chip';
-
-enum GameState {
-  PRE,
-  PLAYING,
-  POST,
-}
-
-enum UIState {
-  CORRECT,
-  INCORRECT,
-}
+import LobbyGameScene from '../components/LobbyGameScene';
 
 const ANSWER_THRESHOLD = 70;
 
@@ -305,11 +297,12 @@ function PlayQuizScreen(): JSX.Element {
       description={quizData?.description}
       trailing={quizData?.isPrivate && <Chip type={ChipType.PRIVATE} />}>
       <div className="w-full h-full flex flex-col">
+        {gameState === GameState.LOBBY && <LobbyGameScene />}
         {gameState === GameState.PRE && (
           <PreGameScene
             topScore={topScore}
             lastAttempt={lastAttempt || lastStoredAttempt}
-            onStart={() => setGameState(GameState.PLAYING)}
+            onChangeScene={(scene: GameState) => setGameState(scene)}
           />
         )}
         {gameState === GameState.POST && (

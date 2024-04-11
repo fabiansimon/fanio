@@ -161,3 +161,21 @@ export enum ChipType {
   PRIVATE,
   PUBLIC,
 }
+
+export enum GameState {
+  PRE,
+  PLAYING,
+  POST,
+  LOBBY,
+}
+
+export enum UIState {
+  CORRECT,
+  INCORRECT,
+}
+
+export enum ToastType {
+  ERROR,
+  WARNING,
+  SUCCESS,
+}
