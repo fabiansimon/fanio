@@ -1,4 +1,4 @@
-import {GameSettings, LocalScore, Quiz} from '../types';
+import {GameSettings, LocalScore, Quiz, QuizInput} from '../types';
 
 const KEYS = {
   scoreIds: 'scoreIds',
@@ -6,6 +6,7 @@ const KEYS = {
   lastAttempts: 'lastAttempts',
   bestAttempts: 'bestAttempts',
   userSettings: 'userSettings',
+  unsavedQuiz: 'unsavedQuiz',
 };
 
 export class LocalStorage {
@@ -70,9 +71,25 @@ export class LocalStorage {
     localStorage.setItem(KEYS.userSettings, JSON.stringify(settings));
   }
 
-  static fetchUserSettings() {
+  static fetchUserSettings(): GameSettings | undefined {
     const storedSettings = localStorage.getItem(KEYS.userSettings);
     if (!storedSettings) return;
     return JSON.parse(storedSettings);
+  }
+
+  static saveUnsavedQuiz(quizInput: QuizInput) {
+    if (!quizInput) return;
+    localStorage.setItem(KEYS.unsavedQuiz, JSON.stringify(quizInput));
+  }
+
+  static fetchUnsavedQuiz() {
+    const storedQuiz = localStorage.getItem(KEYS.unsavedQuiz);
+    if (!storedQuiz) {
+      return;
+    }
+    return JSON.parse(storedQuiz);
+  }
+  static removeUnsavedQuiz() {
+    localStorage.removeItem(KEYS.unsavedQuiz);
   }
 }

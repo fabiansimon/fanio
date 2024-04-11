@@ -12,6 +12,7 @@ import InputField from './InputField';
 import Button from './Button';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
+import HoverContainer from './HoverContainer';
 
 const ANIMATION_DURATION = 0.15; // in secon
 const transition = {
@@ -127,13 +128,14 @@ function PostGameScene({
           {subtitle}
         </Text>
       </div>
-      <div className="bg-black/20 border shadow-md shadow-black rounded-lg border-neutral-500/20  items-center justify-center overflow-hidden p-3">
+      {/* <div className="bg-black/20 border shadow-md shadow-black rounded-lg border-neutral-500/20  items-center justify-center overflow-hidden p-3"> */}
+      <HoverContainer className="items-center overflow-hiddenf flex justify-between px-3 py-4 overflow-hidden">
         <ScoreTile
           achievement={achievement}
           score={attempt.userName ? attempt : lastAttempt}
           position={placement}
         />
-        <div className="relative">
+        <div className="relative w-full mt-4 -mb-1">
           <motion.div
             animate={!isUploaded ? 'hidden' : 'shown'}
             variants={{shown: {x: 0}, hidden: {x: -1000}}}
@@ -148,14 +150,14 @@ function PostGameScene({
             transition={transition}
             variants={{shown: {x: 0}, hidden: {x: 1000}}}
             animate={isUploaded ? 'hidden' : 'shown'}
-            className="flex space-x-2 h-11 mt-4">
+            className="flex w-full flex-grow space-x-2">
             <InputField
               disabled={isLoading}
               maxLength={GAME_OPTIONS.MAX_SCORE_USERNAME_LENGTH}
               value={attempt.userName}
               onInput={handleInput}
               placeholder="Enter your name"
-              className="flex flex-grow w-1/2"
+              className="flex flex-grow w-full"
             />
             <Button
               type={ButtonType.outline}
@@ -165,12 +167,12 @@ function PostGameScene({
               ignoreMetaKey
               loading={isLoading}
               onClick={uploadGameScore}
-              className="flex flex-grow w-1/2"
+              className="flex flex-grow w-full"
               disabled={attempt.userName.trim().length === 0}
             />
           </motion.div>
         </div>
-      </div>
+      </HoverContainer>
       <div className="flex w-full justify-between space-x-2">
         <Button
           text="See Leaderboard"

@@ -156,3 +156,8 @@ interface Setting {
   description: String;
   status: boolean;
 }
+
+export enum ChipType {
+  PRIVATE,
+  PUBLIC,
+}

@@ -113,6 +113,7 @@ function PlayQuizScreen(): JSX.Element {
 
     return null;
   }, [quizData, questionIndex]);
+  console.log(question);
 
   const disableInput = useMemo(
     () => result !== undefined || !isPlaying,

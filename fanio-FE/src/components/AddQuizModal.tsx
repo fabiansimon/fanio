@@ -10,7 +10,7 @@ import ThumbnailPreview from './ThumbnailPreview';
 import Button from './Button';
 import useKeyShortcut from '../hooks/useKeyShortcut';
 import ValidationChip from './ValidationChip';
-import {DateUtils} from '../utils/common';
+import {DateUtils, UI} from '../utils/common';
 
 interface AddQuizModalProps extends ModalProps {
   ignoreOffset?: boolean;
@@ -158,9 +158,12 @@ function AddQuizModal({
           animate="visible"
           exit="hidden"
           onClick={event => event.stopPropagation()}
-          className={`flex relative space-y-1 flex-col bg-neutral-900/90 border w-2/3 shadow-black rounded-xl px-2 py-3 ${
-            !isValid ? 'border-red-800/50' : 'border-neutral-500/50'
-          } ${!isValid && 'shadow-red-500'}`}>
+          className={UI.cn(
+            'flex relative space-y-1 flex-col bg-neutral-900/90 border w-2/3 shadow-black rounded-xl px-2 py-3',
+            !validUrl && 'p-0 border-none',
+            !isValid ? 'border-red-800/50' : 'border-neutral-600/50',
+            !isValid && 'shadow-red-500',
+          )}>
           <div className="flex">
             <ValidationChip
               text={errorMessage || ''}

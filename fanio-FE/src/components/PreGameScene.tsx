@@ -6,6 +6,7 @@ import {AchievementType, LocalScore, Score} from '../types';
 import ScoreTile from './ScoreTile';
 import {DateUtils, UI} from '../utils/common';
 import EmptyContainer from './EmptyContainer';
+import HoverContainer from './HoverContainer';
 
 function PreGameScene({
   topScore,
@@ -51,7 +52,7 @@ function PreGameScene({
     );
 
   return (
-    <div className="flex flex-col my-auto bg-black/20 border shadow-md shadow-black rounded-lg px-4 py-4 mx-[20%] border-neutral-500/20  items-center justify-center">
+    <HoverContainer className="my-auto px-4 py-4 mx-[20%]">
       <div className="space-y-3 w-full -mt-1">
         <Heading className="text-white" size={'3'}>
           Highscore to beat
@@ -98,7 +99,7 @@ function PreGameScene({
         className="flex flex-grow w-full mt-4"
         textSize="2"
       />
-    </div>
+    </HoverContainer>
   );
 }
 
