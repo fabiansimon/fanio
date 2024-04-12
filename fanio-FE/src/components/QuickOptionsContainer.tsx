@@ -46,7 +46,7 @@ function QuickOptionsContainer({
                     {title}
                   </Text>
                   <KeyBinding
-                    className="size-2 mt-1"
+                    className="size-4 mt-1"
                     textClassName="text-[10px]"
                     hotkey={['C', 'J', 'B'][index]}
                     onActivate={() => handleChange(optionKey, !status)}

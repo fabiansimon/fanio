@@ -11,6 +11,7 @@ import {
 } from '../types/index';
 import ToastController from '../providers/ToastController';
 import {sanitizeTerm} from './logic';
+
 const BASE_URL = 'http://localhost:8080/api';
 
 const _axios = axios.create({

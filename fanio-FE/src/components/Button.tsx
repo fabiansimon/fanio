@@ -48,7 +48,7 @@ function Button({
         className,
       )}>
       {loading ? (
-        <Loading className="text-white" size={'3'} />
+        <Loading className="text-white size-5" />
       ) : (
         <>
           {icon && icon}

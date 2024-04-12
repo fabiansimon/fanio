@@ -1,7 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {UI} from '../utils/common';
-import {Text} from '@radix-ui/themes';
-import {Responsive} from '@radix-ui/themes/dist/cjs/props';
+import {Responsive, Text} from '@radix-ui/themes';
 
 interface AnimatedTextProps {
   className?: string;

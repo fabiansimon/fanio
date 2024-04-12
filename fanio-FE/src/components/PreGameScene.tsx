@@ -1,7 +1,7 @@
 import {Heading, Text} from '@radix-ui/themes';
 import Button from './Button';
 import {MinusIcon, PersonIcon, PlusIcon} from '@radix-ui/react-icons';
-import {useCallback, useMemo} from 'react';
+import {StrictMode, useCallback, useEffect, useMemo, useState} from 'react';
 import {
   AchievementType,
   ButtonType,
@@ -13,16 +13,26 @@ import ScoreTile from './ScoreTile';
 import {DateUtils, UI} from '../utils/common';
 import EmptyContainer from './EmptyContainer';
 import HoverContainer from './HoverContainer';
+import {useNavigate} from 'react-router-dom';
+import ROUTES from '../constants/Routes';
+import {useStompClient} from 'react-stomp-hooks';
+import ToastController from '../providers/ToastController';
 
 function PreGameScene({
+  quizId,
   topScore,
   lastAttempt,
   onChangeScene,
 }: {
+  quizId: string;
   topScore?: Score;
   lastAttempt?: LocalScore;
   onChangeScene: (state: GameState) => void;
 }): JSX.Element {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigation = useNavigate();
+  const stompClient = useStompClient();
+
   const isWinner = useMemo(() => {
     if (!topScore || !lastAttempt) return false;
     return topScore?.totalScore < lastAttempt?.totalScore;
@@ -40,18 +50,49 @@ function PreGameScene({
     };
   }, [isWinner]);
 
-  const challengeFriendButton = useCallback(() => {
-    return (
-      <Button
-        icon={<PersonIcon className="text-white mr-2" />}
-        onClick={() => onChangeScene(GameState.LOBBY)}
-        type={ButtonType.outline}
-        text="Challenge Friend"
-        className="flex absolute -bottom-12 w-full"
-        textSize="2"
-      />
-    );
-  }, []);
+  useEffect(() => {
+    if (stompClient) {
+      const subscription = stompClient.subscribe(
+        '/user/queue/lobby-created',
+        message => {
+          setIsLoading(false);
+          navigation(`${ROUTES.lobby}/${quizId}/${message.body}`);
+        },
+      );
+
+      return () => subscription.unsubscribe();
+    }
+    return;
+  }, [stompClient, navigation, quizId]);
+
+  const createLobby = useCallback(() => {
+    setIsLoading(true);
+    if (stompClient && stompClient.connected) {
+      stompClient.publish({
+        destination: '/app/lobby/create',
+        body: '',
+      });
+    } else {
+      setIsLoading(false);
+      console.error('WebSocket connection not established.');
+      ToastController.showErrorToast(
+        'Connection could not be established.',
+        'Please try again later.',
+      );
+    }
+  }, [stompClient]);
+
+  const challengeFriendButton = () => (
+    <Button
+      icon={<PersonIcon className="text-white mr-2" />}
+      onClick={createLobby}
+      loading={isLoading}
+      type={ButtonType.outline}
+      text="Challenge Friend"
+      className="flex absolute -bottom-12 w-full"
+      textSize="2"
+    />
+  );
 
   if (!topScore) {
     return (

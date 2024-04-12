@@ -33,7 +33,6 @@ import {INIT_GAME_SETTINGS, INIT_SCORE} from '../constants/Init';
 import ToastController from '../providers/ToastController';
 import MusicLoader from '../components/MusicLoader';
 import Chip from '../components/Chip';
-import LobbyGameScene from '../components/LobbyGameScene';
 
 const ANSWER_THRESHOLD = 70;
 
@@ -297,9 +296,9 @@ function PlayQuizScreen(): JSX.Element {
       description={quizData?.description}
       trailing={quizData?.isPrivate && <Chip type={ChipType.PRIVATE} />}>
       <div className="w-full h-full flex flex-col">
-        {gameState === GameState.LOBBY && <LobbyGameScene />}
         {gameState === GameState.PRE && (
           <PreGameScene
+            quizId={id!}
             topScore={topScore}
             lastAttempt={lastAttempt || lastStoredAttempt}
             onChangeScene={(scene: GameState) => setGameState(scene)}
