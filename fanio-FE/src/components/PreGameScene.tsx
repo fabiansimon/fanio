@@ -1,7 +1,7 @@
 import {Heading, Text} from '@radix-ui/themes';
 import Button from './Button';
 import {MinusIcon, PersonIcon, PlusIcon} from '@radix-ui/react-icons';
-import {StrictMode, useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   AchievementType,
   ButtonType,
@@ -14,9 +14,9 @@ import {DateUtils, UI} from '../utils/common';
 import EmptyContainer from './EmptyContainer';
 import HoverContainer from './HoverContainer';
 import {useNavigate} from 'react-router-dom';
-import ROUTES from '../constants/Routes';
 import {useStompClient} from 'react-stomp-hooks';
 import ToastController from '../providers/ToastController';
+import ROUTES from '../constants/Routes';
 
 function PreGameScene({
   quizId,
@@ -65,22 +65,18 @@ function PreGameScene({
     return;
   }, [stompClient, navigation, quizId]);
 
-  const createLobby = useCallback(() => {
+  const createLobby = useCallback(async () => {
     setIsLoading(true);
     if (stompClient && stompClient.connected) {
       stompClient.publish({
         destination: '/app/lobby/create',
-        body: '',
+        body: JSON.stringify(quizId),
       });
     } else {
       setIsLoading(false);
       console.error('WebSocket connection not established.');
-      ToastController.showErrorToast(
-        'Connection could not be established.',
-        'Please try again later.',
-      );
     }
-  }, [stompClient]);
+  }, [stompClient, quizId]);
 
   const challengeFriendButton = () => (
     <Button

@@ -189,7 +189,7 @@ export async function fetchScorePlacement({
     );
     return res.data;
   } catch (error) {
-    handleError({error, callName: 'fetchGameStatistic'});
+    handleError({error, callName: 'fetchScorePlacement'});
     throw error;
   }
 }
