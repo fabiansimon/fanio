@@ -15,7 +15,7 @@ import EmptyContainer from './EmptyContainer';
 import HoverContainer from './HoverContainer';
 import {useNavigate} from 'react-router-dom';
 import {useStompClient} from 'react-stomp-hooks';
-import ToastController from '../providers/ToastController';
+import ToastController from '../controllers/ToastController';
 import ROUTES from '../constants/Routes';
 
 function PreGameScene({

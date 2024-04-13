@@ -9,7 +9,7 @@ import {Heading, Text} from '@radix-ui/themes';
 import Chip from '../components/Chip';
 import HoverContainer from '../components/HoverContainer';
 import {useStompClient, useSubscription} from 'react-stomp-hooks';
-import ToastController from '../providers/ToastController';
+import ToastController from '../controllers/ToastController';
 import Loading from '../components/Loading';
 import {CheckIcon, CopyIcon} from '@radix-ui/react-icons';
 import Button from '../components/Button';
@@ -17,6 +17,7 @@ import {randomNumber} from '../utils/logic';
 import MemberTile from '../components/MemberTile';
 import {GAME_OPTIONS} from '../constants/Game';
 import InputField from '../components/InputField';
+import QuizPreview from '../components/QuizPreview';
 
 const ANIMATION_DURATION = 200;
 
@@ -62,13 +63,13 @@ const MOCK_MEMBERS: LobbyMember[] = [
 ];
 
 function LobbyScreen(): JSX.Element {
-  const [topScore, setTopScore] = useState<Score | null>(null);
   const [quizData, setQuizData] = useState<Quiz | null>(null);
   const [userName, setUserName] = useState<string>('');
   const [members, setMembers] = useState<LobbyMember[]>([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isJoined, setIsJoined] = useState<boolean>(false);
+  const [sessionToken, setSessionToken] = useState<string | undefined>();
 
   const {quizId, lobbyId} = useParams();
 
@@ -91,14 +92,46 @@ function LobbyScreen(): JSX.Element {
     setMembers(JSON.parse(message.body));
   });
 
+  useEffect(() => {
+    if (sessionToken) return;
+    console.log(members);
+  }, [members, sessionToken]);
+
+  useEffect(() => {
+    if (!quizId) return;
+    (async () => {
+      try {
+        const {quiz} = await fetchPlayableQuizById({id: quizId});
+        setQuizData({
+          ...quiz,
+          questions: shuffle(quiz.questions),
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, [quizId]);
+
   const handleJoinLobby = () => {
     setIsLoading(true);
     if (stompClient && stompClient.connected) {
-      const res = stompClient.publish({
+      stompClient.publish({
         destination: `/app/lobby/${lobbyId}/join`,
         body: userName,
       });
-      console.log(res);
+    } else {
+      setIsLoading(false);
+      console.error('WebSocket connection is not established.');
+    }
+  };
+
+  const handleUserReady = () => {
+    setIsLoading(true);
+    if (stompClient && stompClient.connected) {
+      stompClient.publish({
+        destination: `/app/lobby/${lobbyId}/join`,
+        body: userName,
+      });
     } else {
       setIsLoading(false);
       console.error('WebSocket connection is not established.');
@@ -113,22 +146,6 @@ function LobbyScreen(): JSX.Element {
     );
   };
 
-  useEffect(() => {
-    if (!quizId) return;
-    (async () => {
-      try {
-        const {quiz, topScore} = await fetchPlayableQuizById({id: quizId});
-        setQuizData({
-          ...quiz,
-          questions: shuffle(quiz.questions),
-        });
-        setTopScore(topScore);
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-  }, [quizId]);
-
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserName(e.target.value);
   };
@@ -136,8 +153,8 @@ function LobbyScreen(): JSX.Element {
   return (
     <PageContainer
       ref={backgroundRef}
-      title={quizData?.title}
-      description={quizData?.description}
+      title={'Creating Lobby'}
+      description={'Ready to find out who the bigger fan is?'}
       trailing={quizData?.isPrivate && <Chip type={ChipType.PRIVATE} />}>
       <div className="w-full h-full flex flex-col items-center justify-center">
         <motion.div
@@ -157,6 +174,7 @@ function LobbyScreen(): JSX.Element {
               </Text>
             </div>
             <InputField
+              autoFocus
               disabled={isLoading}
               maxLength={GAME_OPTIONS.MAX_SCORE_USERNAME_LENGTH}
               value={userName}
@@ -166,6 +184,7 @@ function LobbyScreen(): JSX.Element {
             />
             <Button
               text="Join Lobby"
+              ignoreMetaKey
               className="flex flex-grow w-full"
               textSize="2"
               onClick={handleJoinLobby}
@@ -184,6 +203,16 @@ function LobbyScreen(): JSX.Element {
             visible: {translateX: 0},
           }}
           className="my-auto mx-[20%] absolute">
+          {quizData && (
+            <div className="space-y-2 mb-4">
+              <QuizPreview
+                containerTitle="Selected Quiz"
+                showScore={false}
+                className=""
+                quiz={quizData}
+              />
+            </div>
+          )}
           <HoverContainer className="space-y-2 px-4">
             <div className="space-y-2 w-full -mt-1 mb-2">
               <Heading className="text-white" size={'3'}>
@@ -195,6 +224,7 @@ function LobbyScreen(): JSX.Element {
               </Text>
             </div>
             <UrlContainer onClick={copyLink} />
+
             <div className="flex flex-col w-full py-2">
               {members.length > 0 && (
                 <Text
@@ -205,19 +235,20 @@ function LobbyScreen(): JSX.Element {
                 </Text>
               )}
               <div className="flex flex-col space-y-2 mt-2 px-1">
-                {members.map((m, i) => (
-                  <MemberTile
-                    member={m}
-                    key={m.sessionToken}
-                    isDone={i % 2 === 0}
-                  />
-                ))}
+                {members.map(m => {
+                  const {sessionToken, currRound} = m;
+                  const isDone = currRound === 0;
+                  return (
+                    <MemberTile member={m} key={sessionToken} isDone={isDone} />
+                  );
+                })}
               </div>
             </div>
             <Button
               text="Are you ready?"
               className="flex flex-grow w-full"
               textSize="2"
+              onClick={handleUserReady}
               disabled={userName.trim().length < 3}
               loading={isLoading}
             />

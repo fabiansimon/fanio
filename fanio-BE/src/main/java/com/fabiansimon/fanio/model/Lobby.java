@@ -1,18 +1,15 @@
 package com.fabiansimon.fanio.model;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class Lobby {
     private String id;
     private UUID quizId;
-    private Set<LobbyMember> members;
+    private Map<UUID, LobbyMember> members;
 
     public Lobby(String id, UUID quizId) {
         this.id = id;
         this.quizId = quizId;
-        this.members = Collections.synchronizedSet(new HashSet<>());
+        this.members = Collections.synchronizedMap(new HashMap<>());
     }
 
     public String getId() {
@@ -31,16 +28,36 @@ public class Lobby {
         this.quizId = quizId;
     }
 
+    public boolean updateMember(UUID sessionToken, LobbyMember newState) {
+        if (members.containsKey(sessionToken)) {
+            members.replace(sessionToken, newState);
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean addMember(UUID sessionToken, String userName) {
-        return members.add(new LobbyMember(sessionToken, userName));
+        if (!members.containsKey(sessionToken)) {
+            members.put(sessionToken, new LobbyMember(sessionToken, userName));
+            return true;
+        }
+        return false;
     }
 
-    public boolean removeMember(String sessionId) {
-        return members.remove(sessionId);
+    public boolean removeMember(UUID sessionToken) {
+        if (members.containsKey(sessionToken)) {
+            members.remove(sessionToken);
+            return true;
+        }
+        return false;
+    }
+    public Map<UUID, LobbyMember> getMembers() {
+        return Collections.unmodifiableMap(members);
     }
 
-    public Set<LobbyMember> getMembers() {
-        return Collections.unmodifiableSet(members);
+    public List<LobbyMember> getMembersAsList() {
+        return List.copyOf(members.values());
     }
 
     public boolean isEmpty() {

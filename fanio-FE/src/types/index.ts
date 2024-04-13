@@ -187,3 +187,10 @@ export interface LobbyMember {
   timeElapsed: number;
   currRound: number;
 }
+
+export interface LobbyData {
+  sessionToken: string;
+  members: LobbyMember[];
+  currRound: number;
+  quiz: Quiz;
+}

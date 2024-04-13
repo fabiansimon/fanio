@@ -30,11 +30,9 @@ import {Heading} from '@radix-ui/themes';
 import {UI} from '../utils/common';
 import QuickOptionsContainer from '../components/QuickOptionsContainer';
 import {INIT_GAME_SETTINGS, INIT_SCORE} from '../constants/Init';
-import ToastController from '../providers/ToastController';
+import ToastController from '../controllers/ToastController';
 import MusicLoader from '../components/MusicLoader';
 import Chip from '../components/Chip';
-
-const ANSWER_THRESHOLD = 70;
 
 function PlayQuizScreen(): JSX.Element {
   useKeyShortcut(
@@ -82,6 +80,8 @@ function PlayQuizScreen(): JSX.Element {
     () => result !== undefined || !isPlaying,
     [result, isPlaying],
   );
+
+  console.warn('Current Question', question?.answer);
 
   const handlePlay = useCallback(() => {
     if (!isPlaying) setIsPlaying(true);
@@ -198,7 +198,7 @@ function PlayQuizScreen(): JSX.Element {
       videoRef.current &&
       !result &&
       Math.abs(question.answer.length - input.length) <= 2 &&
-      similarity(input, question!.answer) > ANSWER_THRESHOLD
+      similarity(input, question!.answer) > GAME_OPTIONS.ANSWER_THRESHOLD
     );
   };
 
@@ -256,7 +256,6 @@ function PlayQuizScreen(): JSX.Element {
     setInput('');
     setResult(undefined);
     setQuestionIndex(prev => (prev += 1));
-    setIsLoading(true);
   };
 
   const onPlayerReady = (e: ReactPlayer) => {
@@ -268,7 +267,6 @@ function PlayQuizScreen(): JSX.Element {
 
   const handleSongStart = () => {
     inputRef.current?.focus();
-    setIsLoading(false);
     setTimestamp(performance.now());
     barRef.current?.startAnimation();
   };
@@ -278,7 +276,7 @@ function PlayQuizScreen(): JSX.Element {
     if (showError)
       ToastController.showErrorToast(
         'Song unable to play',
-        'Youtube blocked this song, so we skipped it',
+        'Youtube is currently not responding',
       );
     changeUIState(UIState.INCORRECT);
     setResult({correct: false, delta: 0, points: 0});
@@ -320,6 +318,8 @@ function PlayQuizScreen(): JSX.Element {
                 variants={{visible: {opacity: 1}, hidden: {opacity: 0}}}
                 animate={result !== undefined ? 'visible' : 'hidden'}>
                 <ReactPlayer
+                  onBuffer={() => setIsLoading(true)}
+                  onBufferEnd={() => setIsLoading(false)}
                   playing={isPlaying}
                   onReady={onPlayerReady}
                   onPlay={handleSongStart}

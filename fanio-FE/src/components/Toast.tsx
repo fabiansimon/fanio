@@ -11,7 +11,7 @@ import {
   CheckCircledIcon,
   QuestionMarkCircledIcon,
 } from '@radix-ui/react-icons';
-import ToastController from '../providers/ToastController';
+import ToastController from '../controllers/ToastController';
 import {Heading, Text} from '@radix-ui/themes';
 import {motion} from 'framer-motion';
 import {UI} from '../utils/common';

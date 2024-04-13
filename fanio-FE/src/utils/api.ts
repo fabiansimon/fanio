@@ -9,7 +9,7 @@ import {
   ScoreInput,
   TimeFrame,
 } from '../types/index';
-import ToastController from '../providers/ToastController';
+import ToastController from '../controllers/ToastController';
 import {sanitizeTerm} from './logic';
 
 const BASE_URL = 'http://localhost:8080/api';
