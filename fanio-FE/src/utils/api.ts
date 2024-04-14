@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {
   GameStatistic,
+  InitLobbyData,
   MetaData,
   PaginatedData,
   Quiz,
@@ -23,6 +24,31 @@ const FALLBACK_ERROR_MESSAGE = {
   title: 'Sorry, something went wrong',
   description: 'This is on us. Please try again later.',
 };
+
+function handleError({
+  error,
+  callName,
+  showError = true,
+}: {
+  error: unknown;
+  callName: string;
+  showError?: boolean;
+}) {
+  console.error(`Failed request at function [${callName}]`, error);
+
+  if (!showError) return;
+
+  let errorTitle = FALLBACK_ERROR_MESSAGE.title;
+  let errorDescription = FALLBACK_ERROR_MESSAGE.description;
+
+  if (axios.isAxiosError(error) && error.response) {
+    const [title, description] = Object.entries(error.response.data)[0];
+    errorTitle = title;
+    errorDescription = description as string;
+  }
+
+  ToastController.showErrorToast(errorTitle, errorDescription);
+}
 
 export async function fetchQuizById({id}: {id: string}): Promise<Quiz> {
   try {
@@ -194,27 +220,18 @@ export async function fetchScorePlacement({
   }
 }
 
-function handleError({
-  error,
-  callName,
-  showError = true,
+export async function fetchInitLobbyData({
+  quizId,
+  lobbyId,
 }: {
-  error: unknown;
-  callName: string;
-  showError?: boolean;
-}) {
-  console.error(`Failed request at function [${callName}]`, error);
-
-  if (!showError) return;
-
-  let errorTitle = FALLBACK_ERROR_MESSAGE.title;
-  let errorDescription = FALLBACK_ERROR_MESSAGE.description;
-
-  if (axios.isAxiosError(error) && error.response) {
-    const [title, description] = Object.entries(error.response.data)[0];
-    errorTitle = title;
-    errorDescription = description as string;
+  quizId: string;
+  lobbyId: string;
+}): Promise<InitLobbyData> {
+  try {
+    const res = await _axios.get(`/lobby/${quizId}?lobbyId=${lobbyId}`);
+    return res.data;
+  } catch (error) {
+    handleError({error, callName: 'fetchInitLobbyData'});
+    throw error;
   }
-
-  ToastController.showErrorToast(errorTitle, errorDescription);
 }

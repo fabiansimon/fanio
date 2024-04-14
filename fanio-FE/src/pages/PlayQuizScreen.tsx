@@ -281,6 +281,7 @@ function PlayQuizScreen(): JSX.Element {
     changeUIState(UIState.INCORRECT);
     setResult({correct: false, delta: 0, points: 0});
     barRef.current?.clear();
+    setTimeouts(0);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -355,12 +356,13 @@ function PlayQuizScreen(): JSX.Element {
                 )}>
                 (Press Enter to continue)
               </Heading>
-              <MusicLoader
-                className={UI.cn(
-                  'opacity-1 absolute left-1/2 -translate-x-[50%]',
-                  isLoading ? 'opacity-1' : 'opacity-0',
-                )}
-              />
+              {isLoading && (
+                <MusicLoader
+                  className={UI.cn(
+                    'opacity-1 absolute left-1/2 -translate-x-[50%] pb-4',
+                  )}
+                />
+              )}
               <InputField
                 disabled={disableInput}
                 showSimple
