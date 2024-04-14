@@ -17,6 +17,7 @@ import LeaderboardScreen from './pages/LeaderboardScreen';
 import PlayQuizScreen from './pages/PlayQuizScreen';
 import {StompSessionProvider} from 'react-stomp-hooks';
 import LobbyScreen from './pages/LobbyScreen';
+import LobbyProvider from './providers/LobbyProvider';
 
 function App(): JSX.Element {
   return (
@@ -30,31 +31,33 @@ function App(): JSX.Element {
           onDisconnect={() => {
             console.log('Disconnected from WS');
           }}>
-          <Router>
-            <Routes>
-              <Route path="*" element={<Navigate to="/" replace={true} />} />
-              <Route path="/" element={<LandingScreen />} />
-              <Route
-                path={`${ROUTES.playQuiz}/:id`}
-                element={<PlayQuizScreen />}
-              />
-              <Route
-                path={`${ROUTES.lobby}/:quizId/:lobbyId`}
-                element={<LobbyScreen />}
-              />
+          <LobbyProvider>
+            <Router>
+              <Routes>
+                <Route path="*" element={<Navigate to="/" replace={true} />} />
+                <Route path="/" element={<LandingScreen />} />
+                <Route
+                  path={`${ROUTES.playQuiz}/:id`}
+                  element={<PlayQuizScreen />}
+                />
+                <Route
+                  path={`${ROUTES.lobby}/:quizId/:lobbyId`}
+                  element={<LobbyScreen />}
+                />
 
-              <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
-              <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
-              <Route
-                path={ROUTES.leaderboard}
-                element={<LeaderboardScreen />}
-              />
-              <Route
-                path={`${ROUTES.quizScores}/:id`}
-                element={<QuizScoreScreen />}
-              />
-            </Routes>
-          </Router>
+                <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
+                <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
+                <Route
+                  path={ROUTES.leaderboard}
+                  element={<LeaderboardScreen />}
+                />
+                <Route
+                  path={`${ROUTES.quizScores}/:id`}
+                  element={<QuizScoreScreen />}
+                />
+              </Routes>
+            </Router>
+          </LobbyProvider>
           <Toast />
         </StompSessionProvider>
       </Theme>

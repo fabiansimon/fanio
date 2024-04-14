@@ -15,8 +15,8 @@ import EmptyContainer from './EmptyContainer';
 import HoverContainer from './HoverContainer';
 import {useNavigate} from 'react-router-dom';
 import {useStompClient} from 'react-stomp-hooks';
-import ToastController from '../controllers/ToastController';
 import ROUTES from '../constants/Routes';
+import {useLobbyContext} from '../providers/LobbyProvider';
 
 function PreGameScene({
   quizId,
@@ -29,6 +29,7 @@ function PreGameScene({
   lastAttempt?: LocalScore;
   onChangeScene: (state: GameState) => void;
 }): JSX.Element {
+  const {setLobbyId, createLobby} = useLobbyContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigation = useNavigate();
   const stompClient = useStompClient();
@@ -54,34 +55,30 @@ function PreGameScene({
     if (stompClient) {
       const subscription = stompClient.subscribe(
         '/user/queue/lobby-created',
-        message => {
+        ({body: lobbyId}) => {
           setIsLoading(false);
-          navigation(`${ROUTES.lobby}/${quizId}/${message.body}`);
+          setLobbyId(lobbyId);
+          navigation(`${ROUTES.lobby}/${quizId}/${lobbyId}`);
         },
       );
 
       return () => subscription.unsubscribe();
     }
     return;
-  }, [stompClient, navigation, quizId]);
+  }, [stompClient, navigation, setLobbyId, quizId]);
 
-  const createLobby = useCallback(async () => {
+  const handleCreateLobby = useCallback(async () => {
     setIsLoading(true);
-    if (stompClient && stompClient.connected) {
-      stompClient.publish({
-        destination: '/app/lobby/create',
-        body: JSON.stringify(quizId),
-      });
-    } else {
+    if (!createLobby(quizId)) {
       setIsLoading(false);
       console.error('WebSocket connection not established.');
     }
-  }, [stompClient, quizId]);
+  }, [quizId, createLobby]);
 
   const challengeFriendButton = () => (
     <Button
       icon={<PersonIcon className="text-white mr-2" />}
-      onClick={createLobby}
+      onClick={handleCreateLobby}
       loading={isLoading}
       type={ButtonType.outline}
       text="Challenge Friend"

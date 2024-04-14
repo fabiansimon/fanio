@@ -98,6 +98,10 @@ export class LocalStorage {
     localStorage.setItem(KEYS.sessionToken, token);
   }
 
+  static clearSessionToken() {
+    localStorage.removeItem(KEYS.sessionToken);
+  }
+
   static fetchSessionToken(token: string) {
     const savedToken = localStorage.getItem(KEYS.sessionToken);
     if (savedToken) return token;

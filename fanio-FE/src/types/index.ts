@@ -189,8 +189,9 @@ export interface LobbyMember {
 }
 
 export interface LobbyData {
-  sessionToken: string;
+  lobbyId: string;
   members: LobbyMember[];
   currRound: number;
-  quiz: Quiz;
+  quiz?: Quiz;
+  quizId?: string;
 }

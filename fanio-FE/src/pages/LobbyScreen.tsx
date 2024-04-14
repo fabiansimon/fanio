@@ -18,6 +18,7 @@ import MemberTile from '../components/MemberTile';
 import {GAME_OPTIONS} from '../constants/Game';
 import InputField from '../components/InputField';
 import QuizPreview from '../components/QuizPreview';
+import {useLobbyContext} from '../providers/LobbyProvider';
 
 const ANIMATION_DURATION = 200;
 
@@ -27,82 +28,48 @@ const transition = {
   mass: 0.05,
 };
 
-const NICKNAMES = [
-  'Fabian',
-  'Didi',
-  'Julia',
-  'Clemens',
-  'René',
-  'Verena',
-  'Hayden',
-  'Alex',
-];
-
-const MOCK_MEMBERS: LobbyMember[] = [
-  {
-    currRound: -1,
-    sessionToken: '3u12938213',
-    timeElapsed: 0.0,
-    totalScore: 0.0,
-    userName: 'Fabian',
-  },
-  {
-    currRound: -1,
-    sessionToken: '3u12938213',
-    timeElapsed: 0.0,
-    totalScore: 0.0,
-    userName: 'Didi',
-  },
-  {
-    currRound: -1,
-    sessionToken: '3u12938213',
-    timeElapsed: 0.0,
-    totalScore: 0.0,
-    userName: 'Julia',
-  },
-];
-
+const ANIMATION_X_OFFSET = 3_000;
 function LobbyScreen(): JSX.Element {
-  const [quizData, setQuizData] = useState<Quiz | null>(null);
-  const [userName, setUserName] = useState<string>('');
-  const [members, setMembers] = useState<LobbyMember[]>([]);
+  const {
+    exitLobby,
+    setLobbyId,
+    setMembers,
+    setUserName,
+    setQuiz,
+    updateSelf,
+    userData: {userName, sessionToken, memberData},
+    lobbyData: {quiz, members},
+  } = useLobbyContext();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isJoined, setIsJoined] = useState<boolean>(false);
-  const [sessionToken, setSessionToken] = useState<string | undefined>();
 
   const {quizId, lobbyId} = useParams();
 
   const backgroundRef = useRef<any>(null);
   const stompClient = useStompClient();
 
-  useBeforeUnload(() => {
-    if (stompClient)
-      stompClient.publish({
-        destination: `/app/lobby/${lobbyId}/exit`,
-        body: userName,
-      });
-  });
+  useBeforeUnload(exitLobby);
 
   useSubscription(`/topic/lobby/${lobbyId}/members`, message => {
     if (isLoading) {
       setIsLoading(false);
       setIsJoined(true);
     }
+    console.log('hello');
     setMembers(JSON.parse(message.body));
   });
 
   useEffect(() => {
-    if (sessionToken) return;
-    console.log(members);
-  }, [members, sessionToken]);
+    setLobbyId(lobbyId!);
+  }, [lobbyId, setLobbyId]);
 
   useEffect(() => {
     if (!quizId) return;
     (async () => {
       try {
         const {quiz} = await fetchPlayableQuizById({id: quizId});
-        setQuizData({
+        setQuiz({
           ...quiz,
           questions: shuffle(quiz.questions),
         });
@@ -127,15 +94,10 @@ function LobbyScreen(): JSX.Element {
 
   const handleUserReady = () => {
     setIsLoading(true);
-    if (stompClient && stompClient.connected) {
-      stompClient.publish({
-        destination: `/app/lobby/${lobbyId}/join`,
-        body: userName,
-      });
-    } else {
-      setIsLoading(false);
+    if (!updateSelf({...memberData, currRound: 0}, true)) {
       console.error('WebSocket connection is not established.');
     }
+    setIsLoading(false);
   };
 
   const copyLink = () => {
@@ -155,13 +117,14 @@ function LobbyScreen(): JSX.Element {
       ref={backgroundRef}
       title={'Creating Lobby'}
       description={'Ready to find out who the bigger fan is?'}
-      trailing={quizData?.isPrivate && <Chip type={ChipType.PRIVATE} />}>
+      trailing={quiz?.isPrivate && <Chip type={ChipType.PRIVATE} />}>
       <div className="w-full h-full flex flex-col items-center justify-center">
         <motion.div
           initial="visible"
           animate={!isJoined ? 'visible' : 'hidden'}
+          transition={transition}
           variants={{
-            hidden: {translateX: -1000},
+            hidden: {translateX: -ANIMATION_X_OFFSET},
             visible: {translateX: 0},
           }}>
           <HoverContainer className="space-y-2 px-4">
@@ -177,7 +140,7 @@ function LobbyScreen(): JSX.Element {
               autoFocus
               disabled={isLoading}
               maxLength={GAME_OPTIONS.MAX_SCORE_USERNAME_LENGTH}
-              value={userName}
+              value={userName.toUpperCase()}
               onInput={handleInput}
               placeholder="Enter your name"
               className="flex flex-grow w-full"
@@ -198,18 +161,19 @@ function LobbyScreen(): JSX.Element {
         <motion.div
           initial="hidden"
           animate={isJoined ? 'visible' : 'hidden'}
+          transition={transition}
           variants={{
-            hidden: {translateX: 1000},
+            hidden: {translateX: ANIMATION_X_OFFSET},
             visible: {translateX: 0},
           }}
           className="my-auto mx-[20%] absolute">
-          {quizData && (
+          {quiz && (
             <div className="space-y-2 mb-4">
               <QuizPreview
                 containerTitle="Selected Quiz"
                 showScore={false}
-                className=""
-                quiz={quizData}
+                className="bg-neutral-900"
+                quiz={quiz}
               />
             </div>
           )}
@@ -236,10 +200,15 @@ function LobbyScreen(): JSX.Element {
               )}
               <div className="flex flex-col space-y-2 mt-2 px-1">
                 {members.map(m => {
-                  const {sessionToken, currRound} = m;
+                  const {sessionToken: token, currRound} = m;
                   const isDone = currRound === 0;
                   return (
-                    <MemberTile member={m} key={sessionToken} isDone={isDone} />
+                    <MemberTile
+                      isSelf={token === sessionToken}
+                      member={m}
+                      key={token}
+                      isDone={isDone}
+                    />
                   );
                 })}
               </div>
@@ -248,7 +217,7 @@ function LobbyScreen(): JSX.Element {
               text="Are you ready?"
               className="flex flex-grow w-full"
               textSize="2"
-              onClick={handleUserReady}
+              onClick={exitLobby}
               disabled={userName.trim().length < 3}
               loading={isLoading}
             />

@@ -19,13 +19,13 @@ public class LobbyService {
     }
 
     public boolean joinLobby(String lobbyId, String userName) throws Exception {
-        userName = userName.trim();
+        userName = userName.toUpperCase().trim();
         if (Boolean.parseBoolean(PythonScriptRunner.run("profanity_filter", userName))) throw new Exception("Username is containing profanity");
         Lobby lobby = lobbies.get(lobbyId);
         UUID sessionToken = UUID.randomUUID();
 
         for (LobbyMember member : lobby.getMembers().values()) {
-            if (member.getUserName().toLowerCase().equals(userName)) throw new Exception("Username already taken");
+            if (member.getUserName().equals(userName)) throw new Exception("Username already taken");
         }
 
         if (lobby != null) {

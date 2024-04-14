@@ -1,4 +1,4 @@
-import {CheckIcon, Cross2Icon} from '@radix-ui/react-icons';
+import {CheckIcon, Cross2Icon, PersonIcon} from '@radix-ui/react-icons';
 import {LobbyMember} from '../types';
 import {Text} from '@radix-ui/themes';
 import {useMemo} from 'react';
@@ -7,9 +7,11 @@ import {UI} from '../utils/common';
 function MemberTile({
   member,
   isDone,
+  isSelf,
 }: {
   member: LobbyMember;
   isDone: boolean;
+  isSelf: boolean;
 }): JSX.Element {
   const {userName} = member;
 
@@ -29,9 +31,12 @@ function MemberTile({
 
   return (
     <div className="flex w-full justify-between items-center">
-      <Text size={'2'} weight={'medium'} className="text-white">
-        {userName}
-      </Text>
+      <div className="flex items-center">
+        {isSelf && <PersonIcon className="text-white mr-1" />}
+        <Text size={'2'} weight={'medium'} className="text-white">
+          {userName}
+        </Text>
+      </div>
       <div
         className={UI.cn(
           'rounded-md flex items-center h-7 justify-center px-2 space-x-1',
