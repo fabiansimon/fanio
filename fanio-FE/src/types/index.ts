@@ -195,3 +195,12 @@ export interface LobbyData {
   quiz?: Quiz;
   quizId?: string;
 }
+
+export interface InitLobbyData {
+  quiz: Quiz;
+  topScore?: Score;
+  lobby: Omit<LobbyData, 'currRound' | 'members'> & {
+    membersAsList: LobbyMember[];
+    members: {[key: string]: LobbyMember};
+  };
+}

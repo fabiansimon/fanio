@@ -102,9 +102,9 @@ export class LocalStorage {
     localStorage.removeItem(KEYS.sessionToken);
   }
 
-  static fetchSessionToken(token: string) {
+  static fetchSessionToken() {
     const savedToken = localStorage.getItem(KEYS.sessionToken);
-    if (savedToken) return token;
+    if (savedToken) return savedToken;
     return;
   }
 }

@@ -20,6 +20,7 @@ interface LobbyContextType {
   setQuiz: (quiz: Quiz) => void;
   setQuizId: (quizId: string) => void;
   setUserName: (userName: string) => void;
+  setUserData: (userData: UserData) => void;
   exitLobby: () => void;
   createLobby: (quizId: string) => boolean;
   updateSelf: (self: LobbyMember, sendData: boolean) => boolean;
@@ -34,8 +35,8 @@ interface UserData {
 const LobbyContext = createContext<LobbyContextType | undefined>(undefined);
 
 function LobbyProvider({children}: {children: React.ReactNode}) {
-  const [lobbyData, setLobbyData] = useState<LobbyData>(INIT_LOBBY_DATA);
-  const [userData, setUserData] = useState<UserData>(INIT_USER_DATA);
+  const [lobbyData, _setLobbyData] = useState<LobbyData>(INIT_LOBBY_DATA);
+  const [userData, _setUserData] = useState<UserData>(INIT_USER_DATA);
 
   const stompClient = useStompClient();
   const healthyClient = useMemo(
@@ -44,33 +45,36 @@ function LobbyProvider({children}: {children: React.ReactNode}) {
   );
 
   const setLobbyId = useCallback((lobbyId: string) => {
-    setLobbyData(prev => ({...prev, lobbyId}));
+    _setLobbyData(prev => ({...prev, lobbyId}));
   }, []);
 
   const setQuizId = useCallback((quizId: string) => {
-    setLobbyData(prev => ({...prev, quizId: quizId}));
+    _setLobbyData(prev => ({...prev, quizId: quizId}));
   }, []);
 
   const setQuiz = useCallback((quiz: Quiz) => {
-    setLobbyData(prev => ({...prev, quiz}));
+    _setLobbyData(prev => ({...prev, quiz}));
   }, []);
 
   const setMembers = useCallback((members: LobbyMember[]) => {
-    setLobbyData(prev => ({...prev, members}));
+    _setLobbyData(prev => ({...prev, members}));
   }, []);
 
   const setSessionToken = useCallback((token: string) => {
-    setUserData(prev => ({...prev, sessionToken: token}));
+    _setUserData(prev => ({...prev, sessionToken: token}));
     LocalStorage.saveSessionToken(token);
   }, []);
 
   const setUserName = useCallback((userName: string) => {
-    setUserData(prev => ({...prev, userName}));
+    _setUserData(prev => ({...prev, userName}));
+  }, []);
+
+  const setUserData = useCallback((userData: UserData) => {
+    _setUserData(userData);
   }, []);
 
   const exitLobby = useCallback(() => {
     if (stompClient && lobbyData.lobbyId && userData?.sessionToken) {
-      LocalStorage.clearSessionToken();
       stompClient.publish({
         destination: `/app/lobby/${lobbyData.lobbyId}/exit`,
         body: JSON.stringify(userData.sessionToken),
@@ -92,7 +96,7 @@ function LobbyProvider({children}: {children: React.ReactNode}) {
 
   const updateSelf = useCallback(
     (self: LobbyMember, sendData: boolean): boolean => {
-      setUserData(prev => {
+      _setUserData(prev => {
         return {
           ...prev,
           memberData: self,
@@ -100,16 +104,15 @@ function LobbyProvider({children}: {children: React.ReactNode}) {
       });
 
       if (!sendData) return false;
-
       if (!healthyClient) return false;
 
       stompClient!.publish({
-        destination: '/app/lobby/create',
-        body: JSON.stringify(userData.memberData),
+        destination: `/app/lobby/${lobbyData.lobbyId}/update-member`,
+        body: JSON.stringify(self),
       });
       return true;
     },
-    [stompClient, healthyClient, userData.memberData],
+    [stompClient, healthyClient, lobbyData.lobbyId],
   );
 
   useEffect(() => {
@@ -118,10 +121,12 @@ function LobbyProvider({children}: {children: React.ReactNode}) {
       m => m.userName === userData.userName.toUpperCase(),
     );
     if (self) {
-      setUserData(prev => {
+      const {sessionToken} = self;
+      setSessionToken(sessionToken);
+      _setUserData(prev => {
         return {
           ...prev,
-          sessionToken: self.sessionToken,
+          sessionToken: sessionToken,
           memberData: self,
         };
       });
@@ -137,6 +142,7 @@ function LobbyProvider({children}: {children: React.ReactNode}) {
     setQuiz,
     setQuizId,
     setUserName,
+    setUserData,
     exitLobby,
     createLobby,
     updateSelf,

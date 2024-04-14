@@ -1,24 +1,23 @@
 import {useBeforeUnload, useParams} from 'react-router-dom';
 import PageContainer from '../components/PageContainer';
-import {useEffect, useRef, useState} from 'react';
-import {ButtonType, ChipType, LobbyMember, Quiz, Score} from '../types';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import {ButtonType, ChipType} from '../types';
 import {motion} from 'framer-motion';
-import {fetchPlayableQuizById} from '../utils/api';
+import {fetchInitLobbyData} from '../utils/api';
 import {shuffle} from 'lodash';
 import {Heading, Text} from '@radix-ui/themes';
 import Chip from '../components/Chip';
 import HoverContainer from '../components/HoverContainer';
 import {useStompClient, useSubscription} from 'react-stomp-hooks';
 import ToastController from '../controllers/ToastController';
-import Loading from '../components/Loading';
-import {CheckIcon, CopyIcon} from '@radix-ui/react-icons';
+import {CopyIcon} from '@radix-ui/react-icons';
 import Button from '../components/Button';
-import {randomNumber} from '../utils/logic';
 import MemberTile from '../components/MemberTile';
 import {GAME_OPTIONS} from '../constants/Game';
 import InputField from '../components/InputField';
 import QuizPreview from '../components/QuizPreview';
 import {useLobbyContext} from '../providers/LobbyProvider';
+import {LocalStorage} from '../utils/localStorage';
 
 const ANIMATION_DURATION = 200;
 
@@ -35,6 +34,7 @@ function LobbyScreen(): JSX.Element {
     setLobbyId,
     setMembers,
     setUserName,
+    setUserData,
     setQuiz,
     updateSelf,
     userData: {userName, sessionToken, memberData},
@@ -49,14 +49,19 @@ function LobbyScreen(): JSX.Element {
   const backgroundRef = useRef<any>(null);
   const stompClient = useStompClient();
 
-  useBeforeUnload(exitLobby);
+  const isReady = useMemo(
+    () => memberData.currRound === 0,
+    [memberData.currRound],
+  );
+
+  // useBeforeUnload(exitLobby);
 
   useSubscription(`/topic/lobby/${lobbyId}/members`, message => {
     if (isLoading) {
       setIsLoading(false);
       setIsJoined(true);
     }
-    console.log('hello');
+    console.log('called');
     setMembers(JSON.parse(message.body));
   });
 
@@ -65,10 +70,33 @@ function LobbyScreen(): JSX.Element {
   }, [lobbyId, setLobbyId]);
 
   useEffect(() => {
-    if (!quizId) return;
+    if (!quizId || !lobbyId) return;
     (async () => {
       try {
-        const {quiz} = await fetchPlayableQuizById({id: quizId});
+        const {quiz, topScore, lobby} = await fetchInitLobbyData({
+          quizId,
+          lobbyId,
+        });
+
+        if (!lobby) {
+          return ToastController.showErrorToast(
+            'Lobby not found',
+            'Make sure your link/Lobby ID is correct.',
+          );
+        }
+
+        const savedToken = LocalStorage.fetchSessionToken();
+
+        if (savedToken && lobby.members[savedToken]) {
+          setUserData({
+            sessionToken: savedToken,
+            memberData: lobby.members[savedToken],
+            userName: lobby.members[savedToken].userName,
+          });
+          setMembers(lobby.membersAsList);
+          setIsJoined(true);
+        }
+
         setQuiz({
           ...quiz,
           questions: shuffle(quiz.questions),
@@ -77,7 +105,7 @@ function LobbyScreen(): JSX.Element {
         console.error(error);
       }
     })();
-  }, [quizId]);
+  }, [quizId, lobbyId]);
 
   const handleJoinLobby = () => {
     setIsLoading(true);
@@ -92,9 +120,9 @@ function LobbyScreen(): JSX.Element {
     }
   };
 
-  const handleUserReady = () => {
+  const handleUserReady = (isReady: boolean) => {
     setIsLoading(true);
-    if (!updateSelf({...memberData, currRound: 0}, true)) {
+    if (!updateSelf({...memberData, currRound: isReady ? 0 : -1}, true)) {
       console.error('WebSocket connection is not established.');
     }
     setIsLoading(false);
@@ -127,6 +155,16 @@ function LobbyScreen(): JSX.Element {
             hidden: {translateX: -ANIMATION_X_OFFSET},
             visible: {translateX: 0},
           }}>
+          {quiz && (
+            <div className="space-y-2 mb-4">
+              <QuizPreview
+                containerTitle="Selected Quiz"
+                showScore={false}
+                className="bg-neutral-900"
+                quiz={quiz}
+              />
+            </div>
+          )}
           <HoverContainer className="space-y-2 px-4">
             <div className="space-y-2 w-full -mt-1 mb-2">
               <Heading className="text-white" size={'3'}>
@@ -214,10 +252,11 @@ function LobbyScreen(): JSX.Element {
               </div>
             </div>
             <Button
-              text="Are you ready?"
+              text={isReady ? 'Not ready' : 'Are you ready?'}
+              type={isReady ? ButtonType.outline : ButtonType.primary}
               className="flex flex-grow w-full"
               textSize="2"
-              onClick={exitLobby}
+              onClick={() => handleUserReady(!isReady)}
               disabled={userName.trim().length < 3}
               loading={isLoading}
             />

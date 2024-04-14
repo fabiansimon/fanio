@@ -12,14 +12,13 @@ import org.springframework.stereotype.Controller;
 import java.util.UUID;
 
 @Controller
-public class LobbyController {
+public class LobbySocketController {
     @Autowired
-    private final LobbyService lobbyService;
+    private final LobbyService lobbyService = new LobbyService();
     private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public LobbyController(LobbyService lobbyService, SimpMessagingTemplate messagingTemplate) {
-        this.lobbyService = lobbyService;
+    public LobbySocketController(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -41,8 +40,8 @@ public class LobbyController {
     }
 
     @MessageMapping("/lobby/{lobbyId}/update-member")
-    public void updateMember(@DestinationVariable String lobbyId, UUID sessionToken, LobbyMember newState) {
-        lobbyService.updateMember(lobbyId, sessionToken, newState);
+    public void updateMember(@DestinationVariable String lobbyId, LobbyMember newState) {
+        lobbyService.updateMember(lobbyId, newState.getSessionToken(), newState);
         messagingTemplate.convertAndSend("/topic/lobby/" + lobbyId + "/members", lobbyService.getLobby(lobbyId).getMembersAsList());
     }
 
