@@ -11,6 +11,7 @@ import {DateUtils, UI} from '../utils/common';
 interface QuizPreviewProps {
   quiz: Quiz;
   className?: string;
+  containerTitle?: string;
   defaultNavigation?: boolean;
   onClick?: (id: string) => void;
   onClickScores?: (id: string) => void;
@@ -19,6 +20,7 @@ interface QuizPreviewProps {
 }
 
 function QuizPreview({
+  containerTitle,
   quiz,
   defaultNavigation,
   className,
@@ -55,19 +57,27 @@ function QuizPreview({
     }, [invertColors]);
 
   return (
-    <>
+    <div className="flex w-full">
       <BackgroundLight
         ref={ref}
         containerClassName="flex-grow"
         animate={!invertColors && mouseEntered}
         className={UI.cn(
-          'flex flex-grow flex-col min-h-14 cursor-pointer justify-center space-y-1 border px-2 py-1.5 rounded-lg',
-          'hover:scale-[101%] transition-transform duration-150 ease-in-out cursor-pointer',
+          'flex flex-grow flex-col min-h-14 justify-center space-y-1 border px-2 py-1.5 rounded-lg',
+          onClick &&
+            'hover:scale-[101%] transition-transform duration-150 ease-in-out cursor-pointer cursor-pointer ',
           borderColor,
           backgroundColor,
           className,
         )}
         onClick={_onClick}>
+        {containerTitle && (
+          <div className="border-b-[1.5px] border-b-neutral-700/40 pb-2 mb-2">
+            <Heading className="text-white text-center" size={'3'}>
+              {containerTitle}
+            </Heading>
+          </div>
+        )}
         <Heading weight={'medium'} className={textColor} size={'2'}>
           {title}
         </Heading>
@@ -95,7 +105,7 @@ function QuizPreview({
           </Text>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

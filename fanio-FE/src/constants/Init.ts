@@ -1,3 +1,4 @@
+import {LobbyData, LobbyMember} from '../types';
 import {GAME_OPTIONS} from './Game';
 
 export const INIT_SCORE = {
@@ -22,4 +23,25 @@ export const INIT_GAME_SETTINGS = {
     description: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoPlay.description,
     status: true,
   },
+};
+
+export const INIT_LOBBY_DATA: LobbyData = {
+  currRound: -1,
+  lobbyId: '',
+  members: [],
+  quizId: '',
+};
+
+const INIT_LOBBY_MEMBER: LobbyMember = {
+  currRound: 0,
+  sessionToken: '',
+  timeElapsed: 0,
+  totalScore: 0,
+  userName: '',
+};
+
+export const INIT_USER_DATA = {
+  userName: '',
+  sessionToken: '',
+  memberData: INIT_LOBBY_MEMBER,
 };

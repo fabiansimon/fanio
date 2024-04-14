@@ -318,7 +318,7 @@ function CreateScreen(): JSX.Element {
           <Text
             onClick={() => setQuizInput(INIT_QUIZ_INPUT)}
             size={'1'}
-            className="text-white/50 underline cursor-pointer mt-4">
+            className="text-white/50 underline cursor-pointer pt-4">
             Reset Input
           </Text>
         </HoverContainer>

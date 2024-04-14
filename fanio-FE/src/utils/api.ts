@@ -9,8 +9,9 @@ import {
   ScoreInput,
   TimeFrame,
 } from '../types/index';
-import ToastController from '../providers/ToastController';
+import ToastController from '../controllers/ToastController';
 import {sanitizeTerm} from './logic';
+
 const BASE_URL = 'http://localhost:8080/api';
 
 const _axios = axios.create({
@@ -188,7 +189,7 @@ export async function fetchScorePlacement({
     );
     return res.data;
   } catch (error) {
-    handleError({error, callName: 'fetchGameStatistic'});
+    handleError({error, callName: 'fetchScorePlacement'});
     throw error;
   }
 }

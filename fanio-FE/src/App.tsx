@@ -15,30 +15,51 @@ import LandingScreen from './pages/LandingScreen';
 import QuizScoreScreen from './pages/QuizScoreScreen';
 import LeaderboardScreen from './pages/LeaderboardScreen';
 import PlayQuizScreen from './pages/PlayQuizScreen';
+import {StompSessionProvider} from 'react-stomp-hooks';
+import LobbyScreen from './pages/LobbyScreen';
+import LobbyProvider from './providers/LobbyProvider';
 
 function App(): JSX.Element {
   return (
     <>
       <Theme>
-        <Router>
-          <Routes>
-            <Route path="*" element={<Navigate to="/" replace={true} />} />
-            <Route path="/" element={<LandingScreen />} />
-            {/* <Route path={`${ROUTES.playQuiz}/:id`} element={<PlayScreen />} /> */}
-            <Route
-              path={`${ROUTES.playQuiz}/:id`}
-              element={<PlayQuizScreen />}
-            />
-            <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
-            <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
-            <Route path={ROUTES.leaderboard} element={<LeaderboardScreen />} />
-            <Route
-              path={`${ROUTES.quizScores}/:id`}
-              element={<QuizScoreScreen />}
-            />
-          </Routes>
-        </Router>
-        <Toast />
+        <StompSessionProvider
+          url={'http://localhost:8080/ws-endpoint'}
+          onConnect={() => {
+            console.log('Connected to WS');
+          }}
+          onDisconnect={() => {
+            console.log('Disconnected from WS');
+          }}>
+          <LobbyProvider>
+            <Router>
+              <Routes>
+                <Route path="*" element={<Navigate to="/" replace={true} />} />
+                <Route path="/" element={<LandingScreen />} />
+                <Route
+                  path={`${ROUTES.playQuiz}/:id`}
+                  element={<PlayQuizScreen />}
+                />
+                <Route
+                  path={`${ROUTES.lobby}/:quizId/:lobbyId`}
+                  element={<LobbyScreen />}
+                />
+
+                <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
+                <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
+                <Route
+                  path={ROUTES.leaderboard}
+                  element={<LeaderboardScreen />}
+                />
+                <Route
+                  path={`${ROUTES.quizScores}/:id`}
+                  element={<QuizScoreScreen />}
+                />
+              </Routes>
+            </Router>
+          </LobbyProvider>
+          <Toast />
+        </StompSessionProvider>
       </Theme>
     </>
   );

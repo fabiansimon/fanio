@@ -7,6 +7,7 @@ const KEYS = {
   bestAttempts: 'bestAttempts',
   userSettings: 'userSettings',
   unsavedQuiz: 'unsavedQuiz',
+  sessionToken: 'sessionToken',
 };
 
 export class LocalStorage {
@@ -91,5 +92,19 @@ export class LocalStorage {
   }
   static removeUnsavedQuiz() {
     localStorage.removeItem(KEYS.unsavedQuiz);
+  }
+
+  static saveSessionToken(token: string) {
+    localStorage.setItem(KEYS.sessionToken, token);
+  }
+
+  static clearSessionToken() {
+    localStorage.removeItem(KEYS.sessionToken);
+  }
+
+  static fetchSessionToken(token: string) {
+    const savedToken = localStorage.getItem(KEYS.sessionToken);
+    if (savedToken) return token;
+    return;
   }
 }

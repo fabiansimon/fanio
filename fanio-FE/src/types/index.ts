@@ -179,3 +179,19 @@ export enum ToastType {
   WARNING,
   SUCCESS,
 }
+
+export interface LobbyMember {
+  sessionToken: string;
+  userName: string;
+  totalScore: number;
+  timeElapsed: number;
+  currRound: number;
+}
+
+export interface LobbyData {
+  lobbyId: string;
+  members: LobbyMember[];
+  currRound: number;
+  quiz?: Quiz;
+  quizId?: string;
+}

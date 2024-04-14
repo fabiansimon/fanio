@@ -75,7 +75,7 @@ function InputField(
 
   useEffect(() => {
     if (autoFocus) internalRef.current?.focus();
-  }, []);
+  }, [autoFocus]);
 
   useEffect(() => {
     if (props.value) setVisible(false);

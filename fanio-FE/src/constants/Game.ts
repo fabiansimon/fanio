@@ -23,6 +23,7 @@ export const GAME_OPTIONS = {
   MIN_QUIZ_SONGS: 3,
   SONG_TIMEOUT: 3000,
   POINTS_UPDATE_TIMEOUT: 1200,
+  ANSWER_THRESHOLD: 70,
   GAME_SETTINGS_STRINGS: {
     autoPlay: {
       title: 'Auto Play',
