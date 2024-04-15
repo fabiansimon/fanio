@@ -37,7 +37,7 @@ function App(): JSX.Element {
                 <Route path="*" element={<Navigate to="/" replace={true} />} />
                 <Route path="/" element={<LandingScreen />} />
                 <Route
-                  path={`${ROUTES.playQuiz}/:id`}
+                  path={`${ROUTES.playQuiz}/:quizId/:lobbyId?`}
                   element={<PlayQuizScreen />}
                 />
                 <Route

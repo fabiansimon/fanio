@@ -33,18 +33,28 @@ import {INIT_GAME_SETTINGS, INIT_SCORE} from '../constants/Init';
 import ToastController from '../controllers/ToastController';
 import MusicLoader from '../components/MusicLoader';
 import Chip from '../components/Chip';
+import {useLobbyContext} from '../providers/LobbyProvider';
+import LobbyInformationContainer from '../components/LobbyInformationContainer';
 
 function PlayQuizScreen(): JSX.Element {
   useKeyShortcut(
     'Enter',
     () => {
-      if (result && !settings.autoPlay.status) return updateGameRound();
+      if (!lobbyId && result && !settings.autoPlay.status)
+        return updateGameRound();
       if (!isPlaying || result || gameState !== GameState.PLAYING) return;
       handleSubmitGuess(true);
     },
     true,
   );
-  const {id} = useParams();
+  const {quizId, lobbyId} = useParams();
+  const {
+    updateSelf,
+    userData: {memberData},
+    lobbyData: {members},
+  } = useLobbyContext();
+
+  console.log(members);
 
   const videoRef = useRef<ReactPlayer>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -53,7 +63,9 @@ function PlayQuizScreen(): JSX.Element {
   const backgroundRef = useRef<any>(null);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [gameState, setGameState] = useState<GameState>(GameState.PRE);
+  const [gameState, setGameState] = useState<GameState>(
+    lobbyId ? GameState.PLAYING : GameState.PRE,
+  );
   const [questionIndex, setQuestionIndex] = useState<number>(0);
 
   const [quizData, setQuizData] = useState<Quiz | null>(null);
@@ -69,6 +81,10 @@ function PlayQuizScreen(): JSX.Element {
   const [settings, setSettings] = useState<GameSettings>(
     LocalStorage.fetchUserSettings() || INIT_GAME_SETTINGS,
   );
+
+  const round = useMemo(() => {
+    return score.guesses.length;
+  }, [score.guesses]);
 
   const question = useMemo(() => {
     if (quizData) return quizData.questions[questionIndex];
@@ -119,13 +135,13 @@ function PlayQuizScreen(): JSX.Element {
   };
 
   const lastStoredAttempt = useMemo(
-    () => LocalStorage.fetchLastAttempt(id!),
-    [id],
+    () => LocalStorage.fetchLastAttempt(quizId!),
+    [quizId],
   );
 
   useEffect(() => {
-    LocalStorage.saveUserSettings(settings);
-  }, [settings]);
+    if (!lobbyId) LocalStorage.saveUserSettings(settings);
+  }, [settings, lobbyId]);
 
   useEffect(() => {
     if (settings.autoInput.status) handleSubmitGuess();
@@ -135,12 +151,12 @@ function PlayQuizScreen(): JSX.Element {
     if (questionIndex === quizData?.questions.length) {
       const _lastAttempt: LocalScore = {
         createdAt: new Date(),
-        quizId: id!,
+        quizId: quizId!,
         timeElapsed: score.totalTime,
         totalScore: score.totalScore,
         isUploaded: false,
       };
-      LocalStorage.saveLastAttempt(id!, _lastAttempt!);
+      LocalStorage.saveLastAttempt(quizId!, _lastAttempt!);
       setLastAttempt(_lastAttempt);
       setGameState(GameState.POST);
     }
@@ -149,14 +165,14 @@ function PlayQuizScreen(): JSX.Element {
     score.totalScore,
     score.totalTime,
     quizData?.questions,
-    id,
+    quizId,
   ]);
 
   useEffect(() => {
-    if (!id) return;
+    if (!quizId) return;
     (async () => {
       try {
-        const {quiz, topScore} = await fetchPlayableQuizById({id});
+        const {quiz, topScore} = await fetchPlayableQuizById({quizId});
         setQuizData({
           ...quiz,
           questions: shuffle(quiz.questions),
@@ -166,7 +182,7 @@ function PlayQuizScreen(): JSX.Element {
         console.error(error);
       }
     })();
-  }, [id]);
+  }, [quizId]);
 
   const handleSubmitGuess = (onEnter?: boolean) => {
     if (!isValidInput()) {
@@ -223,16 +239,34 @@ function PlayQuizScreen(): JSX.Element {
   const updateResult = (now: number, delta: number, points: number) => {
     setTimestamp(now);
     setResult({correct: true, delta, points});
+
+    const totalTime = (score.totalTime += delta);
+    const nextRound = round + 1;
+
     setScore(prev => {
       return {
         ...prev,
-        totalTime: (prev.totalTime += delta),
+        totalTime,
         guesses: prev.guesses.concat({
           elapsedTime: delta,
           score: points,
         }),
       };
     });
+
+    if (
+      !updateSelf(
+        {
+          ...memberData,
+          timeElapsed: totalTime,
+          totalScore: score.totalScore + points,
+          currRound: nextRound,
+        },
+        true,
+      )
+    ) {
+      console.error('WebSocket connection is not established.');
+    }
   };
 
   const setTimeouts = (points: number) => {
@@ -297,7 +331,7 @@ function PlayQuizScreen(): JSX.Element {
       <div className="w-full h-full flex flex-col">
         {gameState === GameState.PRE && (
           <PreGameScene
-            quizId={id!}
+            quizId={quizId!}
             topScore={topScore}
             lastAttempt={lastAttempt || lastStoredAttempt}
             onChangeScene={(scene: GameState) => setGameState(scene)}
@@ -305,7 +339,7 @@ function PlayQuizScreen(): JSX.Element {
         )}
         {gameState === GameState.POST && (
           <PostGameScene
-            quizId={id!}
+            quizId={quizId!}
             onRestart={resetGame}
             lastAttempt={lastAttempt!}
             topScore={topScore}
@@ -354,7 +388,11 @@ function PlayQuizScreen(): JSX.Element {
                     ? 'opacity-1'
                     : 'opacity-0',
                 )}>
-                (Press Enter to continue)
+                (
+                {lobbyId
+                  ? 'Please wait for your friends'
+                  : 'Press Enter to continue'}
+                )
               </Heading>
               {isLoading && (
                 <MusicLoader
@@ -371,6 +409,7 @@ function PlayQuizScreen(): JSX.Element {
                 ref={inputRef}
                 className="text-center font-bold mt-8 text-[30px]"
               />
+
               <QuizStatsContainer
                 topScore={topScore}
                 data={score}
@@ -380,10 +419,19 @@ function PlayQuizScreen(): JSX.Element {
                   isLoading ? 'opacity-30' : 'opacity-1',
                 )}
               />
+
+              {lobbyId && (
+                <LobbyInformationContainer
+                  round={round}
+                  lobbyId={lobbyId}
+                  onFinishRound={updateGameRound}
+                />
+              )}
             </div>
           </div>
         )}
         <QuickOptionsContainer
+          isLobby={!!lobbyId}
           disabled={!!result}
           settings={settings}
           setSettings={setSettings}

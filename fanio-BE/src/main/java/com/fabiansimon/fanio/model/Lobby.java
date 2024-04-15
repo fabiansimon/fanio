@@ -1,14 +1,17 @@
 package com.fabiansimon.fanio.model;
+
 import java.util.*;
 
 public class Lobby {
     private String id;
     private UUID quizId;
+    private Integer currRound;
     private Map<UUID, LobbyMember> members;
 
     public Lobby(String id, UUID quizId) {
         this.id = id;
         this.quizId = quizId;
+        this.currRound = -1;
         this.members = Collections.synchronizedMap(new HashMap<>());
     }
 
@@ -26,6 +29,18 @@ public class Lobby {
 
     public void setQuizId(UUID quizId) {
         this.quizId = quizId;
+    }
+
+    public Integer getCurrRound() {
+        return currRound;
+    }
+
+    public void setCurrRound(Integer currRound) {
+        this.currRound = currRound;
+    }
+
+    public void setMembers(Map<UUID, LobbyMember> members) {
+        this.members = members;
     }
 
     public boolean updateMember(UUID sessionToken, LobbyMember newState) {
@@ -63,4 +78,12 @@ public class Lobby {
     public boolean isEmpty() {
         return members.isEmpty();
     }
+
+   public boolean isRoundFinished() {
+        for (LobbyMember member : getMembersAsList()) {
+            if (member.getCurrRound() <= getCurrRound()) return false;
+        }
+
+        return true;
+   }
 }

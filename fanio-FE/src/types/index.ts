@@ -155,6 +155,7 @@ interface Setting {
   title: string;
   description: String;
   status: boolean;
+  disabled?: boolean;
 }
 
 export enum ChipType {

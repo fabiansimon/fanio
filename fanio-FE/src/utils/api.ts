@@ -61,14 +61,14 @@ export async function fetchQuizById({id}: {id: string}): Promise<Quiz> {
 }
 
 export async function fetchPlayableQuizById({
-  id,
+  quizId,
 }: {
-  id: string;
+  quizId: string;
   showScore?: boolean;
 }): Promise<{quiz: Quiz; topScore: Score}> {
   try {
     const response = await _axios.get<{quiz: Quiz; topScore: Score}>(
-      `/quiz/${id}?includeScore=true`,
+      `/quiz/${quizId}?includeScore=true`,
     );
     return response.data;
   } catch (error) {

@@ -45,7 +45,11 @@ public class LobbyService {
     public boolean updateMember(String lobbyId, UUID sessionToken, LobbyMember member) {
         Lobby lobby = lobbies.get(lobbyId);
         lobby.updateMember(sessionToken, member);
-        return true;
+        if (lobby.isRoundFinished()) {
+            lobby.setCurrRound(lobby.getCurrRound()+1);
+            return true;
+        }
+        return false;
     }
 
     public Lobby getLobby(String lobbyId) {

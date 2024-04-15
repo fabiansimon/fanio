@@ -41,7 +41,9 @@ public class LobbySocketController {
 
     @MessageMapping("/lobby/{lobbyId}/update-member")
     public void updateMember(@DestinationVariable String lobbyId, LobbyMember newState) {
-        lobbyService.updateMember(lobbyId, newState.getSessionToken(), newState);
+        if (lobbyService.updateMember(lobbyId, newState.getSessionToken(), newState)) {
+            messagingTemplate.convertAndSend("/topic/lobby/" + lobbyId + "/data", lobbyService.getLobby(lobbyId).getCurrRound());
+        }
         messagingTemplate.convertAndSend("/topic/lobby/" + lobbyId + "/members", lobbyService.getLobby(lobbyId).getMembersAsList());
     }
 

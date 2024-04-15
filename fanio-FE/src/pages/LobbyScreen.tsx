@@ -1,4 +1,4 @@
-import {useBeforeUnload, useParams} from 'react-router-dom';
+import {useBeforeUnload, useNavigate, useParams} from 'react-router-dom';
 import PageContainer from '../components/PageContainer';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {ButtonType, ChipType} from '../types';
@@ -18,6 +18,7 @@ import InputField from '../components/InputField';
 import QuizPreview from '../components/QuizPreview';
 import {useLobbyContext} from '../providers/LobbyProvider';
 import {LocalStorage} from '../utils/localStorage';
+import ROUTES from '../constants/Routes';
 
 const ANIMATION_DURATION = 200;
 
@@ -41,6 +42,8 @@ function LobbyScreen(): JSX.Element {
     lobbyData: {quiz, members},
   } = useLobbyContext();
 
+  const navigation = useNavigate();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isJoined, setIsJoined] = useState<boolean>(false);
 
@@ -61,8 +64,13 @@ function LobbyScreen(): JSX.Element {
       setIsLoading(false);
       setIsJoined(true);
     }
-    console.log('called');
     setMembers(JSON.parse(message.body));
+  });
+
+  useSubscription(`/topic/lobby/${lobbyId}/data`, message => {
+    console.log(message.body);
+    if (JSON.parse(message.body) === 0)
+      navigation(`${ROUTES.playQuiz}/${quizId}/${lobbyId}`);
   });
 
   useEffect(() => {
