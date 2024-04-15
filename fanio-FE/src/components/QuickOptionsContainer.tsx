@@ -22,7 +22,6 @@ function QuickOptionsContainer({
           autoPlay: {
             ...prev.autoPlay,
             status: false,
-            disabled: true,
           },
         };
       });
@@ -30,7 +29,7 @@ function QuickOptionsContainer({
   }, [isLobby, setSettings]);
 
   const handleChange = (key: GameSettingKey, value: boolean) => {
-    if (disabled) return;
+    if (disabled || (isLobby && key === 'autoPlay')) return;
     setSettings(prev => {
       return {
         ...prev,
@@ -50,7 +49,6 @@ function QuickOptionsContainer({
         return (
           <div className="flex justify-center space-x-2 px-3" key={key}>
             <Checkbox
-              disabled={option?.disabled}
               checked={status}
               style={{opacity: status || 0.2}}
               size={'1'}

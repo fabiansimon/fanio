@@ -40,8 +40,7 @@ function PlayQuizScreen(): JSX.Element {
   useKeyShortcut(
     'Enter',
     () => {
-      if (!lobbyId && result && !settings.autoPlay.status)
-        return updateGameRound();
+      if (result && !settings.autoPlay.status) return updateGameRound();
       if (!isPlaying || result || gameState !== GameState.PLAYING) return;
       handleSubmitGuess(true);
     },
@@ -53,8 +52,6 @@ function PlayQuizScreen(): JSX.Element {
     userData: {memberData},
     lobbyData: {members},
   } = useLobbyContext();
-
-  console.log(members);
 
   const videoRef = useRef<ReactPlayer>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -255,6 +252,7 @@ function PlayQuizScreen(): JSX.Element {
     });
 
     if (
+      lobbyId &&
       !updateSelf(
         {
           ...memberData,
@@ -388,11 +386,7 @@ function PlayQuizScreen(): JSX.Element {
                     ? 'opacity-1'
                     : 'opacity-0',
                 )}>
-                (
-                {lobbyId
-                  ? 'Please wait for your friends'
-                  : 'Press Enter to continue'}
-                )
+                ()
               </Heading>
               {isLoading && (
                 <MusicLoader
@@ -424,7 +418,7 @@ function PlayQuizScreen(): JSX.Element {
                 <LobbyInformationContainer
                   round={round}
                   lobbyId={lobbyId}
-                  onFinishRound={updateGameRound}
+                  onFinishRound={() => console.log('Round finished')}
                 />
               )}
             </div>

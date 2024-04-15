@@ -96,6 +96,7 @@ function LobbyProvider({children}: {children: React.ReactNode}) {
 
   const updateSelf = useCallback(
     (self: LobbyMember, sendData: boolean): boolean => {
+      console.log('called');
       _setUserData(prev => {
         return {
           ...prev,

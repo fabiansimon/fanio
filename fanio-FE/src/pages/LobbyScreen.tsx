@@ -21,6 +21,7 @@ import {LocalStorage} from '../utils/localStorage';
 import ROUTES from '../constants/Routes';
 
 const ANIMATION_DURATION = 200;
+const ANIMATION_X_OFFSET = 3_000;
 
 const transition = {
   duration: ANIMATION_DURATION,
@@ -28,7 +29,6 @@ const transition = {
   mass: 0.05,
 };
 
-const ANIMATION_X_OFFSET = 3_000;
 function LobbyScreen(): JSX.Element {
   const {
     exitLobby,
