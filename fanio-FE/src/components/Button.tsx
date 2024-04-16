@@ -41,7 +41,7 @@ function Button({
       {...rest}
       disabled={disabled}
       className={UI.cn(
-        `flex px-10 py-2 rounded-xl items-center justify-center ${
+        `flex md:px-10 px-2 py-2 rounded-xl items-center justify-center ${
           disabled && 'opacity-50'
         }`,
         customClass,

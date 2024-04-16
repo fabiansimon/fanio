@@ -135,7 +135,7 @@ function PostGameScene({
           score={attempt.userName ? attempt : lastAttempt}
           position={placement}
         />
-        <div className="relative w-full mt-4 -mb-1">
+        <div className="relative w-full mt-4 -mb-1 bottom-0">
           <motion.div
             animate={!isUploaded ? 'hidden' : 'shown'}
             variants={{shown: {x: 0}, hidden: {x: -1000}}}
@@ -150,7 +150,7 @@ function PostGameScene({
             transition={transition}
             variants={{shown: {x: 0}, hidden: {x: 1000}}}
             animate={isUploaded ? 'hidden' : 'shown'}
-            className="flex w-full flex-grow space-x-2">
+            className="flex w-full flex-grow space-x-0 space-y-2 flex-col md:flex-row md:space-x-2 md:space-y-0">
             <InputField
               disabled={isLoading}
               maxLength={GAME_OPTIONS.MAX_SCORE_USERNAME_LENGTH}

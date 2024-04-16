@@ -3,6 +3,10 @@ import {ArrowLeftIcon} from '@radix-ui/react-icons';
 import {UI} from '../utils/common';
 import useKeyShortcut from '../hooks/useKeyShortcut';
 import KeyBinding from './KeyBinding';
+import useIsMobile from '../hooks/useIsMobile';
+import useBreakingPoints from '../hooks/useBreakingPoints';
+import {BreakPoint} from '../types';
+import useIsSmall from '../hooks/useIsSmall';
 
 interface ContainerProps {
   hotkey?: string;
@@ -29,6 +33,8 @@ function Container({
   onBack,
 }: ContainerProps): JSX.Element {
   useKeyShortcut(hotkey!, () => onClick && onClick());
+  const isSmall = useIsSmall();
+
   return (
     <div
       onClick={onClick}
@@ -54,9 +60,13 @@ function Container({
         </div>
         {hotkey && <KeyBinding hotkey={hotkey} onActivate={onClick} />}
       </div>
-      <Text className={UI.cn('pt-1 max-w-[80%]', descriptionColor)} size={'2'}>
-        {description}
-      </Text>
+      {!isSmall && (
+        <Text
+          className={UI.cn('pt-1 max-w-[80%]', descriptionColor)}
+          size={'2'}>
+          {description}
+        </Text>
+      )}
       {content && content}
     </div>
   );

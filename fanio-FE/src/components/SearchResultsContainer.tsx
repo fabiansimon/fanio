@@ -49,6 +49,7 @@ function SearchResultsContainer({
   }, [searchResults]);
   return (
     <motion.div
+      initial="hidden"
       animate={!searchResults ? 'hidden' : 'shown'}
       variants={animatedStates}
       transition={transition}

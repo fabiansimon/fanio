@@ -58,8 +58,8 @@ function App(): JSX.Element {
               </Routes>
             </Router>
           </LobbyProvider>
-          <Toast />
         </StompSessionProvider>
+        <Toast />
       </Theme>
     </>
   );

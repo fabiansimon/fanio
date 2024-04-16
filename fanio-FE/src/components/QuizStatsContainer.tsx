@@ -37,7 +37,7 @@ function QuizStatsContainer({
         'flex flex-col w-full justify-between space-y-3',
         className,
       )}>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between">
         <div className="flex w-full flex-grow flex-col">
           <Heading size={'3'} className="text-white">
             {guesses.length} out of {totalQuestion}

@@ -43,8 +43,8 @@ function AllGamesContainer({className}: {className?: string}): JSX.Element {
   }, []);
 
   return (
-    <div className={UI.cn('-mx-5 mt-auto', className)}>
-      <Marquee speed={30} className="mb-4">
+    <div className={UI.cn('-mx-5', className)}>
+      <Marquee speed={30} className="mb-4 py-auto">
         {statistic &&
           Object.entries(statistic).map(([key, val]) => (
             <div key={key} className="mr-6 w-14 mt-4">
