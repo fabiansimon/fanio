@@ -79,7 +79,7 @@ function LandingScreen(): JSX.Element {
         onPress: () => navigation(ROUTES.leaderboard),
         hotkey: 'L',
         className:
-          'bg-gradient-to-b from-red-600 to-red-500 border-red-900 col-span-2 row-span-6',
+          'bg-gradient-to-b from-red-600 to-red-500 border-red-900 col-span-2 row-span-6 relative',
         content: <LeaderboardContainer />,
         isHidden: breakActive,
       },

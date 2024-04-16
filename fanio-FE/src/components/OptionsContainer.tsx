@@ -35,9 +35,11 @@ function OptionsContainer({
             }
           />
         </div>
-        <Text className="text-white/50" size={'2'}>
-          Each Song will start at a random timestamp.
-        </Text>
+        {!isSmall && (
+          <Text className="text-white/50" size={'2'}>
+            Each Song will start at a random timestamp.
+          </Text>
+        )}
       </div>
       {!isSmall && (
         <div className="border-l-neutral-500/20 border-l-[1px] pl-4" />
@@ -56,9 +58,11 @@ function OptionsContainer({
             onCheckedChange={value => onInput(value, InputType.PRIVATE_QUIZ)}
           />
         </div>
-        <Text className="text-white/50" size={'2'}>
-          The Quiz can only be accessed through a shared URL.
-        </Text>
+        {!isSmall && (
+          <Text className="text-white/50" size={'2'}>
+            The Quiz can only be accessed through a shared URL.
+          </Text>
+        )}
       </div>
     </div>
   );

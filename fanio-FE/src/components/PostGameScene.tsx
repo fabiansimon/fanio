@@ -69,6 +69,7 @@ function PostGameScene({
         quizId,
       });
       LocalStorage.saveScoreId(scoreId);
+      LocalStorage.removeLastAttempt(quizId);
       setIsUploaded(true);
     } catch (error) {
       console.log(error);

@@ -51,12 +51,12 @@ const INIT_QUIZ_INPUT = {
 };
 
 function CreateScreen(): JSX.Element {
-  const navigation = useNavigate();
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [questionVisible, setQuestionVisible] = useState<boolean>(false);
   const [quizInput, setQuizInput] = useState<QuizInput | undefined>();
 
+  const navigation = useNavigate();
+  const isSmall = useIsSmall();
   const containsDuplicated = useMemo(() => {
     if (!quizInput?.questions) return false;
     const usedTitles = new Set();
@@ -233,9 +233,14 @@ function CreateScreen(): JSX.Element {
                   handleInput(value, InputType.TITLE)
                 }
               />
-              {quizInput?.options.isPrivate && <Chip type={ChipType.PRIVATE} />}
+              {quizInput?.options.isPrivate && (
+                <Chip
+                  className={isSmall ? '-mt-14 -mr-2' : ''}
+                  type={ChipType.PRIVATE}
+                />
+              )}
             </div>
-
+            {/* 
             <InputField
               showSimple
               value={quizInput?.artists}
@@ -244,14 +249,14 @@ function CreateScreen(): JSX.Element {
               onInput={({currentTarget: {value}}) =>
                 handleInput(value, InputType.ARTISTS)
               }
-            />
+            /> */}
 
             <InputField
               showSimple
               value={quizInput?.description}
               placeholder="Description (optional)"
               maxLength={GAME_OPTIONS.MAX_QUIZ_DESCRIPTION_LENGTH}
-              className="text-sm mt-4 mb-2 text-white/70"
+              className="text-sm mb-2 text-white/70 h-50"
               onInput={({currentTarget: {value}}) =>
                 handleInput(value, InputType.DESCRIPTION)
               }

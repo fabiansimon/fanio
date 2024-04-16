@@ -25,7 +25,7 @@ function LeaderboardContainer(): JSX.Element {
   }, []);
 
   return (
-    <div className="flex flex-col mt-4">
+    <div className="flex flex-col flex-grow h-full mt-4">
       {(scores?.length || 0) > 0 ? (
         <div className="space-y-2 -mx-2">
           {scores?.map((s, i) => {
@@ -51,8 +51,8 @@ function LeaderboardContainer(): JSX.Element {
           })}
         </div>
       ) : (
-        <div className="flex flex-col items-center pt-20">
-          <Heading className="text-white pb-1" size={'2'}>
+        <div className="absolute top-0 left-0 right-0 flex flex-col flex-grow h-full items-center justify-center">
+          <Heading className="text-white pb-1 pt-6" size={'2'}>
             Oh no 🥱
           </Heading>
           <Text className="text-white/80" size={'2'}>

@@ -13,7 +13,13 @@ const ChipData = {
   },
 };
 
-function Chip({type}: {type: keyof typeof ChipData}): JSX.Element {
+function Chip({
+  type,
+  className,
+}: {
+  type: keyof typeof ChipData;
+  className?: string;
+}): JSX.Element {
   const {title, icon, backgroundColor, textColor} = useMemo(
     () => ChipData[type],
     [type],
@@ -22,8 +28,9 @@ function Chip({type}: {type: keyof typeof ChipData}): JSX.Element {
   return (
     <div
       className={UI.cn(
-        'p-1.5 rounded-lg items-center flex space-x-1.5',
+        'p-1.5 rounded-lg h-8 items-center flex space-x-1.5',
         backgroundColor,
+        className,
       )}>
       {icon}
       <Text size={'1'} weight={'medium'} className={textColor}>

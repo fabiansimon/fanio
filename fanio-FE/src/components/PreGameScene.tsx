@@ -108,7 +108,7 @@ function PreGameScene({
 
   return (
     <>
-      <HoverContainer className="my-auto px-4 py-4 relative">
+      <HoverContainer className="my-auto px-4 py-4 relative mx-0 min-w-[400px] md:mx-auto">
         <div className="space-y-3 w-full -mt-1">
           <Heading className="text-white" size={'3'}>
             Highscore to beat
