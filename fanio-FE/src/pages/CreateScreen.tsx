@@ -26,6 +26,8 @@ import {GAME_OPTIONS} from '../constants/Game';
 import {LocalStorage} from '../utils/localStorage';
 import useIsSmall from '../hooks/useIsSmall';
 import OptionsContainer from '../components/OptionsContainer';
+import {useUserDataContext} from '../providers/UserDataProvider';
+import AuthPopUp from '../components/AuthPopUp';
 
 export enum InputType {
   TITLE,
@@ -57,6 +59,8 @@ function CreateScreen(): JSX.Element {
 
   const navigation = useNavigate();
   const isSmall = useIsSmall();
+  const {isAuth} = useUserDataContext();
+
   const containsDuplicated = useMemo(() => {
     if (!quizInput?.questions) return false;
     const usedTitles = new Set();
@@ -198,6 +202,7 @@ function CreateScreen(): JSX.Element {
 
   return (
     <>
+      {!isAuth && <AuthPopUp />}
       <AddQuizModal
         ignoreOffset={quizInput?.options.randomOffsets}
         isVisible={questionVisible}

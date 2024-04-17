@@ -13,7 +13,6 @@ import TopQuizListContainer from '../components/TopQuizListContainer';
 import AllGamesContainer from '../components/AllGamesContainer';
 import LeaderboardContainer from '../components/LeaderboardContainer';
 import useBreakingPoints from '../hooks/useBreakingPoints';
-import ToastController from '../controllers/ToastController';
 
 interface MenuOptions {
   title: string;
@@ -155,9 +154,8 @@ function MarqueeContainer({className}: {className?: string}): JSX.Element {
         {artistList
           .filter((_, i) => i % 2)
           .map((a, i) => (
-            <div>
+            <div key={i}>
               <Heading
-                key={i}
                 size={'4'}
                 weight={'light'}
                 className="text-neutral-500 pr-2">

@@ -15,31 +15,42 @@ import LandingScreen from './pages/LandingScreen';
 import QuizScoreScreen from './pages/QuizScoreScreen';
 import LeaderboardScreen from './pages/LeaderboardScreen';
 import PlayQuizScreen from './pages/PlayQuizScreen';
+import {GoogleOAuthProvider} from '@react-oauth/google';
+import UserDataProvider from './providers/UserDataProvider';
+
+const googleAuthClientId = process.env.REACT_APP_GOOGLE_AUTH_CLIENT_ID!;
 
 function App(): JSX.Element {
   return (
     <>
-      <Theme>
-        <Router>
-          <Routes>
-            <Route path="*" element={<Navigate to="/" replace={true} />} />
-            <Route path="/" element={<LandingScreen />} />
-            <Route
-              path={`${ROUTES.playQuiz}/:quizId`}
-              element={<PlayQuizScreen />}
-            />
+      <GoogleOAuthProvider clientId={googleAuthClientId}>
+        <UserDataProvider>
+          <Theme>
+            <Router>
+              <Routes>
+                <Route path="*" element={<Navigate to="/" replace={true} />} />
+                <Route path="/" element={<LandingScreen />} />
+                <Route
+                  path={`${ROUTES.playQuiz}/:quizId`}
+                  element={<PlayQuizScreen />}
+                />
 
-            <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
-            <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
-            <Route path={ROUTES.leaderboard} element={<LeaderboardScreen />} />
-            <Route
-              path={`${ROUTES.quizScores}/:id`}
-              element={<QuizScoreScreen />}
-            />
-          </Routes>
-        </Router>
-        <Toast />
-      </Theme>
+                <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
+                <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
+                <Route
+                  path={ROUTES.leaderboard}
+                  element={<LeaderboardScreen />}
+                />
+                <Route
+                  path={`${ROUTES.quizScores}/:id`}
+                  element={<QuizScoreScreen />}
+                />
+              </Routes>
+            </Router>
+            <Toast />
+          </Theme>
+        </UserDataProvider>
+      </GoogleOAuthProvider>
     </>
   );
 }

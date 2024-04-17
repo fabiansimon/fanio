@@ -225,7 +225,6 @@ function PlayQuizScreen(): JSX.Element {
     setResult({correct: true, delta, points});
 
     const totalTime = (score.totalTime += delta);
-    const nextRound = round + 1;
 
     setScore(prev => {
       return {
@@ -285,6 +284,9 @@ function PlayQuizScreen(): JSX.Element {
     changeUIState(UIState.INCORRECT);
     setResult({correct: false, delta: 0, points: 0});
     barRef.current?.clear();
+    const now = performance.now();
+    const delta = (now - timestamp) / 1000;
+    updateResult(now, delta, 0);
     setTimeouts(0);
   };
 
