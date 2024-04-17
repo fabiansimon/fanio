@@ -386,7 +386,7 @@ function PlayQuizScreen(): JSX.Element {
                     ? 'opacity-1'
                     : 'opacity-0',
                 )}>
-                ()
+                (Press Enter to continue)
               </Heading>
               {isLoading && (
                 <MusicLoader
