@@ -166,7 +166,6 @@ export enum GameState {
   PRE,
   PLAYING,
   POST,
-  LOBBY,
 }
 
 export enum UIState {
@@ -178,29 +177,4 @@ export enum ToastType {
   ERROR,
   WARNING,
   SUCCESS,
-}
-
-export interface LobbyMember {
-  sessionToken: string;
-  userName: string;
-  totalScore: number;
-  timeElapsed: number;
-  currRound: number;
-}
-
-export interface LobbyData {
-  lobbyId: string;
-  members: LobbyMember[];
-  currRound: number;
-  quiz?: Quiz;
-  quizId?: string;
-}
-
-export interface InitLobbyData {
-  quiz: Quiz;
-  topScore?: Score;
-  lobby: Omit<LobbyData, 'currRound' | 'members'> & {
-    membersAsList: LobbyMember[];
-    members: {[key: string]: LobbyMember};
-  };
 }

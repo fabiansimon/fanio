@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {
   GameStatistic,
-  InitLobbyData,
   MetaData,
   PaginatedData,
   Quiz,
@@ -216,22 +215,6 @@ export async function fetchScorePlacement({
     return res.data;
   } catch (error) {
     handleError({error, callName: 'fetchScorePlacement'});
-    throw error;
-  }
-}
-
-export async function fetchInitLobbyData({
-  quizId,
-  lobbyId,
-}: {
-  quizId: string;
-  lobbyId: string;
-}): Promise<InitLobbyData> {
-  try {
-    const res = await _axios.get(`/lobby/${quizId}?lobbyId=${lobbyId}`);
-    return res.data;
-  } catch (error) {
-    handleError({error, callName: 'fetchInitLobbyData'});
     throw error;
   }
 }

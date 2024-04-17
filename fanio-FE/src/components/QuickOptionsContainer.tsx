@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useEffect} from 'react';
+import {Dispatch, SetStateAction} from 'react';
 import {GameSettingKey, GameSettings} from '../types';
 import {Checkbox, Text} from '@radix-ui/themes';
 import KeyBinding from './KeyBinding';
@@ -8,30 +8,15 @@ function QuickOptionsContainer({
   settings,
   setSettings,
   disabled,
-  isLobby,
 }: {
-  isLobby: boolean;
   settings: GameSettings;
   setSettings: Dispatch<SetStateAction<GameSettings>>;
   disabled: boolean;
 }): JSX.Element {
   const isSmall = useIsSmall();
-  useEffect(() => {
-    if (isLobby) {
-      setSettings(prev => {
-        return {
-          ...prev,
-          autoPlay: {
-            ...prev.autoPlay,
-            status: false,
-          },
-        };
-      });
-    }
-  }, [isLobby, setSettings]);
 
   const handleChange = (key: GameSettingKey, value: boolean) => {
-    if (disabled || (isLobby && key === 'autoPlay')) return;
+    if (disabled) return;
     setSettings(prev => {
       return {
         ...prev,

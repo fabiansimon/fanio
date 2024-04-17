@@ -33,8 +33,6 @@ import {INIT_GAME_SETTINGS, INIT_SCORE} from '../constants/Init';
 import ToastController from '../controllers/ToastController';
 import MusicLoader from '../components/MusicLoader';
 import Chip from '../components/Chip';
-import {useLobbyContext} from '../providers/LobbyProvider';
-import LobbyInformationContainer from '../components/LobbyInformationContainer';
 
 function PlayQuizScreen(): JSX.Element {
   useKeyShortcut(
@@ -46,12 +44,7 @@ function PlayQuizScreen(): JSX.Element {
     },
     true,
   );
-  const {quizId, lobbyId} = useParams();
-  const {
-    updateSelf,
-    userData: {memberData},
-    lobbyData: {members},
-  } = useLobbyContext();
+  const {quizId} = useParams();
 
   const videoRef = useRef<ReactPlayer>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -60,9 +53,7 @@ function PlayQuizScreen(): JSX.Element {
   const backgroundRef = useRef<any>(null);
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [gameState, setGameState] = useState<GameState>(
-    lobbyId ? GameState.PLAYING : GameState.PRE,
-  );
+  const [gameState, setGameState] = useState<GameState>(GameState.PRE);
   const [questionIndex, setQuestionIndex] = useState<number>(0);
 
   const [quizData, setQuizData] = useState<Quiz | null>(null);
@@ -135,10 +126,6 @@ function PlayQuizScreen(): JSX.Element {
     () => LocalStorage.fetchLastAttempt(quizId!),
     [quizId],
   );
-
-  useEffect(() => {
-    if (!lobbyId) LocalStorage.saveUserSettings(settings);
-  }, [settings, lobbyId]);
 
   useEffect(() => {
     if (settings.autoInput.status) handleSubmitGuess();
@@ -250,21 +237,6 @@ function PlayQuizScreen(): JSX.Element {
         }),
       };
     });
-
-    if (
-      lobbyId &&
-      !updateSelf(
-        {
-          ...memberData,
-          timeElapsed: totalTime,
-          totalScore: score.totalScore + points,
-          currRound: nextRound,
-        },
-        true,
-      )
-    ) {
-      console.error('WebSocket connection is not established.');
-    }
   };
 
   const setTimeouts = (points: number) => {
@@ -413,19 +385,10 @@ function PlayQuizScreen(): JSX.Element {
                   isLoading ? 'opacity-30' : 'opacity-1',
                 )}
               />
-
-              {lobbyId && (
-                <LobbyInformationContainer
-                  round={round}
-                  lobbyId={lobbyId}
-                  onFinishRound={() => console.log('Round finished')}
-                />
-              )}
             </div>
           </div>
         )}
         <QuickOptionsContainer
-          isLobby={!!lobbyId}
           disabled={!!result}
           settings={settings}
           setSettings={setSettings}
