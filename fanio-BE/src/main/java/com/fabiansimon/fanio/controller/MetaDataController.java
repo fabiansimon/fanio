@@ -7,20 +7,25 @@ import com.fabiansimon.fanio.service.QuestionService;
 import com.fabiansimon.fanio.service.QuizService;
 import com.fabiansimon.fanio.service.ScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api")
 public class MetaDataController {
+
+    @Value("${youtube.api-key}")
+    private String youtubeKey;
     @Autowired
     QuestionService questionService = new QuestionService();
     @Autowired
     QuizService quizService = new QuizService();
     @Autowired
     ScoreService scoreService = new ScoreService();
-
+    RestTemplate template = new RestTemplate();
 
     @GetMapping("/statistic")
     public ResponseEntity<GameStatisticDTO> fetchTotalGameStatistic() {
@@ -37,13 +42,14 @@ public class MetaDataController {
     }
 
     @PostMapping("/strip-meta")
-    public ResponseEntity<MetaResponseDTO> stripMetaOfYoutube(@RequestBody MetaRequestDTO requestDTO) {
+    public ResponseEntity<?> stripMetaOfYoutube(@RequestBody MetaRequestDTO requestDTO) {
         try {
-            RestTemplate template = new RestTemplate();
             ResponseEntity<String> res = template.getForEntity(requestDTO.getUrl(), String.class);
             String body = res.getBody();
 
             MetaResponseDTO metaData = new MetaResponseDTO();
+
+            fetchYoutubeData("123");
 
             String sourceTitle = stripTitle(body);
             String title = cleanRawTitle(sourceTitle);
@@ -121,5 +127,18 @@ public class MetaDataController {
         }
 
         return trimSides(title.substring(left, right));
+    }
+
+    private String fetchYoutubeData(String videoId) {
+        System.out.println(videoId);
+        System.out.println(youtubeKey);
+        String url = UriComponentsBuilder
+                .fromHttpUrl("https://www.googleapis.com/youtube/v3/videos")
+                .queryParam("part", "id,snippet,contentDetails,statistics")
+                .queryParam("id", videoId)
+                .queryParam("key", youtubeKey)
+                .toUriString();
+
+        return template.getForObject(url, String.class);
     }
 }

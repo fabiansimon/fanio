@@ -1,6 +1,3 @@
-import {Heading, Text} from '@radix-ui/themes';
-import Button from './Button';
-import {UI} from '../utils/common';
 import HoverContainer from './HoverContainer';
 
 interface EmptyContainerProps extends React.HTMLProps<HTMLDivElement> {

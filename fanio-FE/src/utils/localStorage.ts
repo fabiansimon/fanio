@@ -68,6 +68,12 @@ export class LocalStorage {
     localStorage.setItem(KEYS.lastAttempts, JSON.stringify([...storedAttemps]));
   }
 
+  static removeLastAttempt(quizId: string) {
+    const storedAttemps = this.fetchLastAttempts();
+    if (storedAttemps.has(quizId)) storedAttemps.delete(quizId);
+    localStorage.setItem(KEYS.lastAttempts, JSON.stringify([...storedAttemps]));
+  }
+
   static saveUserSettings(settings: GameSettings) {
     localStorage.setItem(KEYS.userSettings, JSON.stringify(settings));
   }

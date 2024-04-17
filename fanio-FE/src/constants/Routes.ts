@@ -3,7 +3,6 @@ const ROUTES = {
   createQuiz: '/create-quiz',
   listQuizzes: '/quizzes',
   quizScores: '/scores',
-  lobby: '/lobby',
   leaderboard: '/leaderboard',
 };
 

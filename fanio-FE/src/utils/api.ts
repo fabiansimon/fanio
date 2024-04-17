@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {
   GameStatistic,
-  InitLobbyData,
   MetaData,
   PaginatedData,
   Quiz,
@@ -61,14 +60,14 @@ export async function fetchQuizById({id}: {id: string}): Promise<Quiz> {
 }
 
 export async function fetchPlayableQuizById({
-  id,
+  quizId,
 }: {
-  id: string;
+  quizId: string;
   showScore?: boolean;
 }): Promise<{quiz: Quiz; topScore: Score}> {
   try {
     const response = await _axios.get<{quiz: Quiz; topScore: Score}>(
-      `/quiz/${id}?includeScore=true`,
+      `/quiz/${quizId}?includeScore=true`,
     );
     return response.data;
   } catch (error) {
@@ -216,22 +215,6 @@ export async function fetchScorePlacement({
     return res.data;
   } catch (error) {
     handleError({error, callName: 'fetchScorePlacement'});
-    throw error;
-  }
-}
-
-export async function fetchInitLobbyData({
-  quizId,
-  lobbyId,
-}: {
-  quizId: string;
-  lobbyId: string;
-}): Promise<InitLobbyData> {
-  try {
-    const res = await _axios.get(`/lobby/${quizId}?lobbyId=${lobbyId}`);
-    return res.data;
-  } catch (error) {
-    handleError({error, callName: 'fetchInitLobbyData'});
     throw error;
   }
 }

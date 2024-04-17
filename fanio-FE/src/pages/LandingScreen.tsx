@@ -55,15 +55,6 @@ function LandingScreen(): JSX.Element {
         content: <TopQuizListContainer />,
       },
       {
-        title: 'All Quizzes',
-        description: 'Check out what we have to offer so far.',
-        onPress: () => navigation(ROUTES.listQuizzes),
-        hotkey: 'A',
-        className:
-          'bg-gradient-to-b from-green-600 to-green-500 border-green-900',
-        content: <AllGamesContainer />,
-      },
-      {
         title: 'Create Quiz',
         description: 'Join the community and challenge your peers!',
         onPress: () => navigation(ROUTES.createQuiz),
@@ -72,12 +63,22 @@ function LandingScreen(): JSX.Element {
           'bg-gradient-to-b from-violet-700 to-violet-500 border-violet-900',
       },
       {
+        title: 'All Quizzes',
+        description: 'Check out what we have to offer so far.',
+        onPress: () => navigation(ROUTES.listQuizzes),
+        hotkey: 'A',
+        className:
+          'bg-gradient-to-b from-green-600 to-green-500 border-green-900',
+        content: <AllGamesContainer />,
+      },
+
+      {
         title: 'Leaderboard',
         description: 'Todays top players',
         onPress: () => navigation(ROUTES.leaderboard),
         hotkey: 'L',
         className:
-          'bg-gradient-to-b from-red-600 to-red-500 border-red-900 col-span-2 row-span-6',
+          'bg-gradient-to-b from-red-600 to-red-500 border-red-900 col-span-2 row-span-6 relative',
         content: <LeaderboardContainer />,
         isHidden: breakActive,
       },
@@ -86,27 +87,26 @@ function LandingScreen(): JSX.Element {
   );
 
   return (
-    <div className="flex flex-col bg-neutral-950 items-center justify-between w-full h-screen">
+    <div className="flex flex-col bg-neutral-950 items-center w-full h-screen fixed">
       <>
-        <div className="mt-12 w-full item pl-12">
-          <Heading size={'9'} className="text-white">
+        <div className="w-full mt-12 pl-4 space-y-2">
+          <Heading size={'8'} className="text-white text-center">
             Fan.io 🎤
           </Heading>
+          <MarqueeContainer className="-ml-4" />
         </div>
-
-        <MarqueeContainer className="-mt-24" />
 
         <SearchContainer
           ref={searchRef}
           setSearchResult={setSearchResult}
-          className="flex min-h-1/3 justify-center"
+          className="flex flex-1 justify-center"
         />
       </>
       <motion.div
         animate={searchResults ? 'hidden' : 'shown'}
         variants={animatedStates}
         transition={transition}
-        className="flex bottom-0 justify-center w-full max-w-screen-xl space-x-2 p-2 max-h-[50%]">
+        className="flex bottom-0 justify-center w-full max-w-screen-lg space-x-2 p-2 max-h-[50%] flex-1">
         <Container
           hotkey={MENU_OPTIONS[0].hotkey}
           title={MENU_OPTIONS[0].title}
@@ -116,7 +116,7 @@ function LandingScreen(): JSX.Element {
           content={MENU_OPTIONS[0].content}
         />
 
-        <div className="grid grid-cols-1 flex-1 sm:grid-cols-2 gap-2 w-full">
+        <div className="grid grid-cols-1 flex-1 sm:grid-cols-2 gap-2">
           {MENU_OPTIONS.slice(1)
             .filter(c => !c.isHidden)
             .map((option, index) => {
@@ -145,7 +145,7 @@ function LandingScreen(): JSX.Element {
   );
 }
 
-function MarqueeContainer({className}: {className: string}): JSX.Element {
+function MarqueeContainer({className}: {className?: string}): JSX.Element {
   const {artistList} = DATA;
 
   return (
@@ -154,17 +154,17 @@ function MarqueeContainer({className}: {className: string}): JSX.Element {
         {artistList
           .filter((_, i) => i % 2)
           .map((a, i) => (
-            <Heading
-              key={i}
-              size={'4'}
-              weight={'light'}
-              style={{maxLines: 1}}
-              className="text-neutral-500 pr-2">
-              {`${a} • `}
-            </Heading>
+            <div key={i}>
+              <Heading
+                size={'4'}
+                weight={'light'}
+                className="text-neutral-500 pr-2">
+                {`${a} • `}
+              </Heading>
+            </div>
           ))}
       </Marquee>
-      <Marquee speed={40}>
+      <Marquee>
         {artistList
           .filter((_, i) => !(i % 2))
           .map((a, i) => (
@@ -172,7 +172,6 @@ function MarqueeContainer({className}: {className: string}): JSX.Element {
               key={i}
               size={'4'}
               weight={'light'}
-              style={{maxLines: 1}}
               className="text-neutral-500 pr-2">
               {`${a} • `}
             </Heading>

@@ -76,6 +76,7 @@ function PageSelector({
 }: PageSelectorProps): JSX.Element {
   const style =
     'flex border border-neutral-200 cursor-pointer w-8 h-8 rounded-sm justify-center items-center bg-white/100';
+  const disabledStyle = 'opacity-30';
 
   const maxLength = useMemo(
     () => Math.ceil(totalElements / maxItems),
@@ -83,21 +84,23 @@ function PageSelector({
   );
   return (
     <div className="flex space-x-[1.2px]">
-      {currPage !== 0 && (
-        <div onClick={() => onValueChange(currPage - 1)} className={style}>
-          <ChevronLeftIcon className="text-slate-600 size-5" />
-        </div>
-      )}
+      <div
+        onClick={() => currPage !== 0 && onValueChange(currPage - 1)}
+        className={UI.cn(style, currPage === 0 && disabledStyle)}>
+        <ChevronLeftIcon className="text-slate-600 size-5" />
+      </div>
       <div className={style}>
         <Text className="text-slate-600" size={'2'}>
           {currPage + 1}
         </Text>
       </div>
-      {currPage !== maxLength - 1 && (
-        <div onClick={() => onValueChange(currPage + 1)} className={style}>
-          <ChevronRightIcon className="text-slate-600 size-5" />
-        </div>
-      )}
+      <div
+        onClick={() =>
+          currPage !== maxLength - 1 && onValueChange(currPage + 1)
+        }
+        className={UI.cn(style, currPage === maxLength - 1 && disabledStyle)}>
+        <ChevronRightIcon className="text-slate-600 size-5" />
+      </div>
       {currPage < maxLength - 1 && (
         <>
           <div className="text-white mt-3 px-1">...</div>

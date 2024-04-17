@@ -28,7 +28,7 @@ const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
       />
       <div className="absolute right-0 flex">
         {!isLoading && trailing && trailing}
-        {isLoading && <Loading className="text-white" />}
+        {isLoading && <Loading className="text-white size-5" />}
       </div>
     </div>
   ),

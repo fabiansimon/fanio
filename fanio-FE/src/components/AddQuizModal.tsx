@@ -11,6 +11,7 @@ import Button from './Button';
 import useKeyShortcut from '../hooks/useKeyShortcut';
 import ValidationChip from './ValidationChip';
 import {DateUtils, UI} from '../utils/common';
+import useIsSmall from '../hooks/useIsSmall';
 
 interface AddQuizModalProps extends ModalProps {
   ignoreOffset?: boolean;
@@ -41,9 +42,12 @@ function AddQuizModal({
     url: '',
     sourceTitle: '',
   });
+
   const urlRef = useRef<any>();
 
   useKeyShortcut('Escape', onRequestClose, true);
+
+  const isSmall = useIsSmall();
 
   const {url, answer, imageUri, startOffset} = question;
 
@@ -150,7 +154,7 @@ function AddQuizModal({
         animate="visible"
         transition={transition}
         onClick={onRequestClose}
-        className="absolute backdrop-blur-md flex w-full h-full z-10 items-center justify-center flex-col">
+        className="fixed top-0 left-0 right-0 bottom-0 backdrop-blur-md flex w-full h-full z-10 items-center justify-center flex-col">
         <motion.div
           variants={modalVariants}
           initial="hidden"
@@ -159,10 +163,11 @@ function AddQuizModal({
           exit="hidden"
           onClick={event => event.stopPropagation()}
           className={UI.cn(
-            'flex relative space-y-1 flex-col bg-neutral-900/90 border w-2/3 shadow-black rounded-xl px-2 py-3',
+            'flex relative space-y-1 flex-col bg-neutral-900/90 border min-w-[50%] shadow-black rounded-xl px-2 py-3',
             !validUrl && 'p-0 border-none',
-            !isValid ? 'border-red-800/50' : 'border-neutral-600/50',
-            !isValid && 'shadow-red-500',
+            !isValid
+              ? 'border-red-800/50 shadow-red-500'
+              : 'border-neutral-600/50',
           )}>
           <div className="flex">
             <ValidationChip
@@ -191,7 +196,7 @@ function AddQuizModal({
                 placeholder="Enter url"
               />
             </div>
-            {validUrl && question.imageUri && (
+            {validUrl && question.imageUri && !isSmall && (
               <ThumbnailPreview
                 className="pl-4"
                 imageUri={imageUri!}
@@ -214,7 +219,6 @@ function AddQuizModal({
                 max={question.maxLength || defaultMaxValue}
                 inverted
                 size={'1'}
-                defaultValue={[100]}
               />
             </div>
           )}

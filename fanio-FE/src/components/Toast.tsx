@@ -16,6 +16,7 @@ import {Heading, Text} from '@radix-ui/themes';
 import {motion} from 'framer-motion';
 import {UI} from '../utils/common';
 import {ToastType} from '../types';
+import useIsSmall from '../hooks/useIsSmall';
 
 interface ModalInfo {
   title?: string;
@@ -31,9 +32,12 @@ const AUTOCLOSE_DURATION = 3000; // in milliseconds
 const ANIMATION_DURATION = 0.2; // in seconds
 
 function Toast(): JSX.Element {
-  const ref = useRef<ToastMethods>();
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [info, setInfo] = useState<ModalInfo | null>(null);
+
+  const ref = useRef<ToastMethods>();
+
+  const isSmall = useIsSmall();
 
   const animationStates = {
     visible: {opacity: 1, x: 0},
@@ -98,7 +102,8 @@ function Toast(): JSX.Element {
         mass: 1,
       }}
       className={UI.cn(
-        'absolute right-10 bottom-10 p-4 rounded-md flex items-center space-x-3',
+        'absolute fixed p-4 right-10 rounded-md flex items-center space-x-3 z-10',
+        !isSmall ? 'bottom-10' : 'top-10 left-10',
         backgroundColor,
       )}>
       {icon}

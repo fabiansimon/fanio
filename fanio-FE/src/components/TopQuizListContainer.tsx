@@ -1,21 +1,10 @@
 import {useCallback, useEffect, useState} from 'react';
 import {UI} from '../utils/common';
-import PaginationBar from './PaginationBar';
 import QuizList from './QuizList';
-import {
-  BreakPoint,
-  ButtonType,
-  PaginatedData,
-  PaginationState,
-  Quiz,
-} from '../types';
+import {BreakPoint, PaginatedData, PaginationState, Quiz} from '../types';
 import {fetchTopQuizzes} from '../utils/api';
 import Loading from './Loading';
-import Button from './Button';
-import {useNavigate} from 'react-router-dom';
-import ROUTES from '../constants/Routes';
 import useIsMobile from '../hooks/useIsMobile';
-import {ScrollArea} from '@radix-ui/themes';
 import useBreakingPoints from '../hooks/useBreakingPoints';
 
 interface TopQuizListProps {
@@ -32,7 +21,6 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
 
   const breakTriggered = useBreakingPoints(BreakPoint.SM);
 
-  const navigation = useNavigate();
   const isMobile = useIsMobile();
 
   const loadQuizzes = useCallback(async () => {
@@ -64,7 +52,7 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
   return (
     <div
       className={UI.cn(
-        'flex flex-col h-full w-full overflow-y-auto -mx-2 ',
+        'flex flex-col h-full w-full overflow-y-auto -mx-2 my-2',
         className,
       )}>
       {isLoading ? (
@@ -74,17 +62,9 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
           showPlacement={!isMobile}
           showScore={!breakTriggered}
           data={quizData?.content || []}
-          className="py-3 mb-10"
+          className="py-3 pb-10"
         />
       )}
-      <Button
-        type={ButtonType.outline}
-        textSize="2"
-        className="border-white/30"
-        hotkey="A"
-        text="See All"
-        onClick={() => navigation(ROUTES.listQuizzes)}
-      />
     </div>
   );
 }

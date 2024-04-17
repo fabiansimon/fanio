@@ -16,6 +16,7 @@ import {Heading, Select, Text} from '@radix-ui/themes';
 import Loading from '../components/Loading';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
+import EmptyContainer from '../components/EmptyContainer';
 
 const timeFrameData = {
   [TimeFrame.DAILY]: {
@@ -47,6 +48,10 @@ function LeaderboardScreen(): JSX.Element {
     pageIndex: 0,
     maxItems: 10,
   });
+
+  const emptyList = useMemo(() => {
+    return !scoreData || scoreData.totalElements === 0;
+  }, [scoreData]);
 
   const loadScores = useCallback(async () => {
     try {
@@ -83,36 +88,48 @@ function LeaderboardScreen(): JSX.Element {
       title={title}
       description={description}
       trailing={
-        <TimeSelector defaultValue={timeFrame} onValueChange={setTimeFrame} />
+        <TimeSelector value={timeFrame} onValueChange={setTimeFrame} />
       }>
-      <div className="flex flex-col h-full justify-between">
-        <div className="mt-6 space-y-3">
-          {scoreData?.content?.map((s, i) => {
-            const {pageIndex, maxItems} = pagination;
-            const position = i + 1 + pageIndex * maxItems;
+      <div className="flex flex-col h-full overflow-y-auto justify-between">
+        {!emptyList ? (
+          <div className="mt-6 space-y-3 overflow-y-auto my-4">
+            {scoreData?.content?.map((s, i) => {
+              const {pageIndex, maxItems} = pagination;
+              const position = i + 1 + pageIndex * maxItems;
 
-            let achievement;
-            if (i < 3 && pagination.pageIndex === 0) {
-              achievement = [
-                AchievementType.FIRST,
-                AchievementType.SECOND,
-                AchievementType.THIRD,
-              ][i];
-            }
+              let achievement;
+              if (i < 3 && pagination.pageIndex === 0) {
+                achievement = [
+                  AchievementType.FIRST,
+                  AchievementType.SECOND,
+                  AchievementType.THIRD,
+                ][i];
+              }
 
-            return (
-              <ScoreTile
-                className="cursor-pointer"
-                hoverContent={<QuizLink quizId={s.quizId} />}
-                position={position}
-                achievement={achievement}
-                isLocal={localScores?.has(s.id)}
-                key={i}
-                score={s}
-              />
-            );
-          })}
-        </div>
+              return (
+                <ScoreTile
+                  className="cursor-pointer"
+                  hoverContent={<QuizLink quizId={s.quizId} />}
+                  position={position}
+                  achievement={achievement}
+                  isLocal={localScores?.has(s.id)}
+                  key={i}
+                  score={s}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <div className="h-full items-center justify-center flex flex-col">
+            <EmptyContainer
+              className="py-auto"
+              title="No Scores to show yet 💨"
+              description="Start off the race and be the first one to submit a score"
+              buttonText="Show All Time Scores"
+              onClick={() => setTimeFrame(TimeFrame.ALLTIME)}
+            />
+          </div>
+        )}
         <PaginationBar
           initialState={pagination}
           totalElements={scoreData?.totalElements || 0}
@@ -183,16 +200,17 @@ function QuizLink({quizId}: {quizId: string}): JSX.Element {
 }
 
 function TimeSelector({
-  defaultValue,
+  value,
   onValueChange,
 }: {
-  defaultValue: TimeFrame;
+  value: TimeFrame;
   onValueChange: (timeFrame: TimeFrame) => void;
 }): JSX.Element {
   return (
     <Select.Root
+      value={value}
       onValueChange={(value: TimeFrame) => onValueChange(value)}
-      defaultValue={defaultValue}>
+      defaultValue={value}>
       <Select.Trigger />
       <Select.Content position="popper">
         <Select.Group>

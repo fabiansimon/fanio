@@ -15,34 +15,24 @@ import LandingScreen from './pages/LandingScreen';
 import QuizScoreScreen from './pages/QuizScoreScreen';
 import LeaderboardScreen from './pages/LeaderboardScreen';
 import PlayQuizScreen from './pages/PlayQuizScreen';
-import {StompSessionProvider} from 'react-stomp-hooks';
-import LobbyScreen from './pages/LobbyScreen';
-import LobbyProvider from './providers/LobbyProvider';
+import {GoogleOAuthProvider} from '@react-oauth/google';
+import UserDataProvider from './providers/UserDataProvider';
+
+const googleAuthClientId = process.env.REACT_APP_GOOGLE_AUTH_CLIENT_ID!;
 
 function App(): JSX.Element {
   return (
     <>
-      <Theme>
-        <StompSessionProvider
-          url={'http://localhost:8080/ws-endpoint'}
-          onConnect={() => {
-            console.log('Connected to WS');
-          }}
-          onDisconnect={() => {
-            console.log('Disconnected from WS');
-          }}>
-          <LobbyProvider>
+      <GoogleOAuthProvider clientId={googleAuthClientId}>
+        <UserDataProvider>
+          <Theme>
             <Router>
               <Routes>
                 <Route path="*" element={<Navigate to="/" replace={true} />} />
                 <Route path="/" element={<LandingScreen />} />
                 <Route
-                  path={`${ROUTES.playQuiz}/:id`}
+                  path={`${ROUTES.playQuiz}/:quizId`}
                   element={<PlayQuizScreen />}
-                />
-                <Route
-                  path={`${ROUTES.lobby}/:quizId/:lobbyId`}
-                  element={<LobbyScreen />}
                 />
 
                 <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
@@ -57,10 +47,10 @@ function App(): JSX.Element {
                 />
               </Routes>
             </Router>
-          </LobbyProvider>
-          <Toast />
-        </StompSessionProvider>
-      </Theme>
+            <Toast />
+          </Theme>
+        </UserDataProvider>
+      </GoogleOAuthProvider>
     </>
   );
 }

@@ -57,7 +57,7 @@ function QuizPreview({
     }, [invertColors]);
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full cursor-pointer">
       <BackgroundLight
         ref={ref}
         containerClassName="flex-grow"
@@ -65,7 +65,7 @@ function QuizPreview({
         className={UI.cn(
           'flex flex-grow flex-col min-h-14 justify-center space-y-1 border px-2 py-1.5 rounded-lg',
           onClick &&
-            'hover:scale-[101%] transition-transform duration-150 ease-in-out cursor-pointer cursor-pointer ',
+            'hover:scale-[101%] transition-transform duration-150 ease-in-out cursor-pointer',
           borderColor,
           backgroundColor,
           className,

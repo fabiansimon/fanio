@@ -24,6 +24,10 @@ import HoverContainer from '../components/HoverContainer';
 import Chip from '../components/Chip';
 import {GAME_OPTIONS} from '../constants/Game';
 import {LocalStorage} from '../utils/localStorage';
+import useIsSmall from '../hooks/useIsSmall';
+import OptionsContainer from '../components/OptionsContainer';
+import {useUserDataContext} from '../providers/UserDataProvider';
+import AuthPopUp from '../components/AuthPopUp';
 
 export enum InputType {
   TITLE,
@@ -49,11 +53,13 @@ const INIT_QUIZ_INPUT = {
 };
 
 function CreateScreen(): JSX.Element {
-  const navigation = useNavigate();
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [questionVisible, setQuestionVisible] = useState<boolean>(false);
   const [quizInput, setQuizInput] = useState<QuizInput | undefined>();
+
+  const navigation = useNavigate();
+  const isSmall = useIsSmall();
+  const {isAuth} = useUserDataContext();
 
   const containsDuplicated = useMemo(() => {
     if (!quizInput?.questions) return false;
@@ -196,6 +202,7 @@ function CreateScreen(): JSX.Element {
 
   return (
     <>
+      {!isAuth && <AuthPopUp />}
       <AddQuizModal
         ignoreOffset={quizInput?.options.randomOffsets}
         isVisible={questionVisible}
@@ -231,9 +238,14 @@ function CreateScreen(): JSX.Element {
                   handleInput(value, InputType.TITLE)
                 }
               />
-              {quizInput?.options.isPrivate && <Chip type={ChipType.PRIVATE} />}
+              {quizInput?.options.isPrivate && (
+                <Chip
+                  className={isSmall ? '-mt-14 -mr-2' : ''}
+                  type={ChipType.PRIVATE}
+                />
+              )}
             </div>
-
+            {/* 
             <InputField
               showSimple
               value={quizInput?.artists}
@@ -242,14 +254,14 @@ function CreateScreen(): JSX.Element {
               onInput={({currentTarget: {value}}) =>
                 handleInput(value, InputType.ARTISTS)
               }
-            />
+            /> */}
 
             <InputField
               showSimple
               value={quizInput?.description}
               placeholder="Description (optional)"
               maxLength={GAME_OPTIONS.MAX_QUIZ_DESCRIPTION_LENGTH}
-              className="text-sm mt-4 mb-2 text-white/70"
+              className="text-sm mb-2 text-white/70 h-50"
               onInput={({currentTarget: {value}}) =>
                 handleInput(value, InputType.DESCRIPTION)
               }
@@ -396,59 +408,4 @@ function QuestionPreviewContainer({
   );
 }
 
-function OptionsContainer({
-  className,
-  onInput,
-}: {
-  className?: string;
-  onInput: (value: boolean, type: InputType) => void;
-}): JSX.Element {
-  return (
-    <div
-      className={UI.cn(
-        'flex border-neutral-500/20 border shadow-mdshadow-black rounded-xl p-3',
-        className,
-      )}>
-      <div className="flex-col flex-grow w-full">
-        <div className="flex space-x-2">
-          <Heading className="text-white/80" size={'2'}>
-            Random Song Start
-          </Heading>
-          <Switch
-            size="1"
-            style={{
-              backgroundColor: UI.addAlpha('#ffffff', 0.2),
-              borderRadius: 100,
-            }}
-            className="text-white"
-            onCheckedChange={value =>
-              onInput(value, InputType.RANDOM_TIMESTAMP)
-            }
-          />
-        </div>
-        <Text className="text-white/50" size={'2'}>
-          Each Song will start at a random timestamp.
-        </Text>
-      </div>
-      <div className="flex-col flex-grow w-full border-l-neutral-500/20 border-l-[1px] pl-4">
-        <div className="flex space-x-2">
-          <Heading className="text-white/80" size={'2'}>
-            Private Quiz
-          </Heading>
-          <Switch
-            size="1"
-            style={{
-              backgroundColor: UI.addAlpha('#ffffff', 0.2),
-              borderRadius: 100,
-            }}
-            onCheckedChange={value => onInput(value, InputType.PRIVATE_QUIZ)}
-          />
-        </div>
-        <Text className="text-white/50" size={'2'}>
-          The Quiz can only be accessed through a shared URL.
-        </Text>
-      </div>
-    </div>
-  );
-}
 export default CreateScreen;

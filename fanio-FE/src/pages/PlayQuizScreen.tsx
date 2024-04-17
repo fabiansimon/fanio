@@ -44,7 +44,7 @@ function PlayQuizScreen(): JSX.Element {
     },
     true,
   );
-  const {id} = useParams();
+  const {quizId} = useParams();
 
   const videoRef = useRef<ReactPlayer>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -69,6 +69,10 @@ function PlayQuizScreen(): JSX.Element {
   const [settings, setSettings] = useState<GameSettings>(
     LocalStorage.fetchUserSettings() || INIT_GAME_SETTINGS,
   );
+
+  const round = useMemo(() => {
+    return score.guesses.length;
+  }, [score.guesses]);
 
   const question = useMemo(() => {
     if (quizData) return quizData.questions[questionIndex];
@@ -119,13 +123,9 @@ function PlayQuizScreen(): JSX.Element {
   };
 
   const lastStoredAttempt = useMemo(
-    () => LocalStorage.fetchLastAttempt(id!),
-    [id],
+    () => LocalStorage.fetchLastAttempt(quizId!),
+    [quizId],
   );
-
-  useEffect(() => {
-    LocalStorage.saveUserSettings(settings);
-  }, [settings]);
 
   useEffect(() => {
     if (settings.autoInput.status) handleSubmitGuess();
@@ -135,12 +135,12 @@ function PlayQuizScreen(): JSX.Element {
     if (questionIndex === quizData?.questions.length) {
       const _lastAttempt: LocalScore = {
         createdAt: new Date(),
-        quizId: id!,
+        quizId: quizId!,
         timeElapsed: score.totalTime,
         totalScore: score.totalScore,
         isUploaded: false,
       };
-      LocalStorage.saveLastAttempt(id!, _lastAttempt!);
+      LocalStorage.saveLastAttempt(quizId!, _lastAttempt!);
       setLastAttempt(_lastAttempt);
       setGameState(GameState.POST);
     }
@@ -149,14 +149,14 @@ function PlayQuizScreen(): JSX.Element {
     score.totalScore,
     score.totalTime,
     quizData?.questions,
-    id,
+    quizId,
   ]);
 
   useEffect(() => {
-    if (!id) return;
+    if (!quizId) return;
     (async () => {
       try {
-        const {quiz, topScore} = await fetchPlayableQuizById({id});
+        const {quiz, topScore} = await fetchPlayableQuizById({quizId});
         setQuizData({
           ...quiz,
           questions: shuffle(quiz.questions),
@@ -166,7 +166,7 @@ function PlayQuizScreen(): JSX.Element {
         console.error(error);
       }
     })();
-  }, [id]);
+  }, [quizId]);
 
   const handleSubmitGuess = (onEnter?: boolean) => {
     if (!isValidInput()) {
@@ -223,10 +223,13 @@ function PlayQuizScreen(): JSX.Element {
   const updateResult = (now: number, delta: number, points: number) => {
     setTimestamp(now);
     setResult({correct: true, delta, points});
+
+    const totalTime = (score.totalTime += delta);
+
     setScore(prev => {
       return {
         ...prev,
-        totalTime: (prev.totalTime += delta),
+        totalTime,
         guesses: prev.guesses.concat({
           elapsedTime: delta,
           score: points,
@@ -281,6 +284,9 @@ function PlayQuizScreen(): JSX.Element {
     changeUIState(UIState.INCORRECT);
     setResult({correct: false, delta: 0, points: 0});
     barRef.current?.clear();
+    const now = performance.now();
+    const delta = (now - timestamp) / 1000;
+    updateResult(now, delta, 0);
     setTimeouts(0);
   };
 
@@ -297,7 +303,7 @@ function PlayQuizScreen(): JSX.Element {
       <div className="w-full h-full flex flex-col">
         {gameState === GameState.PRE && (
           <PreGameScene
-            quizId={id!}
+            quizId={quizId!}
             topScore={topScore}
             lastAttempt={lastAttempt || lastStoredAttempt}
             onChangeScene={(scene: GameState) => setGameState(scene)}
@@ -305,7 +311,7 @@ function PlayQuizScreen(): JSX.Element {
         )}
         {gameState === GameState.POST && (
           <PostGameScene
-            quizId={id!}
+            quizId={quizId!}
             onRestart={resetGame}
             lastAttempt={lastAttempt!}
             topScore={topScore}
@@ -371,6 +377,7 @@ function PlayQuizScreen(): JSX.Element {
                 ref={inputRef}
                 className="text-center font-bold mt-8 text-[30px]"
               />
+
               <QuizStatsContainer
                 topScore={topScore}
                 data={score}
