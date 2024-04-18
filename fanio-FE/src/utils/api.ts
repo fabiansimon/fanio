@@ -218,3 +218,16 @@ export async function fetchScorePlacement({
     throw error;
   }
 }
+
+export async function authUser({token}: {token: string}): Promise<string> {
+  try {
+    const res = await _axios.post('/auth/google', {
+      token,
+    });
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    handleError({error, callName: 'authUser'});
+    throw error;
+  }
+}
