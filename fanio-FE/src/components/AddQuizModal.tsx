@@ -26,6 +26,13 @@ const transition = {
   mass: 0.05,
 };
 
+const INIT_QUESTION_INPUT = {
+  answer: '',
+  url: '',
+  sourceTitle: '',
+  tags: [],
+};
+
 function AddQuizModal({
   isVisible,
   onRequestClose,
@@ -37,11 +44,7 @@ function AddQuizModal({
     'Invalid url',
   );
   const defaultMaxValue = 100;
-  const [question, setQuestion] = useState<QuestionInput>({
-    answer: '',
-    url: '',
-    sourceTitle: '',
-  });
+  const [question, setQuestion] = useState<QuestionInput>(INIT_QUESTION_INPUT);
 
   const urlRef = useRef<any>();
 
@@ -53,10 +56,8 @@ function AddQuizModal({
 
   useEffect(() => {
     if (isVisible) return;
-    setTimeout(() => {
-      setQuestion({answer: '', url: '', sourceTitle: ''});
-      setErrorMessage('Invalid url');
-    }, ANIMATION_DURATION);
+    setQuestion(INIT_QUESTION_INPUT);
+    setErrorMessage('Invalid url');
   }, [isVisible]);
 
   useEffect(() => {
@@ -68,7 +69,7 @@ function AddQuizModal({
     try {
       if (!REGEX.youtube.test(url)) return;
       const res = await fetchMetaData(url);
-      const {title, length, imageUri, sourceTitle} = res;
+      const {title, length, imageUri, sourceTitle, tags} = res;
       setQuestion(prev => {
         return {
           ...prev,
@@ -76,6 +77,7 @@ function AddQuizModal({
           maxLength: length,
           imageUri,
           sourceTitle,
+          tags,
         };
       });
     } catch {

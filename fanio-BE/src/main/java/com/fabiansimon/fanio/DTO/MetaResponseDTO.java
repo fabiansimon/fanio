@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -14,4 +16,5 @@ public class MetaResponseDTO {
     private String sourceTitle;
     private String imageUri;
     private Integer length;
+    private List<String> tags;
 }

@@ -3,11 +3,10 @@ import {
   Heading,
   ScrollArea,
   Strong,
-  Switch,
   Text,
 } from '@radix-ui/themes';
 import Button from '../components/Button';
-import {PlusIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
+import {PlusIcon, DotsVerticalIcon, Cross1Icon} from '@radix-ui/react-icons';
 import {useEffect, useMemo, useState} from 'react';
 import {ButtonType, ChipType, QuestionInput, QuizInput} from '../types';
 import {useNavigate} from 'react-router-dom';
@@ -19,7 +18,6 @@ import {DateUtils, UI} from '../utils/common';
 import PageContainer from '../components/PageContainer';
 import AddQuizModal from '../components/AddQuizModal';
 import ValidationChip from '../components/ValidationChip';
-import {sanitizeTerm} from '../utils/logic';
 import HoverContainer from '../components/HoverContainer';
 import Chip from '../components/Chip';
 import {GAME_OPTIONS} from '../constants/Game';
@@ -46,6 +44,7 @@ const INIT_QUIZ_INPUT = {
   description: '',
   artists: [],
   questions: [],
+  tags: [],
   options: {
     isPrivate: false,
     randomOffsets: false,
@@ -63,11 +62,11 @@ function CreateScreen(): JSX.Element {
 
   const containsDuplicated = useMemo(() => {
     if (!quizInput?.questions) return false;
-    const usedTitles = new Set();
+    const usedUrls = new Set();
+
     for (const question of quizInput?.questions) {
-      const cleanAnswer = sanitizeTerm(question.answer);
-      if (usedTitles.has(cleanAnswer)) return true;
-      usedTitles.add(cleanAnswer);
+      if (usedUrls.has(question.url)) return true;
+      usedUrls.add(question.url);
     }
 
     return false;
@@ -180,11 +179,14 @@ function CreateScreen(): JSX.Element {
   };
 
   const addQuestion = (question: QuestionInput) => {
+    const newTags = question.tags;
     setQuizInput(prev => {
       if (!prev) return;
+      const {questions, tags} = prev;
       return {
         ...prev,
-        questions: prev?.questions.concat(question),
+        tags: tags ? tags.concat(newTags) : newTags,
+        questions: questions.concat(question),
       };
     });
     setQuestionVisible(false);
@@ -200,9 +202,19 @@ function CreateScreen(): JSX.Element {
     });
   };
 
+  const removeTag = (index: number) => {
+    setQuizInput(prev => {
+      if (!prev) return;
+      return {
+        ...prev,
+        tags: prev.tags.filter((_, i) => i !== index),
+      };
+    });
+  };
+
   return (
     <>
-      {!isAuth && <AuthPopUp />}
+      {/* {!isAuth && <AuthPopUp />} */}
       <AddQuizModal
         ignoreOffset={quizInput?.options.randomOffsets}
         isVisible={questionVisible}
@@ -267,25 +279,47 @@ function CreateScreen(): JSX.Element {
               }
             />
 
-            <OptionsContainer
-              className="mt-2"
-              onInput={(value: boolean, type: InputType) =>
-                handleInput(value, type)
-              }
-            />
+            <div className="space-y-2 mt-3">
+              <Heading className="text-white/80" size={'2'}>
+                Tags
+              </Heading>
+              <div className="flex-wrap flex">
+                {quizInput?.tags.map((tag, i) => (
+                  <div
+                    onClick={() => removeTag(i)}
+                    key={i}
+                    className="flex cursor-pointer space-x-2 bg-neutral-600 rounded-md items-center justify-center py-1 px-[7px] mr-2 mb-2">
+                    <Text weight={'medium'} size={'1'} className="text-white">
+                      {tag}
+                    </Text>
+                    <Cross1Icon className="size-2 text-white" />
+                  </div>
+                ))}
+              </div>
+            </div>
 
-            <div className="mx-2 mt-4">
+            <div className="space-y-2 mt-4">
+              <Heading className="text-white/80" size={'2'}>
+                Options
+              </Heading>
+              <OptionsContainer
+                className="mt-2"
+                onInput={(value: boolean, type: InputType) =>
+                  handleInput(value, type)
+                }
+              />
+            </div>
+
+            <div className="mx-2 mt-5">
               {quizInput?.questions && quizInput?.questions.length > 0 && (
                 <>
                   <div className="mr-auto flex justify-between w-full">
-                    <Text className="text-white" size={'2'}>
-                      <Strong className="mr-1">
-                        {quizInput?.questions.length}
-                      </Strong>
+                    <Heading className="text-white/80" size={'2'}>
+                      {quizInput?.questions.length}{' '}
                       {`Song${
                         (quizInput?.questions.length || 0) > 1 ? 's' : ''
                       } added`}
-                    </Text>
+                    </Heading>
                     <ValidationChip
                       text={containsDuplicated ? 'Duplicates' : ''}
                     />

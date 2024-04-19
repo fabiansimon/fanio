@@ -78,10 +78,6 @@ export async function fetchPlayableQuizById({
 
 export async function uploadQuiz(quiz: QuizInput): Promise<Quiz> {
   try {
-    console.log({
-      ...quiz,
-      ...quiz.options,
-    });
     const response = await _axios.post<Quiz>('/create-quiz', {
       ...quiz,
       ...quiz.options,
@@ -140,9 +136,10 @@ export async function fetchMetaData(url: string): Promise<MetaData> {
       url,
       type: 'youtube',
     });
+    console.log(res.data);
     return res.data;
   } catch (error) {
-    handleError({error, callName: 'fetchMetaData', showError: false});
+    handleError({error, callName: 'fetchMetaData'});
     throw error;
   }
 }

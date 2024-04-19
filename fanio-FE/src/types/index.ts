@@ -53,6 +53,7 @@ export interface QuestionInput {
   startOffset?: number;
   maxLength?: number;
   imageUri?: string;
+  tags: string[];
 }
 
 export interface QuizInput {
@@ -61,6 +62,7 @@ export interface QuizInput {
   questions: QuestionInput[];
   artists?: string[];
   options: QuizOptions;
+  tags: string[];
 }
 
 export interface ScoreInput {
@@ -75,6 +77,7 @@ export interface MetaData {
   title: string;
   length: number;
   imageUri: string;
+  tags: string[];
 }
 
 export interface PaginationState {
