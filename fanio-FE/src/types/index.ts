@@ -21,7 +21,8 @@ export interface Quiz {
   creatorId: string;
   questions: Question[];
   isPrivate: boolean;
-  randomOffsets: true;
+  randomOffsets: boolean;
+  totalPlays: number;
 }
 
 export interface Question {
@@ -160,6 +161,7 @@ interface Setting {
 export enum ChipType {
   PRIVATE,
   PUBLIC,
+  RANDOM_TIMESTAMPS,
 }
 
 export enum GameState {

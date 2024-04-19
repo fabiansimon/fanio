@@ -67,7 +67,7 @@ export async function fetchPlayableQuizById({
 }): Promise<{quiz: Quiz; topScore: Score}> {
   try {
     const response = await _axios.get<{quiz: Quiz; topScore: Score}>(
-      `/quiz/${quizId}?includeScore=true`,
+      `/quiz/${quizId}?includeDetails=true`,
     );
     return response.data;
   } catch (error) {
@@ -228,6 +228,20 @@ export async function authUser({token}: {token: string}): Promise<string> {
     return res.data;
   } catch (error) {
     handleError({error, callName: 'authUser'});
+    throw error;
+  }
+}
+
+export async function onGameFinish({
+  quizId,
+}: {
+  quizId: string;
+}): Promise<number> {
+  try {
+    const res = await _axios.patch(`/quiz-finished/${quizId}`);
+    return res.data;
+  } catch (error) {
+    handleError({error, callName: 'onGameFinish', showError: false});
     throw error;
   }
 }

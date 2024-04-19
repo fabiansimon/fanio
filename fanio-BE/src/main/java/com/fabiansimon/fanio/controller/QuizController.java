@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,11 +51,11 @@ public class QuizController {
 
     @GetMapping("/quiz/{id}")
     public ResponseEntity<?> getQuizById(@PathVariable UUID id,
-                                         @RequestParam(defaultValue = "false") boolean includeScore
+                                         @RequestParam(defaultValue = "false") boolean includeDetails
     ) {
         Optional<Quiz> rawQuiz = quizService.getQuiz(id);
         if (rawQuiz.isPresent()) {
-            if (!includeScore) return ResponseEntity.ok(rawQuiz.get());
+            if (!includeDetails) return ResponseEntity.ok(rawQuiz.get());
 
             Score topScore = scoreService.getTopScoreFromQuiz(id);
             PlayableQuizDTO quiz = new PlayableQuizDTO(rawQuiz.get(), topScore);
@@ -79,6 +80,53 @@ public class QuizController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @PatchMapping("/quiz-finished/{id}")
+    public ResponseEntity<?> onQuizFinish(@PathVariable UUID id) {
+        Optional<Quiz> existingQuiz = quizService.getQuiz(id);
+        if (!existingQuiz.isPresent())
+            return ResponseEntity.notFound().build();
+
+        Quiz quiz = existingQuiz.get();
+        Integer totalPlays = quiz.getTotalPlays()+1;
+        quiz.setTotalPlays(totalPlays);
+
+        try {
+            quizService.saveQuiz(quiz);
+            return ResponseEntity.ok(totalPlays);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/patch-quiz/{id}")
+    public ResponseEntity<?> patchQuiz(@PathVariable UUID id, @RequestBody Map<String, Object> updates) {
+        Optional<Quiz> existingQuiz = quizService.getQuiz(id);
+        if (!existingQuiz.isPresent())
+            return ResponseEntity.notFound().build();
+
+        Quiz quiz = existingQuiz.get();
+
+        if (updates.containsKey("title")) {
+            quiz.setTitle((String) updates.get("title"));
+        }
+        if (updates.containsKey("description")) {
+            quiz.setDescription((String) updates.get("description"));
+        }
+        if (updates.containsKey("isPrivate")) {
+            quiz.setIsPrivate((Boolean) updates.get("isPrivate"));
+        }
+        if (updates.containsKey("randomOffsets")) {
+            quiz.setRandomOffsets((Boolean) updates.get("randomOffsets")) ;
+        }
+
+        try {
+            Quiz savedQuiz = quizService.saveQuiz(quiz);
+            return ResponseEntity.ok(savedQuiz);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

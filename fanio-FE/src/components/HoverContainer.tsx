@@ -19,7 +19,7 @@ function HoverContainer({
   return (
     <div
       className={UI.cn(
-        'flex flex-col bg-neutral-900 border shadow-md shadow-black rounded-lg px-8 py-4 border-neutral-500/20 mx-auto items-center justify-center',
+        'flex flex-col bg-neutral-900/50 border shadow-md shadow-black rounded-lg px-8 py-4 border-neutral-500/20 mx-auto items-center justify-center',
         className,
       )}>
       {title && (

@@ -30,6 +30,7 @@ public class Quiz {
     private Long creatorId;
     private Boolean isPrivate;
     private Boolean randomOffsets;
+    private Integer totalPlays;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "quiz_id")
     private List<Question> questions;
