@@ -355,7 +355,7 @@ function PlayQuizScreen(): JSX.Element {
 
             {question && (
               <AnimatedResult
-                className="absolute left-0 top-[22%]"
+                className="absolute left-0 top-[24%]"
                 question={question}
                 result={result}
               />

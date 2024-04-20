@@ -179,13 +179,13 @@ function CreateScreen(): JSX.Element {
   };
 
   const addQuestion = (question: QuestionInput) => {
-    const newTags = question.tags;
+    const newTags = new Set([...question.tags, ...(quizInput?.tags || [])]);
     setQuizInput(prev => {
       if (!prev) return;
-      const {questions, tags} = prev;
+      const {questions} = prev;
       return {
         ...prev,
-        tags: tags ? tags.concat(newTags) : newTags,
+        tags: Array.from(newTags),
         questions: questions.concat(question),
       };
     });
@@ -257,16 +257,6 @@ function CreateScreen(): JSX.Element {
                 />
               )}
             </div>
-            {/* 
-            <InputField
-              showSimple
-              value={quizInput?.artists}
-              placeholder="Artists seperated by a ','"
-              className="text-sm "
-              onInput={({currentTarget: {value}}) =>
-                handleInput(value, InputType.ARTISTS)
-              }
-            /> */}
 
             <InputField
               showSimple
@@ -279,24 +269,26 @@ function CreateScreen(): JSX.Element {
               }
             />
 
-            <div className="space-y-2 mt-3">
-              <Heading className="text-white/80" size={'2'}>
-                Tags
-              </Heading>
-              <div className="flex-wrap flex">
-                {quizInput?.tags.map((tag, i) => (
-                  <div
-                    onClick={() => removeTag(i)}
-                    key={i}
-                    className="flex cursor-pointer space-x-2 bg-neutral-600 rounded-md items-center justify-center py-1 px-[7px] mr-2 mb-2">
-                    <Text weight={'medium'} size={'1'} className="text-white">
-                      {tag}
-                    </Text>
-                    <Cross1Icon className="size-2 text-white" />
-                  </div>
-                ))}
+            {quizInput?.tags && quizInput.tags.length > 0 && (
+              <div className="space-y-2 mt-3">
+                <Heading className="text-white/80" size={'2'}>
+                  Tags
+                </Heading>
+                <div className="flex-wrap flex">
+                  {quizInput.tags.map((tag, i) => (
+                    <div
+                      onClick={() => removeTag(i)}
+                      key={i}
+                      className="flex cursor-pointer space-x-2 bg-neutral-600 rounded-md items-center justify-center py-1 px-[7px] mr-2 mb-2">
+                      <Text weight={'medium'} size={'1'} className="text-white">
+                        {tag}
+                      </Text>
+                      <Cross1Icon className="size-2 text-white" />
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="space-y-2 mt-4">
               <Heading className="text-white/80" size={'2'}>

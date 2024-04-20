@@ -49,7 +49,7 @@ function GameDetailsContainer({
           <div className="flex space-x-2 items-end ml-auto">
             <PlayIcon className="text-white mb-[2px]" />
             <Text size={'2'} className="text-white">
-              {totalPlays}
+              {totalPlays || 0}
             </Text>
             ,
           </div>
@@ -62,7 +62,7 @@ function GameDetailsContainer({
   return (
     <div
       className={UI.cn(
-        'flex w-full border-neutral-500/40 border rounded-lg justify-between px-3 py-2 shadow-md shadow-black/50',
+        'flex w-full border-neutral-500/30 border rounded-lg justify-between px-3 py-2 shadow-md shadow-black/50',
         className,
       )}>
       {detailsData.map(({title, content}, i) => {
