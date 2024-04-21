@@ -224,7 +224,6 @@ function CreateScreen(): JSX.Element {
       <PageContainer
         title="Create quiz"
         description="Make sure to only use youtube links at the moment.">
-        {/* <div className="flex flex-col bg-neutral-900/20 border shadow-md shadow-black rounded-xl px-5 py-4 border-neutral-500/20 w-40vw space-x-4 mx-auto  w-full my-auto"> */}
         <HoverContainer className="my-auto px-4 max-h-[70%]">
           {/* <div className="flex h-full w-[1px] bg-blue-500/50" /> */}
           <div className="flex flex-col flex-grow">

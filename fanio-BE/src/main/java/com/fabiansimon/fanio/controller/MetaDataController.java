@@ -43,7 +43,6 @@ public class MetaDataController {
     public ResponseEntity<?> stripMetaOfYoutube(@RequestBody MetaRequestDTO requestDTO) {
         try {
             MetaResponseDTO response = metaDataService.getMetaData(requestDTO);
-
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();

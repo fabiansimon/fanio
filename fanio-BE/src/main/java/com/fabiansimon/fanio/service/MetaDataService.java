@@ -34,27 +34,30 @@ public class MetaDataService {
     private MetaResponseDTO extractJsonData(String json) {
         MetaResponseDTO data = new MetaResponseDTO();
         ObjectMapper objectMapper = new ObjectMapper();
-        
+
+        System.out.println(json);
+
         try {
             JsonNode rootNode = objectMapper.readTree(json);
             JsonNode itemsNode = rootNode.path("items");
 
-            if (!itemsNode.isMissingNode()) {
-                JsonNode itemNode = itemsNode.get(0);
-                JsonNode snippedNode = itemNode.path("snippet");
+            if (itemsNode.isMissingNode())
+                return data;
 
-                String duration = itemNode.path("contentDetails").path("duration").asText();
+            JsonNode itemNode = itemsNode.get(0);
+            JsonNode snippedNode = itemNode.path("snippet");
 
-                String sourceTitle = snippedNode.path("title").asText();
-                String thumbnailUri = snippedNode.path("thumbnails").path("medium").path("url").asText();
-                JsonNode tagsNode = snippedNode.path("tags");
+            String duration = itemNode.path("contentDetails").path("duration").asText();
 
-                data.setTags(extractTags(tagsNode));
-                data.setTitle(cleanRawTitle(sourceTitle));
-                data.setSourceTitle(sourceTitle);
-                data.setImageUri(thumbnailUri);
-                data.setLength((int) Duration.parse(duration).getSeconds());
-            }
+            String sourceTitle = snippedNode.path("title").asText();
+            String thumbnailUri = snippedNode.path("thumbnails").path("medium").path("url").asText();
+            JsonNode tagsNode = snippedNode.path("tags");
+
+            data.setTags(extractTags(tagsNode));
+            data.setTitle(cleanRawTitle(sourceTitle));
+            data.setSourceTitle(sourceTitle);
+            data.setImageUri(thumbnailUri);
+            data.setLength((int) Duration.parse(duration).getSeconds());
 
         } catch (IOException e) {
             e.printStackTrace();
