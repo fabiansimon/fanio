@@ -6,7 +6,9 @@ import com.fabiansimon.fanio.DTO.MetaResponseDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -14,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,9 +26,16 @@ public class MetaDataService {
     private String youtubeKey;
     RestTemplate template = new RestTemplate();
 
-    public MetaResponseDTO getMetaData(MetaRequestDTO requestDTO) {
-        String videoId = extractVideoId(requestDTO.getUrl());
-        String json = fetchYoutubeData(videoId);
+    public List<MetaResponseDTO> getMetaData(MetaRequestDTO requestDTO) {
+        List<MetaResponseDTO> response = new ArrayList<>();
+
+        String url = requestDTO.getUrl();
+        String playlistId = extractPlaylistId(url);
+        String videoId = extractVideoId(url);
+        String json = fetchYoutubeVideoData(videoId);
+
+        System.out.println(fetchYoutubeListData("RDn7JwXOX_UWI"));
+
         MetaResponseDTO response = extractJsonData(json);
 
         return response;
@@ -35,7 +45,6 @@ public class MetaDataService {
         MetaResponseDTO data = new MetaResponseDTO();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        System.out.println(json);
 
         try {
             JsonNode rootNode = objectMapper.readTree(json);
@@ -78,19 +87,36 @@ public class MetaDataService {
 
     private String extractVideoId(String url) {
         Matcher matcher = Pattern.compile("(?<=watch\\?v=)[^&]*").matcher(url);
-
         if (matcher.find()) {
             return matcher.group(0);
         }
-
-        return null;
+        return "";
     }
 
-    private String fetchYoutubeData(String videoId) {
+    private String extractPlaylistId(String url) {
+        Matcher matcher = Pattern.compile("(?<=list=)[^&]*").matcher(url);
+        if (matcher.find()) {
+            return matcher.group(0);
+        }
+        return "";
+    }
+
+    private String fetchYoutubeVideoData(String videoId) {
         String url = UriComponentsBuilder
                 .fromHttpUrl("https://www.googleapis.com/youtube/v3/videos")
                 .queryParam("part", "id,snippet,contentDetails,statistics")
                 .queryParam("id", videoId)
+                .queryParam("key", youtubeKey)
+                .toUriString();
+
+        return template.getForObject(url, String.class);
+    }
+    private String fetchYoutubeListData(String playlistId) {
+        String url = UriComponentsBuilder
+                .fromHttpUrl("https://www.googleapis.com/youtube/v3/playlistItems")
+                .queryParam("part", "id,snippet,contentDetails,statistics")
+                .queryParam("maxResults", "30")
+                .queryParam("playlistId", playlistId)
                 .queryParam("key", youtubeKey)
                 .toUriString();
 
@@ -110,7 +136,6 @@ public class MetaDataService {
 
         return body.substring(start, right-1);
     }
-
     private Integer extractLength(String body) throws Exception {
         String key = "approxDurationMs";
         int start = body.indexOf(key), right;

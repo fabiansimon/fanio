@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 public class MetaDataController {
@@ -42,7 +44,7 @@ public class MetaDataController {
     @PostMapping("/strip-meta")
     public ResponseEntity<?> stripMetaOfYoutube(@RequestBody MetaRequestDTO requestDTO) {
         try {
-            MetaResponseDTO response = metaDataService.getMetaData(requestDTO);
+            List<MetaResponseDTO> response = metaDataService.getMetaData(requestDTO);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
