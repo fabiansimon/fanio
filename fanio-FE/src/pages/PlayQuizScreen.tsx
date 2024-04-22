@@ -13,8 +13,8 @@ import {
   ScoreState,
   UIState,
 } from '../types';
-import {fetchPlayableQuizById} from '../utils/api';
-import {shuffle} from 'lodash';
+import {fetchPlayableQuizById, onGameFinish} from '../utils/api';
+import {shuffle, uniq} from 'lodash';
 import {calculatePoints, randomNumber, similarity} from '../utils/logic';
 import InputField from '../components/InputField';
 import PostGameScene from '../components/PostGameScene';
@@ -32,7 +32,7 @@ import QuickOptionsContainer from '../components/QuickOptionsContainer';
 import {INIT_GAME_SETTINGS, INIT_SCORE} from '../constants/Init';
 import ToastController from '../controllers/ToastController';
 import MusicLoader from '../components/MusicLoader';
-import Chip from '../components/Chip';
+import GameDetailsContainer from '../components/GameDetailsContainer';
 
 function PlayQuizScreen(): JSX.Element {
   useKeyShortcut(
@@ -56,7 +56,7 @@ function PlayQuizScreen(): JSX.Element {
   const [gameState, setGameState] = useState<GameState>(GameState.PRE);
   const [questionIndex, setQuestionIndex] = useState<number>(0);
 
-  const [quizData, setQuizData] = useState<Quiz | null>(null);
+  const [quizData, setQuizData] = useState<Quiz | undefined>();
   const [topScore, setTopScore] = useState<Score | undefined>();
   const [lastAttempt, setLastAttempt] = useState<LocalScore | undefined>();
 
@@ -69,10 +69,6 @@ function PlayQuizScreen(): JSX.Element {
   const [settings, setSettings] = useState<GameSettings>(
     LocalStorage.fetchUserSettings() || INIT_GAME_SETTINGS,
   );
-
-  const round = useMemo(() => {
-    return score.guesses.length;
-  }, [score.guesses]);
 
   const question = useMemo(() => {
     if (quizData) return quizData.questions[questionIndex];
@@ -133,24 +129,9 @@ function PlayQuizScreen(): JSX.Element {
 
   useEffect(() => {
     if (questionIndex === quizData?.questions.length) {
-      const _lastAttempt: LocalScore = {
-        createdAt: new Date(),
-        quizId: quizId!,
-        timeElapsed: score.totalTime,
-        totalScore: score.totalScore,
-        isUploaded: false,
-      };
-      LocalStorage.saveLastAttempt(quizId!, _lastAttempt!);
-      setLastAttempt(_lastAttempt);
-      setGameState(GameState.POST);
+      onFinishRound();
     }
-  }, [
-    questionIndex,
-    score.totalScore,
-    score.totalTime,
-    quizData?.questions,
-    quizId,
-  ]);
+  }, [questionIndex, quizData?.questions]);
 
   useEffect(() => {
     if (!quizId) return;
@@ -167,6 +148,34 @@ function PlayQuizScreen(): JSX.Element {
       }
     })();
   }, [quizId]);
+
+  const updateTotalPlays = async () => {
+    const plays = await onGameFinish({quizId: quizId!});
+    if (quizData?.totalPlays !== plays) {
+      setQuizData(prev => {
+        if (!prev) return;
+        return {...prev, totalPlays: plays};
+      });
+    }
+  };
+
+  const onFinishRound = () => {
+    const _lastAttempt: LocalScore = {
+      createdAt: new Date(),
+      quizId: quizId!,
+      timeElapsed: score.totalTime,
+      totalScore: score.totalScore,
+      isUploaded: false,
+    };
+    LocalStorage.saveLastAttempt(quizId!, _lastAttempt!);
+    setLastAttempt(_lastAttempt);
+    updateTotalPlays();
+    setQuizData(prev => {
+      if (!prev) return;
+      return {...prev, totalPlays: prev.totalPlays + 1};
+    });
+    setGameState(GameState.POST);
+  };
 
   const handleSubmitGuess = (onEnter?: boolean) => {
     if (!isValidInput()) {
@@ -298,9 +307,11 @@ function PlayQuizScreen(): JSX.Element {
     <PageContainer
       ref={backgroundRef}
       title={quizData?.title}
-      description={quizData?.description}
-      trailing={quizData?.isPrivate && <Chip type={ChipType.PRIVATE} />}>
+      description={quizData?.description}>
       <div className="w-full h-full flex flex-col">
+        {quizData && (
+          <GameDetailsContainer quiz={quizData} className="mt-2 -mb-28" />
+        )}
         {gameState === GameState.PRE && (
           <PreGameScene
             quizId={quizId!}
@@ -344,7 +355,7 @@ function PlayQuizScreen(): JSX.Element {
 
             {question && (
               <AnimatedResult
-                className="absolute left-0 top-[22%]"
+                className="absolute left-0 top-[24%]"
                 question={question}
                 result={result}
               />
@@ -390,6 +401,7 @@ function PlayQuizScreen(): JSX.Element {
             </div>
           </div>
         )}
+
         <QuickOptionsContainer
           disabled={!!result}
           settings={settings}

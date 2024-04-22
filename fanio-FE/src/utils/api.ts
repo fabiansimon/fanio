@@ -67,7 +67,7 @@ export async function fetchPlayableQuizById({
 }): Promise<{quiz: Quiz; topScore: Score}> {
   try {
     const response = await _axios.get<{quiz: Quiz; topScore: Score}>(
-      `/quiz/${quizId}?includeScore=true`,
+      `/quiz/${quizId}?includeDetails=true`,
     );
     return response.data;
   } catch (error) {
@@ -78,10 +78,6 @@ export async function fetchPlayableQuizById({
 
 export async function uploadQuiz(quiz: QuizInput): Promise<Quiz> {
   try {
-    console.log({
-      ...quiz,
-      ...quiz.options,
-    });
     const response = await _axios.post<Quiz>('/create-quiz', {
       ...quiz,
       ...quiz.options,
@@ -140,9 +136,10 @@ export async function fetchMetaData(url: string): Promise<MetaData> {
       url,
       type: 'youtube',
     });
+    console.log(res.data);
     return res.data;
   } catch (error) {
-    handleError({error, callName: 'fetchMetaData', showError: false});
+    handleError({error, callName: 'fetchMetaData'});
     throw error;
   }
 }
@@ -215,6 +212,33 @@ export async function fetchScorePlacement({
     return res.data;
   } catch (error) {
     handleError({error, callName: 'fetchScorePlacement'});
+    throw error;
+  }
+}
+
+export async function authUser({token}: {token: string}): Promise<string> {
+  try {
+    const res = await _axios.post('/auth/google', {
+      token,
+    });
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    handleError({error, callName: 'authUser'});
+    throw error;
+  }
+}
+
+export async function onGameFinish({
+  quizId,
+}: {
+  quizId: string;
+}): Promise<number> {
+  try {
+    const res = await _axios.patch(`/quiz-finished/${quizId}`);
+    return res.data;
+  } catch (error) {
+    handleError({error, callName: 'onGameFinish', showError: false});
     throw error;
   }
 }

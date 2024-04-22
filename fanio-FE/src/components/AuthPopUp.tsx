@@ -2,14 +2,32 @@ import {CredentialResponse, GoogleLogin} from '@react-oauth/google';
 import HoverContainer from './HoverContainer';
 import {useState} from 'react';
 import {useUserDataContext} from '../providers/UserDataProvider';
+import ToastController from '../controllers/ToastController';
+import {authUser} from '../utils/api';
 
 function AuthPopUp(): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {updateUserData} = useUserDataContext();
 
-  const onSuccess = (res: CredentialResponse) => {
-    console.log(res);
+  const onError = () => {
+    return ToastController.showErrorToast('Oh no...', 'Something went wrong.');
+  };
+
+  const onSuccess = async (res: CredentialResponse) => {
+    setIsLoading(true);
+    if (!res.credential) {
+      return onError();
+    }
+
+    try {
+      const jwt = await authUser({token: res.credential});
+    } catch (error) {
+      console.error(error);
+      onError();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -18,7 +36,11 @@ function AuthPopUp(): JSX.Element {
         title="Sign up"
         description="This will only take a second">
         <div className="mt-3">
-          <GoogleLogin onSuccess={onSuccess} type="standard" />
+          <GoogleLogin
+            onError={onError}
+            onSuccess={onSuccess}
+            type="standard"
+          />
         </div>
       </HoverContainer>
     </div>

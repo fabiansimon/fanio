@@ -1,4 +1,9 @@
-import {LockClosedIcon} from '@radix-ui/react-icons';
+import {
+  LockClosedIcon,
+  LockOpen1Icon,
+  LockOpen2Icon,
+  ShuffleIcon,
+} from '@radix-ui/react-icons';
 import {ChipType} from '../types';
 import {useMemo} from 'react';
 import {Text} from '@radix-ui/themes';
@@ -9,6 +14,18 @@ const ChipData = {
     backgroundColor: 'bg-neutral-700/60',
     title: 'Private',
     icon: <LockClosedIcon className="text-white size-3" />,
+    textColor: 'text-white',
+  },
+  [ChipType.PUBLIC]: {
+    backgroundColor: 'bg-neutral-700/60',
+    title: 'Public',
+    icon: <LockOpen2Icon className="text-white size-3" />,
+    textColor: 'text-white',
+  },
+  [ChipType.RANDOM_TIMESTAMPS]: {
+    backgroundColor: 'bg-yellow-900',
+    title: 'Random offset',
+    icon: <ShuffleIcon className="text-white size-3" />,
     textColor: 'text-white',
   },
 };
@@ -28,7 +45,7 @@ function Chip({
   return (
     <div
       className={UI.cn(
-        'p-1.5 rounded-lg h-8 items-center flex space-x-1.5',
+        'py-1.5 px-2 rounded-lg h-8 items-center flex space-x-1.5',
         backgroundColor,
         className,
       )}>

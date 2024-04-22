@@ -24,7 +24,7 @@ public class QuizService {
         return quizRepository.findAllByIsPrivateFalse(pageable);
     }
     public Page<Quiz> getQuizzesByTerm(Pageable pageable, String term) {
-        return quizRepository.findByTitleContainingIgnoreCaseAndIsPrivateFalse(term, pageable);
+        return quizRepository.findByTitleContainingIgnoreCaseOrTagsContainingAndIsPrivateFalse(term, pageable);
     }
     public Integer getQuizzesCount() {
         return (int) quizRepository.count();
