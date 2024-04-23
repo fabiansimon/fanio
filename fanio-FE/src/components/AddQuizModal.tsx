@@ -69,7 +69,7 @@ function AddQuizModal({
     try {
       if (!REGEX.youtube.test(url)) return;
       const res = await fetchMetaData(url);
-      const {title, length, imageUri, sourceTitle, tags} = res;
+      const {title, length, imageUri, sourceTitle, tags} = res[0];
       setQuestion(prev => {
         return {
           ...prev,

@@ -6,6 +6,7 @@ import com.fabiansimon.fanio.DTO.MetaResponseDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.google.gson.stream.JsonToken;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -24,27 +25,31 @@ import java.util.regex.Pattern;
 public class MetaDataService {
     @Value("${youtube.api-key}")
     private String youtubeKey;
+    private final Integer MAX_PLAYLIST_ITEMS = 15;
     RestTemplate template = new RestTemplate();
 
     public List<MetaResponseDTO> getMetaData(MetaRequestDTO requestDTO) {
-        List<MetaResponseDTO> response = new ArrayList<>();
-
         String url = requestDTO.getUrl();
+
         String playlistId = extractPlaylistId(url);
         String videoId = extractVideoId(url);
-        String json = fetchYoutubeVideoData(videoId);
 
-        System.out.println(fetchYoutubeListData("RDn7JwXOX_UWI"));
+        String json = playlistId != null ? fetchYoutubeListData(playlistId) : fetchYoutubeVideoData(videoId);
 
-        MetaResponseDTO response = extractJsonData(json);
+        List<MetaResponseDTO> response = extractJsonData(json, videoId, playlistId);
+
+        for (MetaResponseDTO res : response) {
+            System.out.println(res.toString());
+        }
 
         return response;
     }
 
-    private MetaResponseDTO extractJsonData(String json) {
-        MetaResponseDTO data = new MetaResponseDTO();
+    private List<MetaResponseDTO> extractJsonData(String json, String videoId, String playlistId) {
+        List<MetaResponseDTO> data = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
 
+        Boolean isPlaylist = playlistId != null;
 
         try {
             JsonNode rootNode = objectMapper.readTree(json);
@@ -53,25 +58,36 @@ public class MetaDataService {
             if (itemsNode.isMissingNode())
                 return data;
 
-            JsonNode itemNode = itemsNode.get(0);
-            JsonNode snippedNode = itemNode.path("snippet");
+            for (int i = 0; i < Math.min(itemsNode.size(), MAX_PLAYLIST_ITEMS) ; i++) {
+                JsonNode itemNode = itemsNode.get(i);
+                JsonNode snippedNode = itemNode.path("snippet");
 
-            String duration = itemNode.path("contentDetails").path("duration").asText();
+                String duration = itemNode.path("contentDetails").path("duration").asText();
+                String listVideoId = itemNode.path("contentDetails").path("videoId").asText();
 
-            String sourceTitle = snippedNode.path("title").asText();
-            String thumbnailUri = snippedNode.path("thumbnails").path("medium").path("url").asText();
-            JsonNode tagsNode = snippedNode.path("tags");
+                String sourceTitle = snippedNode.path("title").asText();
+                String thumbnailUri = snippedNode.path("thumbnails").path("medium").path("url").asText();
+                JsonNode tagsNode = snippedNode.path("tags");
 
-            data.setTags(extractTags(tagsNode));
-            data.setTitle(cleanRawTitle(sourceTitle));
-            data.setSourceTitle(sourceTitle);
-            data.setImageUri(thumbnailUri);
-            data.setLength((int) Duration.parse(duration).getSeconds());
+                MetaResponseDTO curr = new MetaResponseDTO();
 
+                curr.setLength(isPlaylist ? 60 : (int) Duration.parse(duration).getSeconds());
+                curr.setTags(isPlaylist ? new ArrayList<>() : extractTags(tagsNode));
+                curr.setTitle(cleanRawTitle(sourceTitle));
+                curr.setSourceTitle(sourceTitle);
+                curr.setImageUri(thumbnailUri);
+                curr.setUri(generateYoutubeUri(isPlaylist ? listVideoId : videoId));
+
+                data.add(curr);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return data;
+    }
+
+    private String generateYoutubeUri(String id) {
+        return "https://www.youtube.com/watch?v=" + id;
     }
 
     private ArrayList<String> extractTags(JsonNode node) {
@@ -98,7 +114,7 @@ public class MetaDataService {
         if (matcher.find()) {
             return matcher.group(0);
         }
-        return "";
+        return null;
     }
 
     private String fetchYoutubeVideoData(String videoId) {
@@ -114,8 +130,8 @@ public class MetaDataService {
     private String fetchYoutubeListData(String playlistId) {
         String url = UriComponentsBuilder
                 .fromHttpUrl("https://www.googleapis.com/youtube/v3/playlistItems")
-                .queryParam("part", "id,snippet,contentDetails,statistics")
-                .queryParam("maxResults", "30")
+                .queryParam("part", "id,snippet,contentDetails")
+                .queryParam("maxResults", MAX_PLAYLIST_ITEMS+1)
                 .queryParam("playlistId", playlistId)
                 .queryParam("key", youtubeKey)
                 .toUriString();

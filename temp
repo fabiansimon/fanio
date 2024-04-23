@@ -1,0 +1,81 @@
+{
+  "kind": "youtube#videoListResponse",
+  "etag": "RXxzrFgdZYIQYmxgiy9VbqhSOLo",
+  "items": [
+    {
+      "kind": "youtube#video",
+      "etag": "XrRW6BCRpGip0VXZLPuHny6FGnQ",
+      "id": "vIhhc7N8-JQ",
+      "snippet": {
+        "publishedAt": "2023-12-07T19:30:11Z",
+        "channelId": "UCfN1W-KqyXZHQDluZx4kYIQ",
+        "title": "OG Keemo feat. Levin Liam - Bee Gees (prod by Funkvater Frank)",
+        "description": "Franky, Keemo, Levin sind iconic wie die Bee Gees. Neue Single out now!\n🌡️ \"BEE GEES\" Single auf allen Plattformen: https://og-keemo.lnk.to/BEEGEES   \n🌡️  Fieber Mixtape auf limitiertem Vinyl: https://www.chimperator-shop.com/ARTIST/OG-KEEMO:::80052_80069.html \n\nhttps://www.instagram.com/ogkeemo/\nhttps://www.instagram.com/funkvaterfrank/\nhttps://www.instagram.com/levinliamlevin/ \nhttps://www.instagram.com/chimperator/ \n\nAufgenommen, produziert und gemischt im Funkloch Rhein-Neckar von Funkvater Frank\nMaster von Volker IDR Gebhardt  \n\nCreative Direction: 27BUCKS @27_bucks\n\nProduction by STUDIO 11:40 @studioelevenforty\nDirector: Felix Aaron @felix_aaron\nExecutive Producer: Ronja Prinz @ronja.prinz\nDoP: Julian Jonas Schmitt @julianjonas.s\n\nProduction Coordinator: Franni König @franaya_twaine                                                    \nProduction Assistants: Sidney Lubwa @official.sweezy, Lilly Merck @lilly.merck, Raviva Nsiama @raviva.ziama                                                                                         \nProduction Assistant / BTS: Lotte Seibert @carlottaseibert\nDirector's Assistant: Samira Kabbara @samirahiamk\nSteadicam: Johannes Ziegler @the_steadicam_operator\nSteadicam Assistant: Amalia Ziegler                                                                                                                               \n1. AC: Daniel Merget @danielmerget\n2. AC: Christoph Michele @chr_istus\nGaffer: Malte Siepen @maltesiepen\nSpark: Jonathan Deges\nCatering: TwoFingers Catering @genuinetreats \n\nCast Group: Gianni @giannisuave & Franky @funkvaterfrank & Ali @_alibtw\nCast Kids: Sam & Paul\nCast Baby: Younes\n\nVFX: Korbinian Weber @instakaski / Whitecloudsfx @whitecloudsfx\nColors: Jenny Montgomery @jennymontgomery via company3 @company_3\n\n#ogkeemo #funkvaterfrank #beegees",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/vIhhc7N8-JQ/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/vIhhc7N8-JQ/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/vIhhc7N8-JQ/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/vIhhc7N8-JQ/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/vIhhc7N8-JQ/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "OG KEEMO ",
+        "tags": [
+          "OG Keemo",
+          "Funkvater Frank",
+          "Keemo",
+          "Funkvater",
+          "Chimperator",
+          "Bee Gees",
+          "Levin Liam"
+        ],
+        "categoryId": "10",
+        "liveBroadcastContent": "none",
+        "localized": {
+          "title": "OG Keemo feat. Levin Liam - Bee Gees (prod by Funkvater Frank)",
+          "description": "Franky, Keemo, Levin sind iconic wie die Bee Gees. Neue Single out now!\n🌡️ \"BEE GEES\" Single auf allen Plattformen: https://og-keemo.lnk.to/BEEGEES   \n🌡️  Fieber Mixtape auf limitiertem Vinyl: https://www.chimperator-shop.com/ARTIST/OG-KEEMO:::80052_80069.html \n\nhttps://www.instagram.com/ogkeemo/\nhttps://www.instagram.com/funkvaterfrank/\nhttps://www.instagram.com/levinliamlevin/ \nhttps://www.instagram.com/chimperator/ \n\nAufgenommen, produziert und gemischt im Funkloch Rhein-Neckar von Funkvater Frank\nMaster von Volker IDR Gebhardt  \n\nCreative Direction: 27BUCKS @27_bucks\n\nProduction by STUDIO 11:40 @studioelevenforty\nDirector: Felix Aaron @felix_aaron\nExecutive Producer: Ronja Prinz @ronja.prinz\nDoP: Julian Jonas Schmitt @julianjonas.s\n\nProduction Coordinator: Franni König @franaya_twaine                                                    \nProduction Assistants: Sidney Lubwa @official.sweezy, Lilly Merck @lilly.merck, Raviva Nsiama @raviva.ziama                                                                                         \nProduction Assistant / BTS: Lotte Seibert @carlottaseibert\nDirector's Assistant: Samira Kabbara @samirahiamk\nSteadicam: Johannes Ziegler @the_steadicam_operator\nSteadicam Assistant: Amalia Ziegler                                                                                                                               \n1. AC: Daniel Merget @danielmerget\n2. AC: Christoph Michele @chr_istus\nGaffer: Malte Siepen @maltesiepen\nSpark: Jonathan Deges\nCatering: TwoFingers Catering @genuinetreats \n\nCast Group: Gianni @giannisuave & Franky @funkvaterfrank & Ali @_alibtw\nCast Kids: Sam & Paul\nCast Baby: Younes\n\nVFX: Korbinian Weber @instakaski / Whitecloudsfx @whitecloudsfx\nColors: Jenny Montgomery @jennymontgomery via company3 @company_3\n\n#ogkeemo #funkvaterfrank #beegees"
+        },
+        "defaultAudioLanguage": "de-DE"
+      },
+      "contentDetails": {
+        "duration": "PT3M41S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": true,
+        "contentRating": {},
+        "projection": "rectangular"
+      },
+      "statistics": {
+        "viewCount": "571518",
+        "likeCount": "21536",
+        "favoriteCount": "0",
+        "commentCount": "942"
+      }
+    }
+  ],
+  "pageInfo": {
+    "totalResults": 1,
+    "resultsPerPage": 1
+  }
+}
+
