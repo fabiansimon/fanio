@@ -1,4 +1,4 @@
-import {motion, useAnimation} from 'framer-motion';
+import {useAnimation} from 'framer-motion';
 import {forwardRef, useImperativeHandle, useState, Ref} from 'react';
 import {UI} from '../utils/common';
 import AnimatedText from './AnimatedText';

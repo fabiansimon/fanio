@@ -1,4 +1,12 @@
-import {useState, useMemo, useEffect, useRef} from 'react';
+import {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  Ref,
+} from 'react';
 import {AnimatePresence, motion} from 'framer-motion';
 import {InputType} from '../pages/CreateScreen';
 import {ButtonType, ModalProps, QuestionInput} from '../types';
@@ -18,6 +26,10 @@ interface AddQuizModalProps extends ModalProps {
   onSave: (quiz: QuestionInput) => void;
 }
 
+export interface AddQuizModalRef {
+  editQuestion: () => void;
+}
+
 const ANIMATION_DURATION = 200;
 
 const transition = {
@@ -33,12 +45,10 @@ const INIT_QUESTION_INPUT = {
   tags: [],
 };
 
-function AddQuizModal({
-  isVisible,
-  onRequestClose,
-  ignoreOffset,
-  onSave,
-}: AddQuizModalProps): JSX.Element {
+function AddQuizModal(
+  {isVisible, onRequestClose, ignoreOffset, onSave}: AddQuizModalProps,
+  ref: Ref<AddQuizModalRef>,
+): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(
     'Invalid url',
@@ -53,6 +63,10 @@ function AddQuizModal({
   const isSmall = useIsSmall();
 
   const {url, answer, imageUri, startOffset} = question;
+
+  useImperativeHandle(ref, () => ({
+    editQuestion: () => console.log('hell'),
+  }));
 
   useEffect(() => {
     if (isVisible) return;
@@ -252,4 +266,4 @@ function AddQuizModal({
   );
 }
 
-export default AddQuizModal;
+export default forwardRef<AddQuizModalRef, AddQuizModalProps>(AddQuizModal);

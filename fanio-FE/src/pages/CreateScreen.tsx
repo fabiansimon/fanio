@@ -7,7 +7,7 @@ import {
 } from '@radix-ui/themes';
 import Button from '../components/Button';
 import {PlusIcon, DotsVerticalIcon, Cross1Icon} from '@radix-ui/react-icons';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {ButtonType, ChipType, QuestionInput, QuizInput} from '../types';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
@@ -16,7 +16,7 @@ import {REGEX} from '../constants/Regex';
 import InputField from '../components/InputField';
 import {DateUtils, UI} from '../utils/common';
 import PageContainer from '../components/PageContainer';
-import AddQuizModal from '../components/AddQuizModal';
+import AddQuizModal, {AddQuizModalRef} from '../components/AddQuizModal';
 import ValidationChip from '../components/ValidationChip';
 import HoverContainer from '../components/HoverContainer';
 import Chip from '../components/Chip';
@@ -55,6 +55,8 @@ function CreateScreen(): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [questionVisible, setQuestionVisible] = useState<boolean>(false);
   const [quizInput, setQuizInput] = useState<QuizInput | undefined>();
+
+  const addModalRef = useRef<AddQuizModalRef>(null);
 
   const navigation = useNavigate();
   const isSmall = useIsSmall();
@@ -212,10 +214,16 @@ function CreateScreen(): JSX.Element {
     });
   };
 
+  const editQuestion = (index: number) => {
+    console.log(quizInput?.questions[index].answer);
+    addModalRef?.current?.editQuestion();
+  };
+
   return (
     <>
       {/* {!isAuth && <AuthPopUp />} */}
       <AddQuizModal
+        ref={addModalRef}
         ignoreOffset={quizInput?.options.randomOffsets}
         isVisible={questionVisible}
         onRequestClose={() => setQuestionVisible(false)}
@@ -333,6 +341,7 @@ function CreateScreen(): JSX.Element {
                     key={index}
                     question={question}
                     onDelete={() => deleteQuestion(index)}
+                    onEdit={() => editQuestion(index)}
                   />
                 ))}
               </ScrollArea>
@@ -376,6 +385,7 @@ function CreateScreen(): JSX.Element {
 function QuestionPreviewContainer({
   question,
   onDelete,
+  onEdit,
   className,
   ignoreOffset,
 }: {
@@ -383,6 +393,7 @@ function QuestionPreviewContainer({
   ignoreOffset: boolean;
   className?: string;
   onDelete: () => void;
+  onEdit: () => void;
 }): JSX.Element {
   const {answer, startOffset, sourceTitle, url} = question;
 
@@ -424,7 +435,7 @@ function QuestionPreviewContainer({
             </div>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content>
-            {/* <DropdownMenu.Item onClick={onEdit}>Edit</DropdownMenu.Item> */}
+            <DropdownMenu.Item onClick={onEdit}>Edit</DropdownMenu.Item>
             <DropdownMenu.Item onClick={onDelete}> Delete</DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
