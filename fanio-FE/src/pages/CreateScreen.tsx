@@ -215,8 +215,20 @@ function CreateScreen(): JSX.Element {
   };
 
   const editQuestion = (index: number) => {
-    console.log(quizInput?.questions[index].answer);
-    addModalRef?.current?.editQuestion();
+    const question = quizInput?.questions[index];
+    if (!question) return;
+    addModalRef?.current?.editQuestion(question, index);
+  };
+  const replaceQuestion = (question: QuestionInput, index: number) => {
+    setQuizInput(prev => {
+      if (!prev) return;
+      const questions = prev.questions;
+      questions[index] = question;
+      return {
+        ...prev,
+        questions,
+      };
+    });
   };
 
   return (
@@ -228,6 +240,7 @@ function CreateScreen(): JSX.Element {
         isVisible={questionVisible}
         onRequestClose={() => setQuestionVisible(false)}
         onSave={addQuestion}
+        onEdit={replaceQuestion}
       />
       <PageContainer
         title="Create quiz"

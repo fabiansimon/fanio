@@ -24,13 +24,15 @@ import useIsSmall from '../hooks/useIsSmall';
 interface AddQuizModalProps extends ModalProps {
   ignoreOffset?: boolean;
   onSave: (quiz: QuestionInput) => void;
+  onEdit: (quiz: QuestionInput, index: number) => void;
 }
 
 export interface AddQuizModalRef {
-  editQuestion: () => void;
+  editQuestion: (question: QuestionInput, index: number) => void;
 }
 
 const ANIMATION_DURATION = 200;
+const DEFAULT_MAX_VALUE = 100;
 
 const transition = {
   duration: ANIMATION_DURATION,
@@ -46,15 +48,15 @@ const INIT_QUESTION_INPUT = {
 };
 
 function AddQuizModal(
-  {isVisible, onRequestClose, ignoreOffset, onSave}: AddQuizModalProps,
+  {isVisible, onRequestClose, ignoreOffset, onSave, onEdit}: AddQuizModalProps,
   ref: Ref<AddQuizModalRef>,
 ): JSX.Element {
+  const [editIndex, setEditIndex] = useState<number>(-1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [question, setQuestion] = useState<QuestionInput>(INIT_QUESTION_INPUT);
   const [errorMessage, setErrorMessage] = useState<string | null>(
     'Invalid url',
   );
-  const defaultMaxValue = 100;
-  const [question, setQuestion] = useState<QuestionInput>(INIT_QUESTION_INPUT);
 
   const urlRef = useRef<any>();
 
@@ -64,19 +66,27 @@ function AddQuizModal(
 
   const {url, answer, imageUri, startOffset} = question;
 
+  const visible = useMemo(
+    () => isVisible || editIndex !== -1,
+    [isVisible, editIndex],
+  );
+
   useImperativeHandle(ref, () => ({
-    editQuestion: () => console.log('hell'),
+    editQuestion: (question: QuestionInput, index: number) => {
+      setEditIndex(index);
+      setQuestion(question);
+    },
   }));
 
   useEffect(() => {
-    if (isVisible) return;
+    if (visible) return;
     setQuestion(INIT_QUESTION_INPUT);
     setErrorMessage('Invalid url');
-  }, [isVisible]);
+  }, [visible]);
 
   useEffect(() => {
-    if (isVisible) urlRef.current?.focus();
-  }, [isVisible]);
+    if (visible) urlRef.current?.focus();
+  }, [visible]);
 
   const handleMetaData = async (url: string) => {
     setIsLoading(true);
@@ -120,13 +130,28 @@ function AddQuizModal(
   };
 
   const calculateOffset = (input: number) => {
-    return (question.maxLength || defaultMaxValue) - (input || 0);
+    return (question.maxLength || DEFAULT_MAX_VALUE) - (input || 0);
+  };
+
+  const onClose = () => {
+    onRequestClose();
+    if (editIndex) setEditIndex(-1);
+  };
+
+  const handleAction = () => {
+    if (editIndex !== -1) {
+      onEdit(question, editIndex);
+      setEditIndex(-1);
+      return;
+    }
+
+    onSave(question);
   };
 
   const offset = useMemo(() => {
     if (!question.startOffset) return 0;
     return (
-      (question.maxLength || defaultMaxValue) - (question.startOffset || 0)
+      (question.maxLength || DEFAULT_MAX_VALUE) - (question.startOffset || 0)
     );
   }, [question]);
 
@@ -159,7 +184,7 @@ function AddQuizModal(
     visible: {scale: 1, opacity: 1},
   };
 
-  if (!isVisible) return <div />;
+  if (!visible) return <div />;
 
   return (
     <AnimatePresence>
@@ -231,8 +256,8 @@ function AddQuizModal(
                 onValueChange={(e: number[]) => {
                   handleInput(calculateOffset(e[0]), InputType.OFFSET);
                 }}
-                value={[offset || question.maxLength || defaultMaxValue]}
-                max={question.maxLength || defaultMaxValue}
+                value={[offset || question.maxLength || DEFAULT_MAX_VALUE]}
+                max={question.maxLength || DEFAULT_MAX_VALUE}
                 inverted
                 size={'1'}
               />
@@ -246,14 +271,14 @@ function AddQuizModal(
                 type={ButtonType.outline}
                 hotkey="C"
                 text="Cancel"
-                onClick={() => onRequestClose()}
+                onClick={onClose}
                 className="flex w-full"
               />
               <Button
                 textSize={'2'}
                 text="Add Song"
                 hotkey="Enter"
-                onClick={() => onSave(question)}
+                onClick={handleAction}
                 disabled={!isValid || !url.trim()}
                 ignoreMetaKey
                 className="flex w-full"
