@@ -6,10 +6,7 @@ import com.fabiansimon.fanio.DTO.MetaResponseDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.google.gson.stream.JsonToken;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -25,7 +22,7 @@ import java.util.regex.Pattern;
 public class MetaDataService {
     @Value("${youtube.api-key}")
     private String youtubeKey;
-    private final Integer MAX_PLAYLIST_ITEMS = 15;
+    private final Integer MAX_PLAYLIST_ITEMS = 10;
     RestTemplate template = new RestTemplate();
 
     public List<MetaResponseDTO> getMetaData(MetaRequestDTO requestDTO) {
@@ -37,10 +34,6 @@ public class MetaDataService {
         String json = playlistId != null ? fetchYoutubeListData(playlistId) : fetchYoutubeVideoData(videoId);
 
         List<MetaResponseDTO> response = extractJsonData(json, videoId, playlistId);
-
-        for (MetaResponseDTO res : response) {
-            System.out.println(res.toString());
-        }
 
         return response;
     }
@@ -76,7 +69,7 @@ public class MetaDataService {
                 curr.setTitle(cleanRawTitle(sourceTitle));
                 curr.setSourceTitle(sourceTitle);
                 curr.setImageUri(thumbnailUri);
-                curr.setUri(generateYoutubeUri(isPlaylist ? listVideoId : videoId));
+                curr.setSourceUrl(generateYoutubeUri(isPlaylist ? listVideoId : videoId));
 
                 data.add(curr);
             }

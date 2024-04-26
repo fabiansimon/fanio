@@ -20,14 +20,15 @@ import useKeyShortcut from '../hooks/useKeyShortcut';
 import ValidationChip from './ValidationChip';
 import {DateUtils, UI} from '../utils/common';
 import useIsSmall from '../hooks/useIsSmall';
+import {INIT_QUESTION_INPUT} from '../constants/Init';
 
-interface AddQuizModalProps extends ModalProps {
+interface AddQuestionModalProps extends ModalProps {
   ignoreOffset?: boolean;
-  onSave: (quiz: QuestionInput) => void;
-  onEdit: (quiz: QuestionInput, index: number) => void;
+  onSave: (questions: QuestionInput[]) => void;
+  onEdit: (question: QuestionInput, index: number) => void;
 }
 
-export interface AddQuizModalRef {
+export interface AddQuestionModalRef {
   editQuestion: (question: QuestionInput, index: number) => void;
 }
 
@@ -40,16 +41,15 @@ const transition = {
   mass: 0.05,
 };
 
-const INIT_QUESTION_INPUT = {
-  answer: '',
-  url: '',
-  sourceTitle: '',
-  tags: [],
-};
-
-function AddQuizModal(
-  {isVisible, onRequestClose, ignoreOffset, onSave, onEdit}: AddQuizModalProps,
-  ref: Ref<AddQuizModalRef>,
+function AddQuestionModal(
+  {
+    isVisible,
+    onRequestClose,
+    ignoreOffset,
+    onSave,
+    onEdit,
+  }: AddQuestionModalProps,
+  ref: Ref<AddQuestionModalRef>,
 ): JSX.Element {
   const [editIndex, setEditIndex] = useState<number>(-1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -93,7 +93,32 @@ function AddQuizModal(
     try {
       if (!REGEX.youtube.test(url)) return;
       const res = await fetchMetaData(url);
-      const {title, length, imageUri, sourceTitle, tags} = res[0];
+      if (res.length > 1) {
+        let questions: QuestionInput[] = [];
+        for (const question of res) {
+          const {
+            title: answer,
+            length: maxLength,
+            imageUri,
+            sourceTitle,
+            tags,
+            sourceUrl,
+          } = question;
+
+          questions.push({
+            answer,
+            tags,
+            url: sourceUrl,
+            imageUri,
+            maxLength,
+            sourceTitle,
+            startOffset,
+          });
+        }
+        onSave(questions);
+        return;
+      }
+      const {title, length, imageUri, sourceTitle, tags, sourceUrl} = res[0];
       setQuestion(prev => {
         return {
           ...prev,
@@ -102,6 +127,7 @@ function AddQuizModal(
           imageUri,
           sourceTitle,
           tags,
+          url: sourceUrl,
         };
       });
     } catch {
@@ -135,17 +161,16 @@ function AddQuizModal(
 
   const onClose = () => {
     onRequestClose();
-    if (editIndex) setEditIndex(-1);
+    if (editIndex !== -1) setEditIndex(-1);
   };
 
   const handleAction = () => {
     if (editIndex !== -1) {
       onEdit(question, editIndex);
-      setEditIndex(-1);
-      return;
+    } else {
+      onSave([question]);
     }
-
-    onSave(question);
+    onClose();
   };
 
   const offset = useMemo(() => {
@@ -186,6 +211,7 @@ function AddQuizModal(
 
   if (!visible) return <div />;
 
+  console.log(ignoreOffset);
   return (
     <AnimatePresence>
       <motion.div
@@ -195,7 +221,7 @@ function AddQuizModal(
         animate="visible"
         transition={transition}
         onClick={onRequestClose}
-        className="fixed top-0 left-0 right-0 bottom-0 backdrop-blur-md flex w-full h-full z-10 items-center justify-center flex-col">
+        className="fixed space-y-10 top-0 left-0 right-0 bottom-0 backdrop-blur-md flex w-full h-full z-10 items-center justify-center flex-col">
         <motion.div
           variants={modalVariants}
           initial="hidden"
@@ -276,7 +302,7 @@ function AddQuizModal(
               />
               <Button
                 textSize={'2'}
-                text="Add Song"
+                text={editIndex !== -1 ? 'Update Song' : 'Add Song'}
                 hotkey="Enter"
                 onClick={handleAction}
                 disabled={!isValid || !url.trim()}
@@ -291,4 +317,6 @@ function AddQuizModal(
   );
 }
 
-export default forwardRef<AddQuizModalRef, AddQuizModalProps>(AddQuizModal);
+export default forwardRef<AddQuestionModalRef, AddQuestionModalProps>(
+  AddQuestionModal,
+);

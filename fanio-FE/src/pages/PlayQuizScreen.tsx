@@ -3,7 +3,6 @@ import PageContainer from '../components/PageContainer';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import ReactPlayer from 'react-player';
 import {
-  ChipType,
   GameSettings,
   GameState,
   GuessResult,
@@ -14,7 +13,7 @@ import {
   UIState,
 } from '../types';
 import {fetchPlayableQuizById, onGameFinish} from '../utils/api';
-import {shuffle, uniq} from 'lodash';
+import {shuffle} from 'lodash';
 import {calculatePoints, randomNumber, similarity} from '../utils/logic';
 import InputField from '../components/InputField';
 import PostGameScene from '../components/PostGameScene';
@@ -26,13 +25,14 @@ import {motion} from 'framer-motion';
 import {GAME_OPTIONS} from '../constants/Game';
 import QuizStatsContainer from '../components/QuizStatsContainer';
 import useKeyShortcut from '../hooks/useKeyShortcut';
-import {Heading} from '@radix-ui/themes';
+import {Heading, Text} from '@radix-ui/themes';
 import {UI} from '../utils/common';
 import QuickOptionsContainer from '../components/QuickOptionsContainer';
 import {INIT_GAME_SETTINGS, INIT_SCORE} from '../constants/Init';
 import ToastController from '../controllers/ToastController';
 import MusicLoader from '../components/MusicLoader';
 import GameDetailsContainer from '../components/GameDetailsContainer';
+import {TrackNextIcon} from '@radix-ui/react-icons';
 
 function PlayQuizScreen(): JSX.Element {
   useKeyShortcut(
@@ -195,7 +195,7 @@ function PlayQuizScreen(): JSX.Element {
       delta,
     });
 
-    updateResult(now, delta, points);
+    updateResult({result: {correct: true, delta, points}, now});
 
     setTimeouts(points);
   };
@@ -229,10 +229,11 @@ function PlayQuizScreen(): JSX.Element {
     }
   };
 
-  const updateResult = (now: number, delta: number, points: number) => {
+  const updateResult = ({result, now}: {result: GuessResult; now: number}) => {
     setTimestamp(now);
-    setResult({correct: true, delta, points});
+    setResult(result);
 
+    const {delta, points} = result;
     const totalTime = (score.totalTime += delta);
 
     setScore(prev => {
@@ -291,11 +292,10 @@ function PlayQuizScreen(): JSX.Element {
         'Youtube is currently not responding',
       );
     changeUIState(UIState.INCORRECT);
-    setResult({correct: false, delta: 0, points: 0});
     barRef.current?.clear();
     const now = performance.now();
     const delta = (now - timestamp) / 1000;
-    updateResult(now, delta, 0);
+    updateResult({result: {correct: false, delta, points: 0}, now});
     setTimeouts(0);
   };
 
@@ -381,6 +381,16 @@ function PlayQuizScreen(): JSX.Element {
                 />
               )}
               <InputField
+                trailing={
+                  <div
+                    onClick={() => handleSongEnd()}
+                    className="mb-4 cursor-pointer flex items-center space-x-2 mr-4">
+                    <Text size={'2'} className="text-white/50">
+                      Skip
+                    </Text>
+                    <TrackNextIcon className="text-white/50" />
+                  </div>
+                }
                 disabled={disableInput}
                 showSimple
                 onInput={handleInput}

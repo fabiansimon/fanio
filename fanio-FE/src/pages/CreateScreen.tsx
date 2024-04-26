@@ -16,7 +16,6 @@ import {REGEX} from '../constants/Regex';
 import InputField from '../components/InputField';
 import {DateUtils, UI} from '../utils/common';
 import PageContainer from '../components/PageContainer';
-import AddQuizModal, {AddQuizModalRef} from '../components/AddQuizModal';
 import ValidationChip from '../components/ValidationChip';
 import HoverContainer from '../components/HoverContainer';
 import Chip from '../components/Chip';
@@ -26,6 +25,9 @@ import useIsSmall from '../hooks/useIsSmall';
 import OptionsContainer from '../components/OptionsContainer';
 import {useUserDataContext} from '../providers/UserDataProvider';
 import AuthPopUp from '../components/AuthPopUp';
+import AddQuestionModal, {
+  AddQuestionModalRef,
+} from '../components/AddQuestionModal';
 
 export enum InputType {
   TITLE,
@@ -56,7 +58,7 @@ function CreateScreen(): JSX.Element {
   const [questionVisible, setQuestionVisible] = useState<boolean>(false);
   const [quizInput, setQuizInput] = useState<QuizInput | undefined>();
 
-  const addModalRef = useRef<AddQuizModalRef>(null);
+  const addModalRef = useRef<AddQuestionModalRef>(null);
 
   const navigation = useNavigate();
   const isSmall = useIsSmall();
@@ -180,17 +182,24 @@ function CreateScreen(): JSX.Element {
     });
   };
 
-  const addQuestion = (question: QuestionInput) => {
-    const newTags = new Set([...question.tags, ...(quizInput?.tags || [])]);
+  const addQuestion = (newQuestions: QuestionInput[]) => {
+    const newTags = newQuestions.reduce((tagsAccumulator, question) => {
+      return new Set([
+        ...tagsAccumulator,
+        ...question.tags,
+        ...(quizInput?.tags || []),
+      ]);
+    }, new Set());
+
     setQuizInput(prev => {
       if (!prev) return;
-      const {questions} = prev;
       return {
         ...prev,
-        tags: Array.from(newTags),
-        questions: questions.concat(question),
+        tags: Array.from([]),
+        questions: prev.questions.concat(newQuestions),
       };
     });
+
     setQuestionVisible(false);
   };
 
@@ -234,7 +243,7 @@ function CreateScreen(): JSX.Element {
   return (
     <>
       {/* {!isAuth && <AuthPopUp />} */}
-      <AddQuizModal
+      <AddQuestionModal
         ref={addModalRef}
         ignoreOffset={quizInput?.options.randomOffsets}
         isVisible={questionVisible}
@@ -368,7 +377,7 @@ function CreateScreen(): JSX.Element {
                   ignoreMetaKey
                   onClick={() => setQuestionVisible(true)}
                   icon={<PlusIcon className="text-white mr-2 size-5" />}
-                  className="flex mt-6 mx-auto"
+                  className="flex mt-6 flex-grow w-[50%] mx-auto"
                   type={ButtonType.outline}
                   textSize="2"
                 />

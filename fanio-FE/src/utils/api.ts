@@ -136,7 +136,6 @@ export async function fetchMetaData(url: string): Promise<MetaData[]> {
       url,
       type: 'youtube',
     });
-    console.log(res.data);
     return res.data;
   } catch (error) {
     handleError({error, callName: 'fetchMetaData'});

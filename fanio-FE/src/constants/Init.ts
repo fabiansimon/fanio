@@ -6,6 +6,13 @@ export const INIT_SCORE = {
   guesses: [],
 };
 
+export const INIT_QUESTION_INPUT = {
+  answer: '',
+  url: '',
+  sourceTitle: '',
+  tags: [],
+};
+
 export const INIT_GAME_SETTINGS = {
   autoDeleteInput: {
     title: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoDeleteInput.title,

@@ -34,6 +34,7 @@ function AnimatedResult({
         setAnimatePoints(true);
       }, GAME_OPTIONS.POINTS_UPDATE_TIMEOUT);
 
+    console.log(result?.correct);
     setTimeout(
       () => {
         setText({

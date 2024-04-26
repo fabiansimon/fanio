@@ -15,7 +15,7 @@ public class MetaResponseDTO {
     private String title;
     private String sourceTitle;
     private String imageUri;
-    private String uri;
+    private String sourceUrl;
     private Integer length;
     private List<String> tags;
 }
