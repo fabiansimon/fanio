@@ -1,4 +1,12 @@
-import {useState, useMemo, useEffect, useRef} from 'react';
+import {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  Ref,
+} from 'react';
 import {AnimatePresence, motion} from 'framer-motion';
 import {InputType} from '../pages/CreateScreen';
 import {ButtonType, ModalProps, QuestionInput} from '../types';
@@ -12,13 +20,20 @@ import useKeyShortcut from '../hooks/useKeyShortcut';
 import ValidationChip from './ValidationChip';
 import {DateUtils, UI} from '../utils/common';
 import useIsSmall from '../hooks/useIsSmall';
+import {INIT_QUESTION_INPUT} from '../constants/Init';
 
-interface AddQuizModalProps extends ModalProps {
+interface AddQuestionModalProps extends ModalProps {
   ignoreOffset?: boolean;
-  onSave: (quiz: QuestionInput) => void;
+  onSave: (questions: QuestionInput[]) => void;
+  onEdit: (question: QuestionInput, index: number) => void;
+}
+
+export interface AddQuestionModalRef {
+  editQuestion: (question: QuestionInput, index: number) => void;
 }
 
 const ANIMATION_DURATION = 200;
+const DEFAULT_MAX_VALUE = 100;
 
 const transition = {
   duration: ANIMATION_DURATION,
@@ -26,25 +41,22 @@ const transition = {
   mass: 0.05,
 };
 
-const INIT_QUESTION_INPUT = {
-  answer: '',
-  url: '',
-  sourceTitle: '',
-  tags: [],
-};
-
-function AddQuizModal({
-  isVisible,
-  onRequestClose,
-  ignoreOffset,
-  onSave,
-}: AddQuizModalProps): JSX.Element {
+function AddQuestionModal(
+  {
+    isVisible,
+    onRequestClose,
+    ignoreOffset,
+    onSave,
+    onEdit,
+  }: AddQuestionModalProps,
+  ref: Ref<AddQuestionModalRef>,
+): JSX.Element {
+  const [editIndex, setEditIndex] = useState<number>(-1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [question, setQuestion] = useState<QuestionInput>(INIT_QUESTION_INPUT);
   const [errorMessage, setErrorMessage] = useState<string | null>(
     'Invalid url',
   );
-  const defaultMaxValue = 100;
-  const [question, setQuestion] = useState<QuestionInput>(INIT_QUESTION_INPUT);
 
   const urlRef = useRef<any>();
 
@@ -54,22 +66,59 @@ function AddQuizModal({
 
   const {url, answer, imageUri, startOffset} = question;
 
-  useEffect(() => {
-    if (isVisible) return;
-    setQuestion(INIT_QUESTION_INPUT);
-    setErrorMessage('Invalid url');
-  }, [isVisible]);
+  const visible = useMemo(
+    () => isVisible || editIndex !== -1,
+    [isVisible, editIndex],
+  );
+
+  useImperativeHandle(ref, () => ({
+    editQuestion: (question: QuestionInput, index: number) => {
+      setEditIndex(index);
+      setQuestion(question);
+    },
+  }));
 
   useEffect(() => {
-    if (isVisible) urlRef.current?.focus();
-  }, [isVisible]);
+    if (visible) return;
+    setQuestion(INIT_QUESTION_INPUT);
+    setErrorMessage('Invalid url');
+  }, [visible]);
+
+  useEffect(() => {
+    if (visible) urlRef.current?.focus();
+  }, [visible]);
 
   const handleMetaData = async (url: string) => {
     setIsLoading(true);
     try {
       if (!REGEX.youtube.test(url)) return;
       const res = await fetchMetaData(url);
-      const {title, length, imageUri, sourceTitle, tags} = res;
+      if (res.length > 1) {
+        let questions: QuestionInput[] = [];
+        for (const question of res) {
+          const {
+            title: answer,
+            length: maxLength,
+            imageUri,
+            sourceTitle,
+            tags,
+            sourceUrl,
+          } = question;
+
+          questions.push({
+            answer,
+            tags,
+            url: sourceUrl,
+            imageUri,
+            maxLength,
+            sourceTitle,
+            startOffset,
+          });
+        }
+        onSave(questions);
+        return;
+      }
+      const {title, length, imageUri, sourceTitle, tags, sourceUrl} = res[0];
       setQuestion(prev => {
         return {
           ...prev,
@@ -78,6 +127,7 @@ function AddQuizModal({
           imageUri,
           sourceTitle,
           tags,
+          url: sourceUrl,
         };
       });
     } catch {
@@ -106,13 +156,27 @@ function AddQuizModal({
   };
 
   const calculateOffset = (input: number) => {
-    return (question.maxLength || defaultMaxValue) - (input || 0);
+    return (question.maxLength || DEFAULT_MAX_VALUE) - (input || 0);
+  };
+
+  const onClose = () => {
+    onRequestClose();
+    if (editIndex !== -1) setEditIndex(-1);
+  };
+
+  const handleAction = () => {
+    if (editIndex !== -1) {
+      onEdit(question, editIndex);
+    } else {
+      onSave([question]);
+    }
+    onClose();
   };
 
   const offset = useMemo(() => {
     if (!question.startOffset) return 0;
     return (
-      (question.maxLength || defaultMaxValue) - (question.startOffset || 0)
+      (question.maxLength || DEFAULT_MAX_VALUE) - (question.startOffset || 0)
     );
   }, [question]);
 
@@ -145,8 +209,9 @@ function AddQuizModal({
     visible: {scale: 1, opacity: 1},
   };
 
-  if (!isVisible) return <div />;
+  if (!visible) return <div />;
 
+  console.log(ignoreOffset);
   return (
     <AnimatePresence>
       <motion.div
@@ -156,7 +221,7 @@ function AddQuizModal({
         animate="visible"
         transition={transition}
         onClick={onRequestClose}
-        className="fixed top-0 left-0 right-0 bottom-0 backdrop-blur-md flex w-full h-full z-10 items-center justify-center flex-col">
+        className="fixed space-y-10 top-0 left-0 right-0 bottom-0 backdrop-blur-md flex w-full h-full z-10 items-center justify-center flex-col">
         <motion.div
           variants={modalVariants}
           initial="hidden"
@@ -217,8 +282,8 @@ function AddQuizModal({
                 onValueChange={(e: number[]) => {
                   handleInput(calculateOffset(e[0]), InputType.OFFSET);
                 }}
-                value={[offset || question.maxLength || defaultMaxValue]}
-                max={question.maxLength || defaultMaxValue}
+                value={[offset || question.maxLength || DEFAULT_MAX_VALUE]}
+                max={question.maxLength || DEFAULT_MAX_VALUE}
                 inverted
                 size={'1'}
               />
@@ -232,14 +297,14 @@ function AddQuizModal({
                 type={ButtonType.outline}
                 hotkey="C"
                 text="Cancel"
-                onClick={() => onRequestClose()}
+                onClick={onClose}
                 className="flex w-full"
               />
               <Button
                 textSize={'2'}
-                text="Add Song"
+                text={editIndex !== -1 ? 'Update Song' : 'Add Song'}
                 hotkey="Enter"
-                onClick={() => onSave(question)}
+                onClick={handleAction}
                 disabled={!isValid || !url.trim()}
                 ignoreMetaKey
                 className="flex w-full"
@@ -252,4 +317,6 @@ function AddQuizModal({
   );
 }
 
-export default AddQuizModal;
+export default forwardRef<AddQuestionModalRef, AddQuestionModalProps>(
+  AddQuestionModal,
+);

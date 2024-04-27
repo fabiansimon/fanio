@@ -77,6 +77,7 @@ export interface MetaData {
   title: string;
   length: number;
   imageUri: string;
+  sourceUrl: string;
   tags: string[];
 }
 

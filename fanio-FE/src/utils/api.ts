@@ -130,13 +130,12 @@ export async function fetchAllQuizzes(
   }
 }
 
-export async function fetchMetaData(url: string): Promise<MetaData> {
+export async function fetchMetaData(url: string): Promise<MetaData[]> {
   try {
-    const res = await _axios.post<MetaData>('/strip-meta', {
+    const res = await _axios.post<MetaData[]>('/strip-meta', {
       url,
       type: 'youtube',
     });
-    console.log(res.data);
     return res.data;
   } catch (error) {
     handleError({error, callName: 'fetchMetaData'});
