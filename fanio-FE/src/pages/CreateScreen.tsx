@@ -184,18 +184,16 @@ function CreateScreen(): JSX.Element {
 
   const addQuestion = (newQuestions: QuestionInput[]) => {
     const newTags = newQuestions.reduce((tagsAccumulator, question) => {
-      return new Set([
-        ...tagsAccumulator,
-        ...question.tags,
-        ...(quizInput?.tags || []),
-      ]);
-    }, new Set());
+      const questionTags = Array.isArray(question.tags) ? question.tags : [];
+      questionTags.forEach(tag => tagsAccumulator.add(tag));
+      return tagsAccumulator;
+    }, new Set(quizInput?.tags || []));
 
     setQuizInput(prev => {
       if (!prev) return;
       return {
         ...prev,
-        tags: Array.from([]),
+        tags: Array.from(newTags),
         questions: prev.questions.concat(newQuestions),
       };
     });
@@ -254,151 +252,144 @@ function CreateScreen(): JSX.Element {
       <PageContainer
         title="Create quiz"
         description="Make sure to only use youtube links at the moment.">
-        <HoverContainer className="my-auto px-4 max-h-[70%]">
-          {/* <div className="flex h-full w-[1px] bg-blue-500/50" /> */}
-          <div className="flex flex-col flex-grow">
-            {/* <div className="mr-auto mt-10 mb-2">
-              <Text className="text-white" weight={'medium'}>
-                1. Add a Title and description
-              </Text>tit
-            </div> */}
-
-            <div className="flex mr-auto mb-4 justify-between w-full">
-              <InputField
-                showSimple
-                value={quizInput?.title}
-                placeholder="Title"
-                maxLength={GAME_OPTIONS.MAX_QUIZ_TITLE_LENGTH}
-                className="text-xl"
-                trailing={
-                  <ValidationChip
-                    text={!quizInput?.title ? 'Missing title' : ''}
-                  />
-                }
-                onInput={({currentTarget: {value}}) =>
-                  handleInput(value, InputType.TITLE)
-                }
-              />
-              {quizInput?.options.isPrivate && (
-                <Chip
-                  className={isSmall ? '-mt-14 -mr-2' : ''}
-                  type={ChipType.PRIVATE}
-                />
-              )}
-            </div>
-
+        <div className="sm:mx-12 border border-neutral-700/50 shadow-black rounded-xl p-3 max-h-full my-auto">
+          <div className="flex mr-auto mb-4 justify-between w-full">
             <InputField
               showSimple
-              value={quizInput?.description}
-              placeholder="Description (optional)"
-              maxLength={GAME_OPTIONS.MAX_QUIZ_DESCRIPTION_LENGTH}
-              className="text-sm mb-2 text-white/70 h-50"
+              value={quizInput?.title}
+              placeholder="Title"
+              maxLength={GAME_OPTIONS.MAX_QUIZ_TITLE_LENGTH}
+              className="text-xl"
+              trailing={
+                <ValidationChip
+                  className="mb-2"
+                  text={!quizInput?.title ? 'Missing title' : ''}
+                />
+              }
               onInput={({currentTarget: {value}}) =>
-                handleInput(value, InputType.DESCRIPTION)
+                handleInput(value, InputType.TITLE)
               }
             />
-
-            {quizInput?.tags && quizInput.tags.length > 0 && (
-              <div className="space-y-2 mt-3">
-                <Heading className="text-white/80" size={'2'}>
-                  Tags
-                </Heading>
-                <div className="flex-wrap flex">
-                  {quizInput.tags.map((tag, i) => (
-                    <div
-                      onClick={() => removeTag(i)}
-                      key={i}
-                      className="flex cursor-pointer space-x-2 bg-neutral-600 rounded-md items-center justify-center py-1 px-[7px] mr-2 mb-2">
-                      <Text weight={'medium'} size={'1'} className="text-white">
-                        {tag}
-                      </Text>
-                      <Cross1Icon className="size-2 text-white" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-2 mt-4">
-              <Heading className="text-white/80" size={'2'}>
-                Options
-              </Heading>
-              <OptionsContainer
-                className="mt-2"
-                onInput={(value: boolean, type: InputType) =>
-                  handleInput(value, type)
-                }
+            {quizInput?.options.isPrivate && (
+              <Chip
+                className={isSmall ? '-mt-14 -mr-2' : ''}
+                type={ChipType.PRIVATE}
               />
-            </div>
-
-            <div className="mx-2 mt-5">
-              {quizInput?.questions && quizInput?.questions.length > 0 && (
-                <>
-                  <div className="mr-auto flex justify-between w-full">
-                    <Heading className="text-white/80" size={'2'}>
-                      {quizInput?.questions.length}{' '}
-                      {`Song${
-                        (quizInput?.questions.length || 0) > 1 ? 's' : ''
-                      } added`}
-                    </Heading>
-                    <ValidationChip
-                      text={containsDuplicated ? 'Duplicates' : ''}
-                    />
-                  </div>
-                  {containsDuplicated && (
-                    <Text
-                      onClick={removeDuplicates}
-                      size={'1'}
-                      className="text-white/50 underline cursor-pointer">
-                      Remove Duplicates
-                    </Text>
-                  )}
-                </>
-              )}
-              <ScrollArea scrollbars="vertical" type="always">
-                {quizInput?.questions.map((question, index) => (
-                  <QuestionPreviewContainer
-                    className="mt-4"
-                    ignoreOffset={quizInput.options.randomOffsets}
-                    key={index}
-                    question={question}
-                    onDelete={() => deleteQuestion(index)}
-                    onEdit={() => editQuestion(index)}
-                  />
-                ))}
-              </ScrollArea>
-            </div>
-
-            {quizInput &&
-              quizInput?.questions.length < GAME_OPTIONS.MAX_QUIZ_SONGS && (
-                <Button
-                  text="Add Song"
-                  hotkey="Enter"
-                  ignoreMetaKey
-                  onClick={() => setQuestionVisible(true)}
-                  icon={<PlusIcon className="text-white mr-2 size-5" />}
-                  className="flex mt-6 flex-grow w-[50%] mx-auto"
-                  type={ButtonType.outline}
-                  textSize="2"
-                />
-              )}
+            )}
           </div>
-          <Text
-            onClick={() => setQuizInput(INIT_QUIZ_INPUT)}
-            size={'1'}
-            className="text-white/50 underline cursor-pointer pt-4">
-            Reset Input
-          </Text>
-        </HoverContainer>
-        <Button
-          text="Create"
-          hotkey="C"
-          disabled={!inputValid}
-          onClick={createQuiz}
-          loading={isLoading}
-          className="flex mt-auto w-full"
-          textSize="3"
-        />
+
+          <InputField
+            showSimple
+            value={quizInput?.description}
+            placeholder="Description (optional)"
+            maxLength={GAME_OPTIONS.MAX_QUIZ_DESCRIPTION_LENGTH}
+            className="text-sm mb-2 text-white/70 h-50"
+            onInput={({currentTarget: {value}}) =>
+              handleInput(value, InputType.DESCRIPTION)
+            }
+          />
+
+          {quizInput?.tags && quizInput.tags.length > 0 && (
+            <div className="space-y-2 mt-3">
+              <Heading className="text-white/80" size={'2'}>
+                Tags
+              </Heading>
+              <div className="flex-wrap flex">
+                {quizInput.tags.map((tag, i) => (
+                  <div
+                    onClick={() => removeTag(i)}
+                    key={i}
+                    className="flex cursor-pointer space-x-2 bg-neutral-600 rounded-md items-center justify-center py-1 px-[7px] mr-2 mb-2">
+                    <Text weight={'medium'} size={'1'} className="text-white">
+                      {tag}
+                    </Text>
+                    <Cross1Icon className="size-2 text-white" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2 mt-4">
+            <Heading className="text-white/80" size={'2'}>
+              Options
+            </Heading>
+            <OptionsContainer
+              className="mt-2"
+              onInput={(value: boolean, type: InputType) =>
+                handleInput(value, type)
+              }
+            />
+          </div>
+
+          <div className="mx-2 mt-5 max-h-full flex-grow">
+            {quizInput?.questions && quizInput?.questions.length > 0 && (
+              <>
+                <div className="mr-auto flex justify-between w-full">
+                  <Heading className="text-white/80" size={'2'}>
+                    {quizInput?.questions.length}{' '}
+                    {`Song${
+                      (quizInput?.questions.length || 0) > 1 ? 's' : ''
+                    } added`}
+                  </Heading>
+                  <ValidationChip
+                    text={containsDuplicated ? 'Duplicates' : ''}
+                  />
+                </div>
+                {containsDuplicated && (
+                  <Text
+                    onClick={removeDuplicates}
+                    size={'1'}
+                    className="text-white/50 underline cursor-pointer">
+                    Remove Duplicates
+                  </Text>
+                )}
+              </>
+            )}
+            <div className="overflow-y-auto pr-2 flex-grow max-h-[2%]">
+              {quizInput?.questions.map((question, index) => (
+                <QuestionPreviewContainer
+                  className="mt-4"
+                  ignoreOffset={quizInput.options.randomOffsets}
+                  key={index}
+                  question={question}
+                  onDelete={() => deleteQuestion(index)}
+                  onEdit={() => editQuestion(index)}
+                />
+              ))}
+            </div>
+          </div>
+          {quizInput &&
+            quizInput?.questions.length < GAME_OPTIONS.MAX_QUIZ_SONGS && (
+              <Button
+                text="Add Song"
+                hotkey="Enter"
+                ignoreMetaKey
+                onClick={() => setQuestionVisible(true)}
+                icon={<PlusIcon className="text-white mr-2 size-5" />}
+                className="flex mt-6 flex-grow w-[50%] mx-auto"
+                type={ButtonType.outline}
+                textSize="2"
+              />
+            )}
+          <Button
+            text="Create Quiz"
+            hotkey="C"
+            disabled={!inputValid}
+            onClick={createQuiz}
+            loading={isLoading}
+            className="flex mt-2 flex-grow w-[50%] mx-auto"
+            textSize="2"
+          />
+          <div className="justify-center flex">
+            <Text
+              onClick={() => setQuizInput(INIT_QUIZ_INPUT)}
+              size={'1'}
+              className="text-white/50 underline cursor-pointer pt-4">
+              Reset Input
+            </Text>
+          </div>
+        </div>
       </PageContainer>
     </>
   );

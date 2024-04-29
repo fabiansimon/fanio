@@ -6,6 +6,7 @@ import com.fabiansimon.fanio.DTO.MetaResponseDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.hibernate.jdbc.Expectation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,14 +26,13 @@ public class MetaDataService {
     private final Integer MAX_PLAYLIST_ITEMS = 10;
     RestTemplate template = new RestTemplate();
 
-    public List<MetaResponseDTO> getMetaData(MetaRequestDTO requestDTO) {
+    public List<MetaResponseDTO> getMetaData(MetaRequestDTO requestDTO) throws Exception {
         String url = requestDTO.getUrl();
 
         String playlistId = extractPlaylistId(url);
         String videoId = extractVideoId(url);
 
         String json = playlistId != null ? fetchYoutubeListData(playlistId) : fetchYoutubeVideoData(videoId);
-
         List<MetaResponseDTO> response = extractJsonData(json, videoId, playlistId);
 
         return response;
@@ -110,7 +110,7 @@ public class MetaDataService {
         return null;
     }
 
-    private String fetchYoutubeVideoData(String videoId) {
+    private String fetchYoutubeVideoData(String videoId) throws Exception {
         String url = UriComponentsBuilder
                 .fromHttpUrl("https://www.googleapis.com/youtube/v3/videos")
                 .queryParam("part", "id,snippet,contentDetails,statistics")
@@ -118,53 +118,27 @@ public class MetaDataService {
                 .queryParam("key", youtubeKey)
                 .toUriString();
 
-        return template.getForObject(url, String.class);
+        try {
+            return template.getForObject(url, String.class);
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
+
     }
-    private String fetchYoutubeListData(String playlistId) {
+    private String fetchYoutubeListData(String playlistId) throws Exception {
         String url = UriComponentsBuilder
                 .fromHttpUrl("https://www.googleapis.com/youtube/v3/playlistItems")
                 .queryParam("part", "id,snippet,contentDetails")
-                .queryParam("maxResults", MAX_PLAYLIST_ITEMS+1)
+                .queryParam("maxResults", MAX_PLAYLIST_ITEMS + 1)
                 .queryParam("playlistId", playlistId)
                 .queryParam("key", youtubeKey)
                 .toUriString();
 
-        return template.getForObject(url, String.class);
-    }
-
-    private String extractThumbnail(String body) throws Exception {
-        String key = "thumbnails\":[{\"url\":\"";
-        int start = body.indexOf(key), right;
-        if (start == -1) {
-            throw new Exception("Unable to extract the thumbnail");
+        try {
+            return template.getForObject(url, String.class);
+        } catch (Exception e) {
+            throw new Exception(e);
         }
-
-        start += key.length();
-        right = start;
-        while (body.charAt(right++) != '\\');
-
-        return body.substring(start, right-1);
-    }
-    private Integer extractLength(String body) throws Exception {
-        String key = "approxDurationMs";
-        int start = body.indexOf(key), right;
-        if (start == -1) {
-            throw new Exception("Unable to extract the length");
-        }
-        start += key.length() + 3; // Include key length and remove the '""' and ':';
-        right = start;
-        while (Character.isDigit(body.charAt(right++)));
-        return Integer.parseInt(body.substring(start, right-1)) / 1000; // milliseconds > seconds
-    }
-
-    private String stripTitle(String body) {
-        String startKey = "<title>", endKey = "</title>";
-        int start = body.indexOf(startKey) + startKey.length();
-        int end = body.indexOf(endKey);
-        if (start == -1 || end == -1) {
-            return "";
-        }
-        return body.substring(start, end);
     }
 
     private static String trimSides(String title) {

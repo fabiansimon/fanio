@@ -211,7 +211,6 @@ function AddQuestionModal(
 
   if (!visible) return <div />;
 
-  console.log(ignoreOffset);
   return (
     <AnimatePresence>
       <motion.div
