@@ -9,7 +9,12 @@ import {
 } from 'react';
 import {AnimatePresence, motion} from 'framer-motion';
 import {InputType} from '../pages/CreateScreen';
-import {ButtonType, ModalProps, QuestionInput} from '../types';
+import {
+  ButtonType,
+  ModalProps,
+  QuestionInput,
+  QuestionInputType,
+} from '../types';
 import {fetchMetaData} from '../utils/api';
 import {REGEX} from '../constants/Regex';
 import {Slider, Strong, Text} from '@radix-ui/themes';
@@ -24,6 +29,7 @@ import {INIT_QUESTION_INPUT} from '../constants/Init';
 
 interface AddQuestionModalProps extends ModalProps {
   ignoreOffset?: boolean;
+  type?: QuestionInputType;
   onSave: (questions: QuestionInput[]) => void;
   onEdit: (question: QuestionInput, index: number) => void;
 }
@@ -44,6 +50,7 @@ const transition = {
 function AddQuestionModal(
   {
     isVisible,
+    type,
     onRequestClose,
     ignoreOffset,
     onSave,
@@ -93,7 +100,7 @@ function AddQuestionModal(
     try {
       if (!REGEX.youtube.test(url)) return;
       const res = await fetchMetaData(url);
-      if (res.length > 1) {
+      if (res.length > 1 && type === QuestionInputType.PLAYLIST) {
         let questions: QuestionInput[] = [];
         for (const question of res) {
           const {
@@ -118,6 +125,7 @@ function AddQuestionModal(
         onSave(questions);
         return;
       }
+
       const {title, length, imageUri, sourceTitle, tags, sourceUrl} = res[0];
       setQuestion(prev => {
         return {

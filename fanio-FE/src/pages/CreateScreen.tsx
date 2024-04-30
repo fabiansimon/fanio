@@ -17,7 +17,13 @@ import {
   Cross2Icon,
 } from '@radix-ui/react-icons';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import {ButtonType, ChipType, QuestionInput, QuizInput} from '../types';
+import {
+  ButtonType,
+  ChipType,
+  QuestionInput,
+  QuestionInputType,
+  QuizInput,
+} from '../types';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
 import {uploadQuiz} from '../utils/api';
@@ -60,7 +66,8 @@ enum Status {
 
 function CreateScreen(): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [questionVisible, setQuestionVisible] = useState<boolean>(false);
+  const [questionInputType, setQuestionInputType] =
+    useState<QuestionInputType | null>(null);
   const [quizInput, setQuizInput] = useState<QuizInput | undefined>();
 
   const addModalRef = useRef<AddQuestionModalRef>(null);
@@ -203,7 +210,7 @@ function CreateScreen(): JSX.Element {
       };
     });
 
-    setQuestionVisible(false);
+    setQuestionInputType(null);
   };
 
   const deleteQuestion = (index: number) => {
@@ -249,56 +256,114 @@ function CreateScreen(): JSX.Element {
       <AddQuestionModal
         ref={addModalRef}
         ignoreOffset={quizInput?.options.randomOffsets}
-        isVisible={questionVisible}
-        onRequestClose={() => setQuestionVisible(false)}
+        isVisible={questionInputType !== null}
+        type={questionInputType || QuestionInputType.SONG}
+        onRequestClose={() => setQuestionInputType(null)}
         onSave={addQuestion}
         onEdit={replaceQuestion}
       />
       <PageContainer title="Create quiz">
-        <div className="flex flex-col">
-          <Heading size={'5'} className="text-white">
-            1. Name Quiz
-          </Heading>
-          <Text className="text-white/50">
-            Make sure the title fits the theme of the quiz
-          </Text>
-          <div className="pt-8 flex">
-            <StatusIndicator
-              className="mr-2 mt-1"
-              status={quizInput?.title ? Status.SUCCESS : Status.ERROR}
-            />
-            <div>
-              <Text size={'2'} weight={'medium'} className="text-white/50">
-                Add Title
-              </Text>
-              <InputField
-                value={quizInput?.title}
-                showSimple
-                onInput={({currentTarget: {value}}) =>
-                  handleInput(value, InputType.TITLE)
-                }
-                placeholder="e.g. Taylor Swift"
-                maxLength={GAME_OPTIONS.MAX_QUIZ_TITLE_LENGTH}
-                className="font-bold text-[20px] border-none"
+        <div className="flex-grow min-h-full overflow-y-auto">
+          <div className="flex flex-col flex-grow min-h-[200%]">
+            <Heading size={'4'} className="text-white">
+              1. Name Quiz
+            </Heading>
+            <Text size={'2'} className="text-white/50">
+              Make sure the title fits the theme of the quiz
+            </Text>
+            <div className="pt-8 flex">
+              <StatusIndicator
+                className="mr-2 mt-1"
+                status={quizInput?.title ? Status.SUCCESS : Status.ERROR}
               />
+              <div>
+                <Text size={'2'} weight={'medium'} className="text-white/50">
+                  Add Title
+                </Text>
+                <InputField
+                  value={quizInput?.title}
+                  showSimple
+                  onInput={({currentTarget: {value}}) =>
+                    handleInput(value, InputType.TITLE)
+                  }
+                  placeholder="e.g. Taylor Swift"
+                  maxLength={GAME_OPTIONS.MAX_QUIZ_TITLE_LENGTH}
+                  className="font-bold text-[20px] border-none"
+                />
+              </div>
             </div>
-          </div>
-          <div className="pt-4 flex">
-            <div className="size-8" />
-            <div className="flex flex-col flex-grow">
-              <Text size={'2'} weight={'medium'} className="text-white/50">
-                Add Description (optional)
+            <div className="pt-4 flex">
+              <div className="size-8" />
+              <div className="flex flex-col flex-grow">
+                <Text size={'2'} weight={'medium'} className="text-white/50">
+                  Add Description (optional)
+                </Text>
+                <InputField
+                  showSimple
+                  value={quizInput?.description}
+                  placeholder="e.g. Her biggest hits 2024"
+                  maxLength={GAME_OPTIONS.MAX_QUIZ_DESCRIPTION_LENGTH}
+                  className="text-sm mb-2 text-white/70 max-w-[100%] pt-1 border-none"
+                  onInput={({currentTarget: {value}}) =>
+                    handleInput(value, InputType.DESCRIPTION)
+                  }
+                />
+              </div>
+            </div>
+            <div>
+              <Heading size={'4'} className="text-white pt-8">
+                2. Select Options
+              </Heading>
+              <div className="space-y-2 mt-4">
+                <OptionsContainer
+                  className="mt-2"
+                  onInput={(value: boolean, type: InputType) =>
+                    handleInput(value, type)
+                  }
+                />
+              </div>
+            </div>
+            <div className="flex flex-col w-full">
+              <Heading size={'4'} className="text-white pt-8">
+                3. Add Songs
+              </Heading>
+              <Text size={'2'} className="text-white/50">
+                You can either link Youtube Videos or Youtube Playlists
               </Text>
-              <InputField
-                showSimple
-                value={quizInput?.description}
-                placeholder="e.g. Her biggest hits 2024"
-                maxLength={GAME_OPTIONS.MAX_QUIZ_DESCRIPTION_LENGTH}
-                className="text-sm mb-2 text-white/70 max-w-[100%] pt-1 border-none"
-                onInput={({currentTarget: {value}}) =>
-                  handleInput(value, InputType.DESCRIPTION)
-                }
-              />
+              {quizInput?.questions.map((question, index) => (
+                <QuestionPreviewContainer
+                  className="mt-4"
+                  ignoreOffset={quizInput.options.randomOffsets}
+                  key={index}
+                  question={question}
+                  onDelete={() => deleteQuestion(index)}
+                  onEdit={() => editQuestion(index)}
+                />
+              ))}
+              {quizInput &&
+                quizInput?.questions.length < GAME_OPTIONS.MAX_QUIZ_SONGS && (
+                  <div className="flex space-x-2 mt-3">
+                    <Button
+                      textSize="2"
+                      text="Add Song"
+                      className="flex flex-grow"
+                      onClick={() =>
+                        setQuestionInputType(QuestionInputType.SONG)
+                      }
+                      icon={<PlusIcon className="text-white mr-2 size-5" />}
+                    />
+                    <Button
+                      textSize="2"
+                      type={ButtonType.outline}
+                      text="Add Playlist"
+                      className="flex flex-grow"
+                      onClick={() =>
+                        setQuestionInputType(QuestionInputType.SONG)
+                      }
+                      icon={<PlusIcon className="text-white mr-2 size-5" />}
+                    />
+                  </div>
+                )}
             </div>
           </div>
         </div>

@@ -184,3 +184,8 @@ export enum ToastType {
   WARNING,
   SUCCESS,
 }
+
+export enum QuestionInputType {
+  SONG,
+  PLAYLIST,
+}
