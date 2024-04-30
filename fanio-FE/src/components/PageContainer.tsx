@@ -73,7 +73,7 @@ function PageContainer(
     <div
       ref={divRef}
       className={UI.cn(
-        'flex items-center justify-center transition-colors ease-in-out w-full fixed',
+        'flex items-center justify-center transition-colors ease-in-out w-full fixed py-4',
         `duration-${BACKGROUND_ANIMATION_DURATION}`,
         backgroundColor,
         className,

@@ -12,11 +12,21 @@ export function shuffle(questions: Question[]) {
 
 export function similarity(input: string, answer: string) {
   input = sanitizeTerm(input);
-  answer = sanitizeTerm(answer);
-  const max = Math.max(input.length, answer.length);
-  if (max === 0) return 100;
+  let bestScore = 0;
+  for (const a of answer.split('/')) {
+    answer = sanitizeTerm(a);
+    const max = Math.max(input.length, a.length);
+    if (max === 0) {
+      bestScore = 100;
+    } else {
+      bestScore = Math.max(
+        ((max - levenshteinDistance(input, a)) / max) * 100,
+        bestScore,
+      );
+    }
+  }
 
-  return ((max - levenshteinDistance(input, answer)) / max) * 100;
+  return bestScore;
 }
 
 export function sanitizeTerm(input: string) {

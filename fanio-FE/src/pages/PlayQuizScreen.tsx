@@ -207,7 +207,8 @@ function PlayQuizScreen(): JSX.Element {
       videoRef.current &&
       !result &&
       Math.abs(question.answer.length - input.length) <= 2 &&
-      similarity(input, question!.answer) > GAME_OPTIONS.ANSWER_THRESHOLD
+      // similarity(input, question!.answer) > GAME_OPTIONS.ANSWER_THRESHOLD
+      similarity(input, 'Fiesling/Boiler') > GAME_OPTIONS.ANSWER_THRESHOLD
     );
   };
 
@@ -382,7 +383,8 @@ function PlayQuizScreen(): JSX.Element {
               )}
               <InputField
                 trailing={
-                  result === undefined && (
+                  result === undefined &&
+                  !isLoading && (
                     <div
                       onClick={() => handleSongEnd(false)}
                       className="mb-4 cursor-pointer flex items-center space-x-2 mr-4">
