@@ -13,6 +13,18 @@ export const INIT_QUESTION_INPUT = {
   tags: [],
 };
 
+export const INIT_QUIZ_INPUT = {
+  title: '',
+  description: '',
+  artists: [],
+  questions: [],
+  tags: [],
+  options: {
+    isPrivate: false,
+    randomOffsets: false,
+  },
+};
+
 export const INIT_GAME_SETTINGS = {
   autoDeleteInput: {
     title: GAME_OPTIONS.GAME_SETTINGS_STRINGS.autoDeleteInput.title,

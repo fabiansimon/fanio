@@ -6,7 +6,16 @@ import {
   Text,
 } from '@radix-ui/themes';
 import Button from '../components/Button';
-import {PlusIcon, DotsVerticalIcon, Cross1Icon} from '@radix-ui/react-icons';
+import {
+  PlusIcon,
+  DotsVerticalIcon,
+  Cross1Icon,
+  CheckCircledIcon,
+  CrossCircledIcon,
+  QuestionMarkIcon,
+  CheckIcon,
+  Cross2Icon,
+} from '@radix-ui/react-icons';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {ButtonType, ChipType, QuestionInput, QuizInput} from '../types';
 import {useNavigate} from 'react-router-dom';
@@ -28,6 +37,8 @@ import AuthPopUp from '../components/AuthPopUp';
 import AddQuestionModal, {
   AddQuestionModalRef,
 } from '../components/AddQuestionModal';
+import {INIT_QUIZ_INPUT} from '../constants/Init';
+import {STATUS_CODES} from 'http';
 
 export enum InputType {
   TITLE,
@@ -41,17 +52,11 @@ export enum InputType {
   PRIVATE_QUIZ,
 }
 
-const INIT_QUIZ_INPUT = {
-  title: '',
-  description: '',
-  artists: [],
-  questions: [],
-  tags: [],
-  options: {
-    isPrivate: false,
-    randomOffsets: false,
-  },
-};
+enum Status {
+  NEUTRAL,
+  SUCCESS,
+  ERROR,
+}
 
 function CreateScreen(): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -249,14 +254,89 @@ function CreateScreen(): JSX.Element {
         onSave={addQuestion}
         onEdit={replaceQuestion}
       />
-      <PageContainer
-        title="Create quiz"
-        description="Make sure to only use youtube links at the moment.">
-        <div>
-          <Heading className="text-white">1. Name Quiz</Heading>
+      <PageContainer title="Create quiz">
+        <div className="flex flex-col">
+          <Heading size={'5'} className="text-white">
+            1. Name Quiz
+          </Heading>
+          <Text className="text-white/50">
+            Make sure the title fits the theme of the quiz
+          </Text>
+          <div className="pt-8 flex">
+            <StatusIndicator
+              className="mr-2 mt-1"
+              status={quizInput?.title ? Status.SUCCESS : Status.ERROR}
+            />
+            <div>
+              <Text size={'2'} weight={'medium'} className="text-white/50">
+                Add Title
+              </Text>
+              <InputField
+                value={quizInput?.title}
+                showSimple
+                onInput={({currentTarget: {value}}) =>
+                  handleInput(value, InputType.TITLE)
+                }
+                placeholder="e.g. Taylor Swift"
+                maxLength={GAME_OPTIONS.MAX_QUIZ_TITLE_LENGTH}
+                className="font-bold text-[20px] border-none"
+              />
+            </div>
+          </div>
+          <div className="pt-4 flex">
+            <div className="size-8" />
+            <div className="flex flex-col flex-grow">
+              <Text size={'2'} weight={'medium'} className="text-white/50">
+                Add Description (optional)
+              </Text>
+              <InputField
+                showSimple
+                value={quizInput?.description}
+                placeholder="e.g. Her biggest hits 2024"
+                maxLength={GAME_OPTIONS.MAX_QUIZ_DESCRIPTION_LENGTH}
+                className="text-sm mb-2 text-white/70 max-w-[100%] pt-1 border-none"
+                onInput={({currentTarget: {value}}) =>
+                  handleInput(value, InputType.DESCRIPTION)
+                }
+              />
+            </div>
+          </div>
         </div>
       </PageContainer>
     </>
+  );
+}
+
+function StatusIndicator({
+  status,
+  className,
+}: {
+  status: Status;
+  className?: string;
+}): JSX.Element {
+  const {icon, backgroundColor} = useMemo(() => {
+    return {
+      icon: [
+        <QuestionMarkIcon className="text-white/30 size-3" />,
+        <CheckIcon className="text-green-500/80" />,
+        <Cross2Icon className="text-red-500/90" />,
+      ][status],
+      backgroundColor: [
+        'bg-neutral-500/30',
+        'bg-green-500/30',
+        'bg-red-500/35',
+      ][status],
+    };
+  }, [status]);
+  return (
+    <div
+      className={UI.cn(
+        'size-6 flex items-center justify-center rounded-md',
+        backgroundColor,
+        className,
+      )}>
+      {icon}
+    </div>
   );
 }
 
