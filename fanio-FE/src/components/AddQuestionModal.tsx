@@ -298,7 +298,7 @@ function AddQuestionModal(
           )}
 
           {validUrl && (
-            <div className="flex justify-between mx-1 pt-2 space-x-2">
+            <div className="flex justify-between mx-1 pt-4 space-x-2">
               <Button
                 textSize={'2'}
                 type={ButtonType.outline}
