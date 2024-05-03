@@ -152,24 +152,25 @@ public class MetaDataService {
         return left <= right ? title.substring(left, right + 1) : "";
     }
 
-    private static String cleanRawTitle(String title) {
+    public static String cleanRawTitle(String title) {
         try {
+            String[] featKeys = {"feat", "feat.", "ft", "ft.", "feature", "featuring", "by", "official video", "official music video", "music video", "prod", "prod.", "official version", "audio"};
             String lowerTitle = title.toLowerCase();
-            String[] featKeys = {"feat", "feat.", "ft", "ft.", "feature", "featuring", "by", "official video", "official music video", "music video", "prod", "prod.", "official version"};
-            int dashIndex = title.indexOf("-");
-            int left = dashIndex != -1 ? dashIndex + 1 : 0;
-            int right = title.length() - 1;
+
+            int dashIndex = lowerTitle.indexOf("-");
+            int left = dashIndex == -1 ? 0 : dashIndex + 1;
+            int right = title.length();
 
             for (String s : featKeys) {
-                int index = lowerTitle.indexOf(s);
-                if (index != -1) {
-                    right = Math.min(right, index);
+                int i = lowerTitle.indexOf(s);
+                if (i != -1 && i > left && !Character.isLetterOrDigit(title.charAt(i-1))) {
+                    right = Math.min(right, i);
                 }
             }
 
             return trimSides(title.substring(left, right));
         } catch (Exception e) {
-            return "";
+            throw new IllegalArgumentException("Failed to clean title: " + title, e);
         }
     }
 }
