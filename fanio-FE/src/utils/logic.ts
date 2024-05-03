@@ -12,18 +12,28 @@ export function shuffle(questions: Question[]) {
 
 export function similarity(input: string, answer: string) {
   input = sanitizeTerm(input);
-  answer = sanitizeTerm(answer);
-  const max = Math.max(input.length, answer.length);
-  if (max === 0) return 100;
+  let bestScore = 0;
+  for (let a of answer.split('/')) {
+    a = sanitizeTerm(a);
+    const max = Math.max(input.length, a.length);
+    if (max === 0) {
+      bestScore = 100;
+    } else {
+      bestScore = Math.max(
+        ((max - levenshteinDistance(input, a)) / max) * 100,
+        bestScore,
+      );
+    }
+  }
 
-  return ((max - levenshteinDistance(input, answer)) / max) * 100;
+  return bestScore;
 }
 
 export function sanitizeTerm(input: string) {
   let clean = '';
   for (const char of input) {
-    if (!/[\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(char)) {
-      if (/[äöüß]/.test(char)) {
+    if (!/[\s!@#$%^*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(char)) {
+      if (/[äöüß&]/.test(char)) {
         clean += cleanSpecialCharacters(char.toLowerCase());
       } else {
         clean += char.toLowerCase();
@@ -43,6 +53,8 @@ export function rateScore(currScore: number, topScore: number) {
 
 function cleanSpecialCharacters(c: string) {
   switch (c) {
+    case '&':
+      return 'and';
     case 'ä':
       return 'ae';
     case 'ö':

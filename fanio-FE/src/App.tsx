@@ -17,6 +17,7 @@ import LeaderboardScreen from './pages/LeaderboardScreen';
 import PlayQuizScreen from './pages/PlayQuizScreen';
 import {GoogleOAuthProvider} from '@react-oauth/google';
 import UserDataProvider from './providers/UserDataProvider';
+import NavBar from './components/NavBar';
 
 const googleAuthClientId = process.env.REACT_APP_GOOGLE_AUTH_CLIENT_ID!;
 
@@ -46,6 +47,7 @@ function App(): JSX.Element {
                   element={<QuizScoreScreen />}
                 />
               </Routes>
+              <NavBar />
             </Router>
             <Toast />
           </Theme>

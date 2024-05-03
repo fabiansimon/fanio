@@ -6,7 +6,6 @@ import PaginationBar from '../components/PaginationBar';
 import QuizList from '../components/QuizList';
 import {PAGE_DATA} from '../constants/Data';
 import PageContainer from '../components/PageContainer';
-import {ScrollArea} from '@radix-ui/themes';
 
 function QuizListScreen(): JSX.Element {
   const [quizData, setQuizData] = useState<PaginatedData<Quiz> | null>();

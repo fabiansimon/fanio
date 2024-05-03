@@ -382,14 +382,17 @@ function PlayQuizScreen(): JSX.Element {
               )}
               <InputField
                 trailing={
-                  <div
-                    onClick={() => handleSongEnd()}
-                    className="mb-4 cursor-pointer flex items-center space-x-2 mr-4">
-                    <Text size={'2'} className="text-white/50">
-                      Skip
-                    </Text>
-                    <TrackNextIcon className="text-white/50" />
-                  </div>
+                  result === undefined &&
+                  !isLoading && (
+                    <div
+                      onClick={() => handleSongEnd(false)}
+                      className="mb-4 cursor-pointer flex items-center space-x-2 mr-4">
+                      <Text size={'2'} className="text-white/50">
+                        Skip
+                      </Text>
+                      <TrackNextIcon className="text-white/50" />
+                    </div>
+                  )
                 }
                 disabled={disableInput}
                 showSimple

@@ -13,6 +13,7 @@ import TopQuizListContainer from '../components/TopQuizListContainer';
 import AllGamesContainer from '../components/AllGamesContainer';
 import LeaderboardContainer from '../components/LeaderboardContainer';
 import useBreakingPoints from '../hooks/useBreakingPoints';
+import Logo from '../components/Logo';
 
 interface MenuOptions {
   title: string;
@@ -89,19 +90,21 @@ function LandingScreen(): JSX.Element {
   return (
     <div className="flex flex-col bg-neutral-950 items-center w-full h-screen fixed">
       <>
-        <div className="w-full mt-12 pl-4 space-y-2">
-          <Heading size={'8'} className="text-white text-center">
-            Fan.io 🎤
+        <div className="w-full mt-16 mb-2 pl-4 space-y-2 flex items-center justify-center">
+          <Logo className="size-6" />
+          <Heading size={'6'} weight={'medium'} className="text-white pb-1">
+            anio
           </Heading>
-          <MarqueeContainer className="-ml-4" />
         </div>
 
+        <MarqueeContainer className="-ml-4" />
         <SearchContainer
           ref={searchRef}
           setSearchResult={setSearchResult}
           className="flex flex-1 justify-center"
         />
       </>
+
       <motion.div
         animate={searchResults ? 'hidden' : 'shown'}
         variants={animatedStates}
