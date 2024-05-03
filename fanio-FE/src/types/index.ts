@@ -189,3 +189,9 @@ export enum QuestionInputType {
   SONG,
   PLAYLIST,
 }
+
+export enum StatusType {
+  NEUTRAL,
+  SUCCESS,
+  ERROR,
+}

@@ -14,6 +14,7 @@ import {
   ModalProps,
   QuestionInput,
   QuestionInputType,
+  StatusType,
 } from '../types';
 import {fetchMetaData} from '../utils/api';
 import {REGEX} from '../constants/Regex';
@@ -61,7 +62,7 @@ function AddQuestionModal(
   const [editIndex, setEditIndex] = useState<number>(-1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [question, setQuestion] = useState<QuestionInput>(INIT_QUESTION_INPUT);
-  const [errorMessage, setErrorMessage] = useState<string | null>(
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
     'Invalid url',
   );
 
@@ -203,7 +204,7 @@ function AddQuestionModal(
       return false;
     }
 
-    setErrorMessage(null);
+    setErrorMessage(undefined);
     return true;
   }, [answer, validUrl, url]);
 
@@ -245,7 +246,8 @@ function AddQuestionModal(
           )}>
           <div className="flex">
             <ValidationChip
-              text={errorMessage || ''}
+              status={errorMessage ? StatusType.ERROR : StatusType.SUCCESS}
+              text={errorMessage}
               className="absolute right-0 -top-8 "
             />
             <div className="flex flex-col space-y-1 flex-1">

@@ -13,8 +13,8 @@ export function shuffle(questions: Question[]) {
 export function similarity(input: string, answer: string) {
   input = sanitizeTerm(input);
   let bestScore = 0;
-  for (const a of answer.split('/')) {
-    answer = sanitizeTerm(a);
+  for (let a of answer.split('/')) {
+    a = sanitizeTerm(a);
     const max = Math.max(input.length, a.length);
     if (max === 0) {
       bestScore = 100;
@@ -32,8 +32,8 @@ export function similarity(input: string, answer: string) {
 export function sanitizeTerm(input: string) {
   let clean = '';
   for (const char of input) {
-    if (!/[\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(char)) {
-      if (/[äöüß]/.test(char)) {
+    if (!/[\s!@#$%^*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(char)) {
+      if (/[äöüß&]/.test(char)) {
         clean += cleanSpecialCharacters(char.toLowerCase());
       } else {
         clean += char.toLowerCase();
@@ -53,6 +53,8 @@ export function rateScore(currScore: number, topScore: number) {
 
 function cleanSpecialCharacters(c: string) {
   switch (c) {
+    case '&':
+      return 'and';
     case 'ä':
       return 'ae';
     case 'ö':

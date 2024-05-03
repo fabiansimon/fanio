@@ -207,8 +207,7 @@ function PlayQuizScreen(): JSX.Element {
       videoRef.current &&
       !result &&
       Math.abs(question.answer.length - input.length) <= 2 &&
-      // similarity(input, question!.answer) > GAME_OPTIONS.ANSWER_THRESHOLD
-      similarity(input, 'Fiesling/Boiler') > GAME_OPTIONS.ANSWER_THRESHOLD
+      similarity(input, question!.answer) > GAME_OPTIONS.ANSWER_THRESHOLD
     );
   };
 
