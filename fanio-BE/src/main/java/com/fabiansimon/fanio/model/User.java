@@ -1,37 +1,39 @@
 package com.fabiansimon.fanio.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "questions")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Question {
+public class User {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
+
     @CreationTimestamp
-    private Date addedAt;
-    @UpdateTimestamp
-    private Date updatedAt;
-    private String url;
-    private String answer;
-    private String sourceTitle;
-    private Double startOffset;
+    private Date createdAt;
+
+    private String userName;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "quiz_user_id", referencedColumnName = "id")
+    private List<Quiz> quizzes;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "score_user_id", referencedColumnName = "id")
+    private List<Score> scores;
 }
