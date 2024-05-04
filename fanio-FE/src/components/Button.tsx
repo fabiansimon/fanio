@@ -1,6 +1,5 @@
 import React, {useMemo} from 'react';
 import {Button as RadixButton, Kbd, Text} from '@radix-ui/themes';
-import useKeyShortcut from '../hooks/useKeyShortcut';
 import KeyBinding from './KeyBinding';
 import {UI} from '../utils/common';
 import {ButtonType} from '../types';
@@ -30,8 +29,16 @@ function Button({
   ...rest
 }: any): JSX.Element {
   const customClass = useMemo(() => {
-    if (type === ButtonType.outline)
-      return 'bg-transparent border border-neutral-700';
+    switch (type) {
+      case ButtonType.outline:
+        return 'bg-transparent border border-neutral-700';
+
+      case ButtonType.text:
+        return 'bg-transparent';
+
+      default:
+        break;
+    }
 
     return 'bg-blue-600';
   }, [type]);

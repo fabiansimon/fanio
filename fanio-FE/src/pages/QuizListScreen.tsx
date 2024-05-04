@@ -1,27 +1,29 @@
 import {useCallback, useEffect, useState} from 'react';
 import {PaginatedData, PaginationState, Quiz} from '../types';
-import {fetchAllQuizzes} from '../utils/api';
+import {fetchTopQuizzes} from '../utils/api';
 import SearchInput from '../components/SearchInput';
 import PaginationBar from '../components/PaginationBar';
 import QuizList from '../components/QuizList';
 import {PAGE_DATA} from '../constants/Data';
 import PageContainer from '../components/PageContainer';
 
+const INIT_PAGINATION_STATE = {
+  pageIndex: 0,
+  maxItems: PAGE_DATA.maxItemsOptions[1],
+};
+
 function QuizListScreen(): JSX.Element {
   const [quizData, setQuizData] = useState<PaginatedData<Quiz> | null>();
   const [searchResults, setSearchResult] = useState<Quiz[] | null>(null);
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    maxItems: PAGE_DATA.maxItemsOptions[0],
-  });
+  const [pagination, setPagination] = useState(INIT_PAGINATION_STATE);
 
   const loadQuizzes = useCallback(async () => {
     try {
       const {pageIndex, maxItems} = pagination;
-      const {totalElements, content} = await fetchAllQuizzes(
-        pageIndex,
-        maxItems,
-      );
+      const {totalElements, content} = await fetchTopQuizzes({
+        page: pageIndex,
+        size: maxItems,
+      });
       setQuizData({totalElements, content});
     } catch (error) {
       console.error(error);
@@ -51,6 +53,7 @@ function QuizListScreen(): JSX.Element {
         data={searchResults || quizData?.content || []}
       />
       <PaginationBar
+        initialState={INIT_PAGINATION_STATE}
         className="mt-4"
         totalElements={quizData?.totalElements || 0}
         onValueChange={handlePaginationChange}

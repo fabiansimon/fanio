@@ -18,9 +18,12 @@ function ValidationChip({
   className?: string;
 }): JSX.Element {
   const {icon, backgroundColor, textColor} = useMemo(() => {
-    const textColor = ['text-white/30', 'text-green-500/80', 'text-red-500/90'][
-      status
-    ];
+    const textColor = [
+      'text-white/30',
+      'text-green-500/80',
+      'text-red-500/90',
+      'text-orange-500/90',
+    ][status];
 
     return {
       textColor,
@@ -33,6 +36,7 @@ function ValidationChip({
         'bg-neutral-500/30',
         'bg-green-500/30',
         'bg-red-500/30',
+        'bg-orange-500/30',
       ][status],
     };
   }, [status]);

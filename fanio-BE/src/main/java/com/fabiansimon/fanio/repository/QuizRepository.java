@@ -17,4 +17,8 @@ public interface QuizRepository extends JpaRepository<Quiz, UUID> {
     Page<Quiz> findByTitleContainingIgnoreCaseOrTagsContainingAndIsPrivateFalse(@Param("term") String term, Pageable pageable);
 
     Page<Quiz> findAllByIsPrivateFalse(Pageable pageable);
+
+    @Query(value = "SELECT * FROM quizzes WHERE is_private = false ORDER BY total_plays DESC",
+            nativeQuery = true)
+    Page<Quiz> findTopQuizzes(Pageable pageable);
 }

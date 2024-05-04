@@ -33,7 +33,7 @@ function QuizPreview({
   const mouseEntered = useMouseEntered(ref);
 
   const navigate = useNavigate();
-  const {title, id, questions, createdAt} = quiz;
+  const {title, id, questions, createdAt, totalPlays} = quiz;
 
   const {_onClick, _onClickScores} = useMemo(() => {
     return {
@@ -86,7 +86,8 @@ function QuizPreview({
             {`${questions.length} Questions`}
           </Text>
           <Text className={subtitleColor} size={'1'}>
-            {DateUtils.formatDate(createdAt, true)}
+            {/* {DateUtils.formatDate(createdAt, true)} */}
+            {totalPlays}x played
           </Text>
         </div>
       </BackgroundLight>

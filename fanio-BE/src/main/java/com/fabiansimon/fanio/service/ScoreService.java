@@ -31,8 +31,8 @@ public class ScoreService {
     public Page<Score> getTopScores(Pageable pageable, TimeFrame timeFrame) {
         switch (timeFrame) {
             case day -> { return scoreRepository.findDailyTopScores(pageable); }
+            default -> { return scoreRepository.findAllTimeTopScores(pageable); }
         }
-        return scoreRepository.findAllTimeTopScores(pageable);
     }
 
     public Integer getTotalTimeElapsed() {

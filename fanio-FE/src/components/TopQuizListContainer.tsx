@@ -1,7 +1,13 @@
 import {useCallback, useEffect, useState} from 'react';
 import {UI} from '../utils/common';
 import QuizList from './QuizList';
-import {BreakPoint, PaginatedData, PaginationState, Quiz} from '../types';
+import {
+  BreakPoint,
+  PaginatedData,
+  PaginationState,
+  Quiz,
+  TimeFrame,
+} from '../types';
 import {fetchTopQuizzes} from '../utils/api';
 import Loading from './Loading';
 import useIsMobile from '../hooks/useIsMobile';
@@ -26,10 +32,11 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
   const loadQuizzes = useCallback(async () => {
     try {
       const {pageIndex, maxItems} = pagination;
-      const {content, totalElements} = await fetchTopQuizzes(
-        pageIndex,
-        maxItems,
-      );
+      const {content, totalElements} = await fetchTopQuizzes({
+        page: pageIndex,
+        size: maxItems,
+        timeFrame: TimeFrame.ALLTIME,
+      });
       setQuizData({
         content,
         totalElements,

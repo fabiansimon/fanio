@@ -48,7 +48,7 @@ function LandingScreen(): JSX.Element {
   const MENU_OPTIONS: MenuOptions[] = useMemo(
     () => [
       {
-        title: 'Todays top quizzes',
+        title: 'Top quizzes',
         description:
           "If you can't see anything you like, you can always search for it or just create it.",
         className:

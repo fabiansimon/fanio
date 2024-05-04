@@ -6,8 +6,9 @@ import {
   DiscIcon,
   MagicWandIcon,
   Cross1Icon,
+  VideoIcon,
 } from '@radix-ui/react-icons';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ButtonType,
   ChipType,
@@ -210,12 +211,39 @@ function CreateScreen(): JSX.Element {
     LocalStorage.removeUnsavedQuiz();
   };
 
+  const songsLimitChip = useCallback(() => {
+    if (!quizInput) return null;
+
+    const amount = quizInput.questions.length;
+    const max = GAME_OPTIONS.MAX_QUIZ_SONGS;
+    const min = GAME_OPTIONS.MIN_QUIZ_SONGS;
+
+    let status;
+    if (amount >= max) {
+      status = StatusType.ERROR;
+    } else if (amount > max - 5) {
+      status = StatusType.WARNING;
+    } else {
+      status = StatusType.NEUTRAL;
+    }
+
+    const text =
+      amount <= max - 5
+        ? `Min. ${min} Songs - Max. ${max} Songs`
+        : `${amount}/${max} Songs`;
+
+    return <ValidationChip status={status} ignoreIcon text={text} />;
+  }, [quizInput]);
+
   return (
     <>
       {/* {!isAuth && <AuthPopUp />} */}
       <AddQuestionModal
         ref={addModalRef}
         ignoreOffset={quizInput?.options.randomOffsets}
+        maxAmount={
+          GAME_OPTIONS.MAX_QUIZ_SONGS - (quizInput?.questions.length || 0)
+        }
         isVisible={questionInputType !== null}
         type={questionInputType || QuestionInputType.SONG}
         onRequestClose={() => setQuestionInputType(null)}
@@ -303,6 +331,7 @@ function CreateScreen(): JSX.Element {
                 You can either link Youtube Videos or Youtube Playlists
               </Text>
               <div className="flex mt-2 space-x-1">
+                {songsLimitChip()}
                 {containsDuplicated && (
                   <ValidationChip
                     status={StatusType.ERROR}
@@ -335,23 +364,28 @@ function CreateScreen(): JSX.Element {
                   </div>
                 );
               })}
+              {/* <Text size={'1'} className="text-white/50 text-center pb-4 mt-6">
+                3 songs left
+              </Text> */}
               {quizInput &&
                 quizInput?.questions.length < GAME_OPTIONS.MAX_QUIZ_SONGS && (
-                  <div className="flex space-x-2 mt-6">
+                  <div className="flex border border-neutral-700/80 rounded-xl mt-4 overflow-hidden">
                     <Button
                       textSize="2"
                       text="Add Song"
-                      className="flex flex-grow"
+                      className="flex flex-grow hover:bg-neutral-900 rounded-none"
                       onClick={() =>
                         setQuestionInputType(QuestionInputType.SONG)
                       }
-                      icon={<PlusIcon className="text-white mr-2 size-5" />}
+                      icon={<VideoIcon className="text-white mr-2 size-4" />}
+                      type={ButtonType.text}
                     />
+                    <div className="border-l border-neutral-700/80 w-0" />
                     <Button
                       textSize="2"
-                      type={ButtonType.outline}
+                      type={ButtonType.text}
                       text="Add Playlist"
-                      className="flex flex-grow"
+                      className="flex flex-grow hover:bg-neutral-900 rounded-none"
                       onClick={() =>
                         setQuestionInputType(QuestionInputType.PLAYLIST)
                       }
@@ -474,7 +508,11 @@ function SummaryContainer({
     }
 
     const {url, answer} = _question!;
-    if (!REGEX.youtube.test(url) || !answer.trim()) return false;
+    if (
+      !(REGEX.youtubeSong.test(url) || REGEX.youtubeSong.test(url)) ||
+      !answer.trim()
+    )
+      return false;
     return true;
   };
 
