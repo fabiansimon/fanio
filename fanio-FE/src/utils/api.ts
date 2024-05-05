@@ -154,12 +154,19 @@ export async function searchQuizByTerm(term: string): Promise<Quiz[] | []> {
   }
 }
 
-export async function fetchTopQuizzes(
-  page: number = 0,
-  size: number = 10,
-): Promise<PaginatedData<Quiz>> {
+export async function fetchTopQuizzes({
+  page = 0,
+  size = 10,
+  timeFrame = TimeFrame.ALLTIME,
+}: {
+  page: number;
+  size: number;
+  timeFrame?: TimeFrame;
+}): Promise<PaginatedData<Quiz>> {
   try {
-    const res = await _axios.get(`/quizzes?page=${page}&size=${size}`);
+    const res = await _axios.get(
+      `/top-quizzes?page=${page}&size=${size}&timeFrame=${timeFrame}`,
+    );
     return res.data;
   } catch (error) {
     handleError({error, callName: 'fetchTopQuizzes'});

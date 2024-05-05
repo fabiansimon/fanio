@@ -27,10 +27,13 @@ import ValidationChip from './ValidationChip';
 import {DateUtils, UI} from '../utils/common';
 import useIsSmall from '../hooks/useIsSmall';
 import {INIT_QUESTION_INPUT} from '../constants/Init';
+import {GAME_OPTIONS} from '../constants/Game';
+import ToastController from '../controllers/ToastController';
 
 interface AddQuestionModalProps extends ModalProps {
   ignoreOffset?: boolean;
   type?: QuestionInputType;
+  maxAmount: number;
   onSave: (questions: QuestionInput[]) => void;
   onEdit: (question: QuestionInput, index: number) => void;
 }
@@ -41,6 +44,7 @@ export interface AddQuestionModalRef {
 
 const ANIMATION_DURATION = 200;
 const DEFAULT_MAX_VALUE = 100;
+const INIT_ERROR_MESSAGE = 'Missing url';
 
 const transition = {
   duration: ANIMATION_DURATION,
@@ -55,6 +59,7 @@ function AddQuestionModal(
     onRequestClose,
     ignoreOffset,
     onSave,
+    maxAmount,
     onEdit,
   }: AddQuestionModalProps,
   ref: Ref<AddQuestionModalRef>,
@@ -63,7 +68,7 @@ function AddQuestionModal(
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [question, setQuestion] = useState<QuestionInput>(INIT_QUESTION_INPUT);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
-    'Invalid url',
+    INIT_ERROR_MESSAGE,
   );
 
   const urlRef = useRef<any>();
@@ -74,10 +79,27 @@ function AddQuestionModal(
 
   const {url, answer, imageUri, startOffset} = question;
 
+  const {placeholder, title, error} = useMemo(() => {
+    const {youtubePlaylist, youtubeSongUrl} = GAME_OPTIONS.PLACEHOLDER;
+
+    const isSong = type === QuestionInputType.SONG;
+    return {
+      placeholder: isSong ? youtubeSongUrl : youtubePlaylist,
+      title: isSong ? 'Add Youtube Song' : 'Add Youtube Playlist',
+      error: isSong ? 'Invalid url' : 'Invalid playlist url',
+    };
+  }, [type]);
+
   const visible = useMemo(
     () => isVisible || editIndex !== -1,
     [isVisible, editIndex],
   );
+
+  const validUrl = useMemo(() => {
+    return type === QuestionInputType.PLAYLIST
+      ? REGEX.youtubePlaylist.test(url)
+      : REGEX.youtubeSong.test(url);
+  }, [url, type]);
 
   useImperativeHandle(ref, () => ({
     editQuestion: (question: QuestionInput, index: number) => {
@@ -89,47 +111,44 @@ function AddQuestionModal(
   useEffect(() => {
     if (visible) return;
     setQuestion(INIT_QUESTION_INPUT);
-    setErrorMessage('Invalid url');
+    setErrorMessage(INIT_ERROR_MESSAGE);
   }, [visible]);
 
   useEffect(() => {
     if (visible) urlRef.current?.focus();
   }, [visible]);
 
-  const handleMetaData = async (url: string) => {
+  useEffect(() => {
+    if (validUrl) handleMetaData();
+  }, [validUrl]);
+
+  const handleMetaData = async () => {
     setIsLoading(true);
     try {
-      if (!REGEX.youtube.test(url)) return;
       const res = await fetchMetaData(url);
-      if (res.length > 1 && type === QuestionInputType.PLAYLIST) {
-        let questions: QuestionInput[] = [];
-        for (const question of res) {
-          const {
-            title: answer,
-            length: maxLength,
-            imageUri,
-            sourceTitle,
-            tags,
-            sourceUrl,
-          } = question;
+      if (!res.length) return;
 
-          questions.push({
-            answer,
-            tags,
-            url: sourceUrl,
-            imageUri,
-            maxLength,
-            sourceTitle,
-            startOffset,
+      if (type === QuestionInputType.PLAYLIST && res.length > 1) {
+        const questions: QuestionInput[] = res
+          .slice(0, maxAmount)
+          .map((question, index) => {
+            console.log(index);
+            const {title, length, imageUri, sourceTitle, tags, sourceUrl} =
+              question;
+            return {
+              answer: title,
+              tags,
+              url: sourceUrl,
+              imageUri,
+              maxLength: length,
+              sourceTitle,
+              startOffset,
+            };
           });
-        }
         onSave(questions);
-        return;
-      }
-
-      const {title, length, imageUri, sourceTitle, tags, sourceUrl} = res[0];
-      setQuestion(prev => {
-        return {
+      } else {
+        const {title, length, imageUri, sourceTitle, tags, sourceUrl} = res[0];
+        setQuestion(prev => ({
           ...prev,
           answer: title,
           maxLength: length,
@@ -137,9 +156,13 @@ function AddQuestionModal(
           sourceTitle,
           tags,
           url: sourceUrl,
-        };
-      });
-    } catch {
+        }));
+      }
+    } catch (error) {
+      ToastController.showErrorToast(
+        'Oh no...',
+        'Something went wrong when fetching the data. Try again in a second.',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -151,8 +174,6 @@ function AddQuestionModal(
     }
 
     setQuestion(prev => {
-      if (type === InputType.URL) handleMetaData(value as string);
-
       return {
         ...prev,
         ...(type === InputType.URL && {url: value as string}),
@@ -189,14 +210,15 @@ function AddQuestionModal(
     );
   }, [question]);
 
-  const validUrl = useMemo(() => {
-    return REGEX.youtube.test(url);
-  }, [url]);
+  const expandContent = useMemo(() => {
+    if (type === QuestionInputType.PLAYLIST) return false;
+    return validUrl;
+  }, [type, validUrl]);
 
   const isValid = useMemo(() => {
     if (!url.trim()) return true;
     if (!validUrl) {
-      setErrorMessage('Invalid url');
+      setErrorMessage(error);
       return false;
     }
     if (!answer.trim()) {
@@ -206,7 +228,7 @@ function AddQuestionModal(
 
     setErrorMessage(undefined);
     return true;
-  }, [answer, validUrl, url]);
+  }, [answer, validUrl, url, error]);
 
   const backdropVariants = {
     hidden: {backdropFilter: 'blur(0px)'},
@@ -239,19 +261,25 @@ function AddQuestionModal(
           onClick={event => event.stopPropagation()}
           className={UI.cn(
             'flex relative space-y-1 flex-col bg-neutral-900/90 border min-w-[50%] shadow-black rounded-xl px-2 py-3',
-            !validUrl && 'p-0 border-none',
+            !expandContent && 'p-0 border-none',
             !isValid
               ? 'border-red-800/50 shadow-red-500'
               : 'border-neutral-600/50',
           )}>
           <div className="flex">
-            <ValidationChip
-              status={errorMessage ? StatusType.ERROR : StatusType.SUCCESS}
-              text={errorMessage}
-              className="absolute right-0 -top-8 "
-            />
+            <div className="absolute justify-between w-full flex -top-8">
+              <div>
+                <Text size={'2'} weight={'medium'} className="text-white pl-1">
+                  {title}
+                </Text>
+              </div>
+              <ValidationChip
+                status={errorMessage ? StatusType.ERROR : StatusType.SUCCESS}
+                text={errorMessage}
+              />
+            </div>
             <div className="flex flex-col space-y-1 flex-1">
-              {validUrl && (
+              {expandContent && (
                 <InputField
                   isLoading={isLoading}
                   showSimple
@@ -266,13 +294,14 @@ function AddQuestionModal(
               <InputField
                 value={url}
                 ref={urlRef}
+                className="text-xs"
                 onInput={({currentTarget: {value}}) =>
                   handleInput(value, InputType.URL)
                 }
-                placeholder="Enter url"
+                placeholder={placeholder}
               />
             </div>
-            {validUrl && question.imageUri && !isSmall && (
+            {expandContent && question.imageUri && !isSmall && (
               <ThumbnailPreview
                 className="pl-4"
                 imageUri={imageUri!}
@@ -281,7 +310,7 @@ function AddQuestionModal(
             )}
           </div>
 
-          {!ignoreOffset && validUrl && (
+          {!ignoreOffset && expandContent && (
             <div className="px-1 py-4 space-y-2">
               <Text size="1" className="text-white/90">
                 Start offset:{' '}
@@ -299,7 +328,7 @@ function AddQuestionModal(
             </div>
           )}
 
-          {validUrl && (
+          {expandContent && (
             <div className="flex justify-between mx-1 pt-4 space-x-2">
               <Button
                 textSize={'2'}

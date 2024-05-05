@@ -15,9 +15,14 @@ export const GAME_OPTIONS = {
     'I know you can do better than this',
     "I don't want to lie to you, that wasn't great.",
   ],
+  PLACEHOLDER: {
+    youtubeSongUrl: 'e.g: www.youtube.com/watch?v=c5WbOCztjQs',
+    youtubePlaylist:
+      'e.g: www.youtube.com/watch?v=gy9d9fMzNMI&list=RDgy9d9fMzNMI',
+  },
   MAX_POINTS_PER_ROUND: 1_000,
   MAX_SCORE_USERNAME_LENGTH: 20,
-  MAX_QUIZ_TITLE_LENGTH: 15,
+  MAX_QUIZ_TITLE_LENGTH: 25,
   MAX_QUIZ_DESCRIPTION_LENGTH: 50,
   MAX_QUIZ_SONGS: 15,
   MIN_QUIZ_SONGS: 3,

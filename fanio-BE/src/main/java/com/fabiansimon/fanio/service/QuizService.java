@@ -1,5 +1,6 @@
 package com.fabiansimon.fanio.service;
 
+import com.fabiansimon.fanio.enums.TimeFrame;
 import com.fabiansimon.fanio.model.Quiz;
 import com.fabiansimon.fanio.repository.QuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,14 @@ public class QuizService {
     public Page<Quiz> getQuizzesByTerm(Pageable pageable, String term) {
         return quizRepository.findByTitleContainingIgnoreCaseOrTagsContainingAndIsPrivateFalse(term, pageable);
     }
+
+    public Page<Quiz> getTopQuizzes(Pageable pageable, TimeFrame timeFrame) {
+        switch (timeFrame) {
+            case day -> { return quizRepository.findTopQuizzes(pageable); }
+            default -> { return quizRepository.findTopQuizzes(pageable); }
+        }
+    }
+
     public Integer getQuizzesCount() {
         return (int) quizRepository.count();
     };

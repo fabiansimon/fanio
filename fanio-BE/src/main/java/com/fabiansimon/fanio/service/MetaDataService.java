@@ -42,7 +42,7 @@ public class MetaDataService {
         List<MetaResponseDTO> data = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        Boolean isPlaylist = playlistId != null;
+        boolean isPlaylist = playlistId != null;
 
         try {
             JsonNode rootNode = objectMapper.readTree(json);
@@ -154,10 +154,15 @@ public class MetaDataService {
 
     public static String cleanRawTitle(String title) {
         try {
-            String[] featKeys = {"feat", "feat.", "ft", "ft.", "feature", "featuring", "by", "official video", "official music video", "music video", "prod", "prod.", "official version", "audio"};
+            String[] featKeys = {"feat", "feat.", "ft", "ft.", "feature", "featuring", "by", "official video", "official music video", "music video", "prod", "prod.", "official version", "audio", "lyrics"};
             String lowerTitle = title.toLowerCase();
 
-            int dashIndex = lowerTitle.indexOf("-");
+            String[] dashes = {" - ", " – ", " – "};
+            int dashIndex = -1;
+            for (String dash : dashes) {
+                dashIndex = lowerTitle.indexOf(dash);
+                if (dashIndex != -1) break;
+            }
             int left = dashIndex == -1 ? 0 : dashIndex + 1;
             int right = title.length();
 

@@ -5,7 +5,6 @@ import {useNavigate} from 'react-router-dom';
 import {forwardRef, Ref, useImperativeHandle, useRef, useState} from 'react';
 import {motion} from 'framer-motion';
 import useIsMobile from '../hooks/useIsMobile';
-import useKeyShortcut from '../hooks/useKeyShortcut';
 
 const BACKGROUND_ANIMATION_DURATION = 170;
 const SHAKE_ANIMATION_DURATION = 20;
@@ -36,8 +35,6 @@ function PageContainer(
 
   const isMobile = useIsMobile();
   const navigation = useNavigate();
-
-  useKeyShortcut('Escape', () => navigation(-1), true);
 
   const shakeAnimation = {
     shake: {

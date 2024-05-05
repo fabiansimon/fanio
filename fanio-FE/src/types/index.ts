@@ -102,6 +102,7 @@ export enum ButtonType {
   primary,
   secondary,
   outline,
+  text,
 }
 
 export interface ModalProps {
@@ -194,4 +195,5 @@ export enum StatusType {
   NEUTRAL,
   SUCCESS,
   ERROR,
+  WARNING,
 }

@@ -1,6 +1,7 @@
 package com.fabiansimon.fanio.controller;
 
 import com.fabiansimon.fanio.DTO.PlayableQuizDTO;
+import com.fabiansimon.fanio.enums.TimeFrame;
 import com.fabiansimon.fanio.model.Quiz;
 import com.fabiansimon.fanio.model.Score;
 import com.fabiansimon.fanio.service.QuizService;
@@ -34,6 +35,17 @@ public class QuizController {
         Page<Quiz> quizzes = quizService.getAllQuizzes(pageable);
 
         return ResponseEntity.ok(quizzes);
+    }
+
+    @GetMapping("/top-quizzes")
+    public ResponseEntity<?> getTopQuizzes(
+            @RequestParam(defaultValue = "allTime") TimeFrame timeFrame,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+       Pageable pageable = PageRequest.of(page, size);
+       Page<Quiz> quizzes = quizService.getTopQuizzes(pageable, timeFrame);
+       return ResponseEntity.ok(quizzes);
     }
 
     @GetMapping("/search-quiz")
