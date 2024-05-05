@@ -95,6 +95,12 @@ function AddQuestionModal(
     [isVisible, editIndex],
   );
 
+  const validUrl = useMemo(() => {
+    return type === QuestionInputType.PLAYLIST
+      ? REGEX.youtubePlaylist.test(url)
+      : REGEX.youtubeSong.test(url);
+  }, [url, type]);
+
   useImperativeHandle(ref, () => ({
     editQuestion: (question: QuestionInput, index: number) => {
       setEditIndex(index);
@@ -112,18 +118,21 @@ function AddQuestionModal(
     if (visible) urlRef.current?.focus();
   }, [visible]);
 
-  const handleMetaData = async (url: string) => {
+  useEffect(() => {
+    if (validUrl) handleMetaData();
+  }, [validUrl]);
+
+  const handleMetaData = async () => {
     setIsLoading(true);
     try {
-      if (!validUrl) return;
-
       const res = await fetchMetaData(url);
       if (!res.length) return;
 
       if (type === QuestionInputType.PLAYLIST && res.length > 1) {
         const questions: QuestionInput[] = res
-          .splice(0, maxAmount)
-          .map(question => {
+          .slice(0, maxAmount)
+          .map((question, index) => {
+            console.log(index);
             const {title, length, imageUri, sourceTitle, tags, sourceUrl} =
               question;
             return {
@@ -158,14 +167,13 @@ function AddQuestionModal(
       setIsLoading(false);
     }
   };
+
   const handleInput = (value: string | number, type: InputType) => {
     if (typeof value === 'string' && type === InputType.URL) {
       value = value.trim();
     }
 
     setQuestion(prev => {
-      if (type === InputType.URL) handleMetaData(value as string);
-
       return {
         ...prev,
         ...(type === InputType.URL && {url: value as string}),
@@ -201,12 +209,6 @@ function AddQuestionModal(
       (question.maxLength || DEFAULT_MAX_VALUE) - (question.startOffset || 0)
     );
   }, [question]);
-
-  const validUrl = useMemo(() => {
-    return type === QuestionInputType.PLAYLIST
-      ? REGEX.youtubePlaylist.test(url)
-      : REGEX.youtubeSong.test(url);
-  }, [url, type]);
 
   const expandContent = useMemo(() => {
     if (type === QuestionInputType.PLAYLIST) return false;

@@ -228,7 +228,7 @@ function CreateScreen(): JSX.Element {
     }
 
     const text =
-      amount <= max - 5
+      amount === 0
         ? `Min. ${min} Songs - Max. ${max} Songs`
         : `${amount}/${max} Songs`;
 
