@@ -22,13 +22,13 @@ const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
         ref={ref}
         type="text"
         className={UI.cn(
-          'relative bg-transparent pb-1 flex w-full text-2xl text-white font-medium text-left focus:outline-none focus:border-b-1 focus:border-white/70 border-b-[1.5px] border-b-white/10 placeholder-neutral-600',
+          'relative bg-transparent pb-1 flex text-2xl text-white font-medium text-left focus:outline-none focus:border-b-1 focus:border-white/70 border-b-[1.5px] border-b-white/10 placeholder-neutral-600',
           props.className,
         )}
       />
-      <div className="absolute right-0 bottom-0 flex">
+      <div className="absolute right-0 flex">
         {!isLoading && trailing && trailing}
-        {isLoading && <Loading className="text-white size-5 mb-3" />}
+        {isLoading && <Loading className="text-white size-5" />}
       </div>
     </div>
   ),
