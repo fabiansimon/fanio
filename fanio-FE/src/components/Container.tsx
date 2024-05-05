@@ -3,9 +3,6 @@ import {ArrowLeftIcon} from '@radix-ui/react-icons';
 import {UI} from '../utils/common';
 import useKeyShortcut from '../hooks/useKeyShortcut';
 import KeyBinding from './KeyBinding';
-import useIsMobile from '../hooks/useIsMobile';
-import useBreakingPoints from '../hooks/useBreakingPoints';
-import {BreakPoint} from '../types';
 import useIsSmall from '../hooks/useIsSmall';
 
 interface ContainerProps {
@@ -58,7 +55,13 @@ function Container({
             {title}
           </Heading>
         </div>
-        {hotkey && <KeyBinding hotkey={hotkey} onActivate={onClick} />}
+        {hotkey && (
+          <KeyBinding
+            className="mb-auto"
+            hotkey={hotkey}
+            onActivate={onClick}
+          />
+        )}
       </div>
       {!isSmall && (
         <Text
