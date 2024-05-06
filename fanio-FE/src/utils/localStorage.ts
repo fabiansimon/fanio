@@ -1,4 +1,4 @@
-import {GameSettings, LocalScore, Quiz, QuizInput} from '../types';
+import {GameSettings, LocalScore, Quiz, QuizInput, UserData} from '../types';
 
 const KEYS = {
   scoreIds: 'scoreIds',
@@ -7,6 +7,7 @@ const KEYS = {
   bestAttempts: 'bestAttempts',
   userSettings: 'userSettings',
   unsavedQuiz: 'unsavedQuiz',
+  userData: 'userData',
   sessionToken: 'sessionToken',
 };
 
@@ -110,7 +111,21 @@ export class LocalStorage {
 
   static fetchSessionToken() {
     const savedToken = localStorage.getItem(KEYS.sessionToken);
-    if (savedToken) return savedToken;
-    return;
+    if (!savedToken) return;
+    return savedToken;
+  }
+
+  static saveUserData(user: UserData) {
+    localStorage.setItem(KEYS.userData, JSON.stringify(user));
+  }
+
+  static fetchUserData() {
+    const savedUser = localStorage.getItem(KEYS.userData);
+    if (!savedUser) return;
+    return JSON.parse(savedUser);
+  }
+
+  static clearUserData() {
+    localStorage.removeItem(KEYS.userData);
   }
 }

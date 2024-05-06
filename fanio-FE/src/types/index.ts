@@ -197,3 +197,14 @@ export enum StatusType {
   ERROR,
   WARNING,
 }
+
+export interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  authId: string;
+  id: string;
+  quizzes: Quiz[];
+  scores: Score[];
+  createdAt: Date;
+}

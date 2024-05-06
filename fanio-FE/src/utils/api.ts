@@ -8,6 +8,7 @@ import {
   Score,
   ScoreInput,
   TimeFrame,
+  UserData,
 } from '../types/index';
 import ToastController from '../controllers/ToastController';
 import {sanitizeTerm} from './logic';
@@ -222,7 +223,7 @@ export async function fetchScorePlacement({
   }
 }
 
-export async function authUser({token}: {token: string}): Promise<string> {
+export async function authUser({token}: {token: string}): Promise<UserData> {
   try {
     const res = await _axios.post('/auth/google', {
       token,

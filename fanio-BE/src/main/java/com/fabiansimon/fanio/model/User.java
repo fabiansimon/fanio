@@ -23,11 +23,13 @@ public class User {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
-
     @CreationTimestamp
     private Date createdAt;
 
-    private String userName;
+    private String authId;
+    private String email;
+    private String firstName;
+    private String lastName;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "quiz_user_id", referencedColumnName = "id")
