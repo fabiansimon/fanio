@@ -37,7 +37,10 @@ function AnimatedResult({
     setTimeout(
       () => {
         setText({
-          title: result?.correct === true ? 'Correct ✅' : 'Out of time 🙃',
+          title:
+            result?.correct === true
+              ? 'Correct ✅'
+              : "Didn't get this one huh 🤔",
           link: question?.sourceTitle || question?.answer,
         });
         setAnimatePoints(false);

@@ -33,7 +33,7 @@ function QuizPreview({
   const mouseEntered = useMouseEntered(ref);
 
   const navigate = useNavigate();
-  const {title, id, questions, createdAt, totalPlays} = quiz;
+  const {title, id, questions, totalPlays} = quiz;
 
   const {_onClick, _onClickScores} = useMemo(() => {
     return {
@@ -64,7 +64,7 @@ function QuizPreview({
         animate={!invertColors && mouseEntered}
         className={UI.cn(
           'flex flex-grow flex-col min-h-14 justify-center space-y-1 border px-2 py-1.5 rounded-lg',
-          onClick &&
+          onClick !== null &&
             'hover:scale-[101%] transition-transform duration-150 ease-in-out cursor-pointer',
           borderColor,
           backgroundColor,
@@ -87,7 +87,7 @@ function QuizPreview({
           </Text>
           <Text className={subtitleColor} size={'1'}>
             {/* {DateUtils.formatDate(createdAt, true)} */}
-            {totalPlays}x played
+            {UI.formatNumber(totalPlays)}x times
           </Text>
         </div>
       </BackgroundLight>

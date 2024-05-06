@@ -14,7 +14,12 @@ import {
 } from '../types';
 import {fetchPlayableQuizById, onGameFinish} from '../utils/api';
 import {shuffle} from 'lodash';
-import {calculatePoints, randomNumber, similarity} from '../utils/logic';
+import {
+  calculatePoints,
+  inputThreshold,
+  randomNumber,
+  similarity,
+} from '../utils/logic';
 import InputField from '../components/InputField';
 import PostGameScene from '../components/PostGameScene';
 import PreGameScene from '../components/PreGameScene';
@@ -206,7 +211,7 @@ function PlayQuizScreen(): JSX.Element {
       question &&
       videoRef.current &&
       !result &&
-      Math.abs(question.answer.length - input.length) <= 2 &&
+      inputThreshold(question.answer, input) &&
       similarity(input, question!.answer) > GAME_OPTIONS.ANSWER_THRESHOLD
     );
   };

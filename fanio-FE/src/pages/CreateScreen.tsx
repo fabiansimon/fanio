@@ -7,6 +7,7 @@ import {
   MagicWandIcon,
   Cross1Icon,
   VideoIcon,
+  CheckCircledIcon,
 } from '@radix-ui/react-icons';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
@@ -111,7 +112,17 @@ function CreateScreen(): JSX.Element {
       if (!prev) return;
       switch (type) {
         case InputType.TITLE:
-          return {...prev, title: value as string};
+          const newTitle = value as string;
+          const tagTitle = newTitle.toUpperCase();
+          const tags = [...prev.tags];
+
+          if (tags[0]?.includes(tagTitle.slice(0, -1))) {
+            tags[0] = tagTitle;
+          } else {
+            tags.unshift(tagTitle);
+          }
+
+          return {...prev, title: value as string, tags};
 
         case InputType.DESCRIPTION:
           return {...prev, description: value as string};
@@ -179,6 +190,21 @@ function CreateScreen(): JSX.Element {
     });
   };
 
+  const addTag = (tag: string) => {
+    setQuizInput(prev => {
+      if (!prev || (quizInput?.tags.length || 0) >= GAME_OPTIONS.MAX_QUIZ_TAGS)
+        return;
+
+      const newTags = new Set(prev.tags);
+      newTags.add(tag.trim());
+
+      return {
+        ...prev,
+        tags: Array.from(newTags),
+      };
+    });
+  };
+
   const removeTag = (index: number) => {
     setQuizInput(prev => {
       if (!prev) return;
@@ -194,6 +220,7 @@ function CreateScreen(): JSX.Element {
     if (!question) return;
     addModalRef?.current?.editQuestion(question, index);
   };
+
   const replaceQuestion = (question: QuestionInput, index: number) => {
     setQuizInput(prev => {
       if (!prev) return;
@@ -399,6 +426,7 @@ function CreateScreen(): JSX.Element {
         {quizInput && (
           <SummaryContainer
             removeTag={removeTag}
+            addTag={addTag}
             quiz={quizInput}
             isValid={validQuizInput}
           />
@@ -484,12 +512,15 @@ function SummaryContainer({
   quiz,
   isValid,
   removeTag,
+  addTag,
 }: {
   quiz: QuizInput;
   isValid: boolean;
   removeTag: (index: number) => void;
+  addTag: (tag: string) => void;
 }): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [newTag, setNewTag] = useState<string>('');
   const navigation = useNavigate();
   const isSmall = useIsSmall();
 
@@ -542,13 +573,21 @@ function SummaryContainer({
     }
   };
 
+  const handleInput = (value: string) => {
+    setNewTag(value.toUpperCase());
+    if (value[value.length - 1] === ',') {
+      addTag(newTag);
+      setNewTag('');
+    }
+  };
+
   return (
     <motion.div
       animate={isValid ? 'visible' : 'hidden'}
       transition={{damping: 300}}
       variants={{hidden: {translateY: 1000}, visible: {translateY: 0}}}
-      className="absolute bg-neutral-800/50 flex min-h-44 flex-col mb-8 pb-8 px-4 pt-4 rounded-t-2xl shadow-lg shadow-black left-0 right-0 bottom-0 backdrop-blur-sm">
-      <div className="flex justify-between flex-grow">
+      className="absolute bg-neutral-800/50 flex min-h-44 flex-col mb-8 pb-8 px-4 pt-4 rounded-t-2xl shadow-lg shadow-black left-0 right-0 bottom-0 backdrop-blur-sm max-w-screen-xl w-full mx-auto">
+      <div className="flex justify-between">
         <div className="flex flex-col justify-between">
           <div>
             <Heading className="text-white" size={'4'}>
@@ -558,28 +597,34 @@ function SummaryContainer({
               {description}
             </Text>
           </div>
-          {tags.length > 0 && (
-            <>
-              <Text className="text-white/50 pt-3 pb-2" size={'1'}>
-                (Tags to help find your quiz, make sure they fit.)
-              </Text>
-              <div className="border border-neutral-700/50 rounded-md p-2 mb-3 max-h-24 overflow-y-auto max-w-[80%]">
-                <div className="flex-wrap flex">
-                  {tags.map((tag, i) => (
-                    <div
-                      onClick={() => removeTag(i)}
-                      key={i}
-                      className="flex cursor-pointer space-x-2 bg-neutral-600 rounded-md items-center justify-center py-1 px-[7px] mr-2 mb-2">
-                      <Text weight={'medium'} size={'1'} className="text-white">
-                        {tag}
-                      </Text>
-                      <Cross1Icon className="size-2 text-white" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
+          <>
+            <Text className="text-white/50 pt-3 pb-2" size={'1'}>
+              Tags to help find your quiz, make sure they fit. Seperate with a
+              comma (,)
+            </Text>
+            <div className="border border-neutral-700/50 rounded-md p-2 mb-3 max-h-24 overflow-y-auto max-w-[80%]">
+              <span className="flex-wrap flex">
+                {tags.map((tag, i) => (
+                  <div
+                    onClick={() => removeTag(i)}
+                    key={i}
+                    className="flex cursor-pointer space-x-2 bg-neutral-600 rounded-md items-center justify-center py-1 px-[7px] mr-2 mb-2">
+                    <Text weight={'medium'} size={'1'} className="text-white">
+                      {tag}
+                    </Text>
+                    <Cross1Icon className="size-2 text-white" />
+                  </div>
+                ))}
+                <InputField
+                  value={newTag}
+                  onInput={({currentTarget: {value}}) => handleInput(value)}
+                  showSimple
+                  placeholder="Add Tag"
+                  className="text-xs border-none w-24 mb-1"
+                />
+              </span>
+            </div>
+          </>
           <div className="border border-neutral-500/50 bg-black/50 items-center mr-auto h-10 flex rounded-md px-2 space-x-2">
             <DiscIcon className="text-white" />
             <Text weight={'medium'} size={'2'} className="text-white/90">
@@ -599,8 +644,9 @@ function SummaryContainer({
           <Button
             onClick={createQuiz}
             loading={isLoading}
+            textSize="2"
             icon={<MagicWandIcon className="text-white size-4" />}
-            className="w-52"
+            className="w-52 font-medium"
             text="Create Quiz"
           />
         </div>

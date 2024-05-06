@@ -47,9 +47,9 @@ function AllGamesContainer({className}: {className?: string}): JSX.Element {
       <Marquee speed={30} className="mb-4 py-auto">
         {statistic &&
           Object.entries(statistic).map(([key, val]) => (
-            <div key={key} className="mr-6 w-14 mt-4">
+            <div key={key} className="mr-6 mt-4">
               <Heading size="4" className="text-white">
-                {val}
+                {UI.formatNumber(val)}
               </Heading>
               <Text size="2" className="text-white/80">
                 {statisticTerm(key)}
