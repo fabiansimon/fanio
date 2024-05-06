@@ -113,7 +113,7 @@ function CreateScreen(): JSX.Element {
       switch (type) {
         case InputType.TITLE:
           const newTitle = value as string;
-          const tagTitle = newTitle.toUpperCase().trim();
+          const tagTitle = newTitle.toUpperCase();
           const tags = [...prev.tags];
 
           if (tags[0]?.includes(tagTitle.slice(0, -1))) {
@@ -586,8 +586,8 @@ function SummaryContainer({
       animate={isValid ? 'visible' : 'hidden'}
       transition={{damping: 300}}
       variants={{hidden: {translateY: 1000}, visible: {translateY: 0}}}
-      className="absolute bg-neutral-800/50 flex min-h-44 flex-col mb-8 pb-8 px-4 pt-4 rounded-t-2xl shadow-lg shadow-black left-0 right-0 bottom-0 backdrop-blur-sm">
-      <div className="flex justify-between flex-grow">
+      className="absolute bg-neutral-800/50 flex min-h-44 flex-col mb-8 pb-8 px-4 pt-4 rounded-t-2xl shadow-lg shadow-black left-0 right-0 bottom-0 backdrop-blur-sm max-w-screen-xl w-full mx-auto">
+      <div className="flex justify-between">
         <div className="flex flex-col justify-between">
           <div>
             <Heading className="text-white" size={'4'}>
@@ -644,8 +644,9 @@ function SummaryContainer({
           <Button
             onClick={createQuiz}
             loading={isLoading}
+            textSize="2"
             icon={<MagicWandIcon className="text-white size-4" />}
-            className="w-52"
+            className="w-52 font-medium"
             text="Create Quiz"
           />
         </div>

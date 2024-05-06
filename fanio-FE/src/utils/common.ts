@@ -39,6 +39,13 @@ export class UI {
     return twMerge(clsx(inputs));
   }
 
+  static formatNumber(number: number) {
+    return number.toLocaleString('de-DE', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+  }
+
   static formatPoints(points: number, postfix = 'pts') {
     const formattedPoints = new Intl.NumberFormat('de-DE', {
       minimumFractionDigits: 0,
