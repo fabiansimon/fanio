@@ -89,6 +89,14 @@ export function calculatePoints({
   };
 }
 
+export function inputThreshold(answer: string, input: string) {
+  let min = 100;
+  for (const a of answer.split('/')) {
+    min = Math.min(min, a.length);
+  }
+  return Math.abs(min - input.length) <= GAME_OPTIONS.INPUT_ANSWER_DIFFERENCE;
+}
+
 function levenshteinDistance(a: string, b: string) {
   const matrix = [];
 
