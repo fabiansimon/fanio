@@ -33,6 +33,9 @@ function Button({
       case ButtonType.outline:
         return 'bg-transparent border border-neutral-700';
 
+      case ButtonType.secondary:
+        return 'bg-slate-500/30 border border-neutral-700';
+
       case ButtonType.text:
         return 'bg-transparent';
 
@@ -58,7 +61,7 @@ function Button({
       ) : (
         <>
           {icon && icon}
-          <Text size={textSize} className="text-white line-clamp-1">
+          <Text size={textSize} className="line-clamp-1 text-white/90">
             {text}
           </Text>
           {children}

@@ -26,11 +26,11 @@ function PreGameScene({
   const {icon, textColor, backgroundColor} = useMemo(() => {
     return {
       textColor: isWinner ? 'text-green-700' : 'text-red-500',
-      backgroundColor: isWinner ? 'bg-green-600' : 'bg-red-600',
+      backgroundColor: isWinner ? 'bg-green-600/50' : 'bg-red-600/50',
       icon: isWinner ? (
-        <MinusIcon className="text-white size-4" />
+        <MinusIcon className="text-green-500 size-4" />
       ) : (
-        <PlusIcon className="text-white size-4" />
+        <PlusIcon className="text-red-500 size-4" />
       ),
     };
   }, [isWinner]);
@@ -71,7 +71,7 @@ function PreGameScene({
               <div className="w-full border-[.2px] border-white/30" />
               <div className="flex items-center justify-end relative">
                 <div className="flex flex-col text-right ml-2">
-                  <Heading weight={'medium'} className={textColor} size={'3'}>
+                  <Heading weight={'medium'} className={textColor} size={'2'}>
                     {UI.formatPoints(
                       topScore.totalScore - lastAttempt.totalScore,
                     )}

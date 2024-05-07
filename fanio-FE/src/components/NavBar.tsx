@@ -12,7 +12,7 @@ function NavBar(): JSX.Element {
   const navigation = useNavigate();
   const {pathname} = useLocation();
 
-  const {isAuth, openAuthModal} = useUserDataContext();
+  const {isAuth, openAuthModal, userData} = useUserDataContext();
 
   const linkData = useMemo(() => {
     return [
@@ -42,6 +42,16 @@ function NavBar(): JSX.Element {
         }}
         className="z-10"
       />
+
+      {isAuth ? (
+        <Avatar
+          user={userData!}
+          onClick={() => navigation(ROUTES.account)}
+          className="size-7 border border-white/30 z-10"
+        />
+      ) : (
+        <Button text="Sign Up/Login" onClick={openAuthModal} textSize="1" />
+      )}
       <ul className="flex absolute left-0 justify-center flex-grow w-full space-x-8">
         {linkData.map(({title, route, icon}, index) => {
           const {textColor} = {
@@ -59,14 +69,6 @@ function NavBar(): JSX.Element {
           );
         })}
       </ul>
-      {isAuth ? (
-        <Avatar
-          onClick={() => navigation(ROUTES.account)}
-          className="size-7 border border-white/30"
-        />
-      ) : (
-        <Button text="Sign Up/Login" onClick={openAuthModal} textSize="1" />
-      )}
     </nav>
   );
 }

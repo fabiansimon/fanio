@@ -4,8 +4,10 @@ import com.fabiansimon.fanio.DTO.PlayableQuizDTO;
 import com.fabiansimon.fanio.enums.TimeFrame;
 import com.fabiansimon.fanio.model.Quiz;
 import com.fabiansimon.fanio.model.Score;
+import com.fabiansimon.fanio.model.User;
 import com.fabiansimon.fanio.service.QuizService;
 import com.fabiansimon.fanio.service.ScoreService;
+import com.fabiansimon.fanio.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +27,8 @@ public class QuizController {
     private QuizService quizService;
     @Autowired
     private ScoreService scoreService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/quizzes")
     public ResponseEntity<Page<Quiz>> getAllQuizzes(
@@ -77,8 +81,11 @@ public class QuizController {
         return ResponseEntity.notFound().build();
     }
     @PostMapping("/create-quiz")
-    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz) {
+    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz, @RequestParam("userId") UUID userId) {
         try {
+            User creator = userService.findUser(userId).get();
+            quiz.setCreator(creator);
+
             return new ResponseEntity<>(quizService.saveQuiz(quiz), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

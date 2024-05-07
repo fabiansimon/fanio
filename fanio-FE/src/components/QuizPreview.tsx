@@ -6,7 +6,7 @@ import ROUTES from '../constants/Routes';
 import BackgroundLight from './BackgroundLight';
 import useMouseEntered from '../hooks/useMouseEntered';
 import {useMemo, useRef} from 'react';
-import {DateUtils, UI} from '../utils/common';
+import {UI} from '../utils/common';
 
 interface QuizPreviewProps {
   quiz: Quiz;

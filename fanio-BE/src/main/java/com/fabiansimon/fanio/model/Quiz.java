@@ -27,7 +27,6 @@ public class Quiz {
     private Date createdAt;
     private String title;
     private String description;
-    private Long creatorId;
     private Boolean isPrivate;
     private Boolean randomOffsets;
     @Builder.Default
@@ -37,4 +36,7 @@ public class Quiz {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "quiz_id")
     private List<Question> questions;
+    @ManyToOne
+    @JoinColumn(name = "creator_id", referencedColumnName = "id")
+    private User creator;
 }

@@ -66,7 +66,7 @@ function QuizScoreScreen(): JSX.Element {
         {emptyList ? (
           <EmptyContainer
             className="my-auto"
-            title="No Scores to show yet 💨"
+            title="No scores to be show yet 💨"
             description="Start off the race and be the first one to submit a score"
             buttonText={"Let's play"}
             onClick={() => navigation(`${ROUTES.playQuiz}/${id}`)}
@@ -92,7 +92,6 @@ function QuizScoreScreen(): JSX.Element {
                     key={s.id}
                     position={position}
                     achievement={achievement}
-                    isLocal={localScores?.has(s.id)}
                     score={s}
                   />
                 );

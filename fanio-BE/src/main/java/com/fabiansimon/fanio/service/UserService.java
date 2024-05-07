@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -30,6 +31,10 @@ public class UserService {
 
     public Optional<User> findUser(String authId) {
         return userRepository.findByAuthId(authId);
+    }
+
+    public Optional<User> findUser(UUID userID) {
+        return userRepository.findById(userID);
     }
 
     public GoogleIdToken verifyGoogleToken(String token) {

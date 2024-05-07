@@ -3,7 +3,7 @@ import {GameSettings, LocalScore, Quiz, QuizInput, UserData} from '../types';
 const KEYS = {
   scoreIds: 'scoreIds',
   quizData: 'quizData',
-  lastAttempts: 'lastAttempts',
+  lastAttempt: 'lastAttempt',
   bestAttempts: 'bestAttempts',
   userSettings: 'userSettings',
   unsavedQuiz: 'unsavedQuiz',
@@ -47,32 +47,6 @@ export class LocalStorage {
 
   static clearQuizData() {
     localStorage.removeItem(KEYS.quizData);
-  }
-
-  static fetchLastAttempts(): Map<string, LocalScore> {
-    const storedAttempts = localStorage.getItem(KEYS.lastAttempts);
-    if (storedAttempts) return new Map(JSON.parse(storedAttempts));
-
-    return new Map();
-  }
-
-  static fetchLastAttempt(quizId: string): LocalScore | undefined {
-    const storedAttempts = this.fetchLastAttempts();
-    if (storedAttempts.has(quizId)) return storedAttempts.get(quizId);
-
-    return;
-  }
-
-  static saveLastAttempt(quizId: string, score: LocalScore) {
-    const storedAttemps = this.fetchLastAttempts();
-    storedAttemps.set(quizId, score);
-    localStorage.setItem(KEYS.lastAttempts, JSON.stringify([...storedAttemps]));
-  }
-
-  static removeLastAttempt(quizId: string) {
-    const storedAttemps = this.fetchLastAttempts();
-    if (storedAttemps.has(quizId)) storedAttemps.delete(quizId);
-    localStorage.setItem(KEYS.lastAttempts, JSON.stringify([...storedAttemps]));
   }
 
   static saveUserSettings(settings: GameSettings) {

@@ -154,7 +154,7 @@ public class MetaDataService {
 
     public static String cleanRawTitle(String title) {
         try {
-            String[] featKeys = {"feat", "feat.", "ft", "ft.", "feature", "featuring", "by", "official video", "official music video", "music video", "prod", "prod.", "official version", "audio", "lyrics", "official lyric video", "visualizer"};
+            String[] featKeys = {"feat", "feat.", "ft", "ft.", "feature", "featuring", "by", "official video", "official music video", "music video", "prod", "prod.", "official version", "audio", "lyrics", "official lyric video", "visualizer", "net video", "official hd video"};
             String lowerTitle = title.toLowerCase();
 
             String[] dashes = {" - ", " – ", " – "};

@@ -55,6 +55,20 @@ export class UI {
     return `${formattedPoints} ${postfix}`;
   }
 
+  static formatName({
+    firstName = '',
+    lastName = '',
+    initals = false,
+  }: {
+    firstName?: string;
+    lastName?: string;
+    initals?: boolean;
+  }) {
+    return `${initals ? firstName[0] : firstName}${initals ? '' : ' '}${
+      lastName[0]
+    }${initals ? '' : '.'}`;
+  }
+
   static addAlpha(color: string, opacity: number): string {
     const op = Math.round(opacity * 255);
     const hexOpacity = op.toString(16).padStart(2, '0').toUpperCase();

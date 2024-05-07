@@ -25,7 +25,6 @@ public class User {
     private UUID id;
     @CreationTimestamp
     private Date createdAt;
-
     private String authId;
     private String email;
     private String firstName;

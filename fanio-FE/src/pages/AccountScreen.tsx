@@ -46,7 +46,7 @@ function ProfileSummary({
   const {lastName, firstName, email} = user;
   return (
     <HoverContainer className={UI.cn('space-y-[0.5px]', className)}>
-      <Avatar className="mb-3" />
+      <Avatar user={user} className="mb-3" />
       <Heading
         size={'4'}
         className="text-white">{`${firstName} ${lastName}`}</Heading>
