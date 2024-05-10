@@ -68,7 +68,6 @@ public class ScoreController {
 
     @PostMapping("/upload-score")
     public ResponseEntity<?> createScore(@RequestBody Score score, @RequestParam("userId") UUID userId) {
-        System.out.println("called");
         if (scoreService.usesProfanity(score.getUserName())) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("Profanity detected", "The username contains inappropriate content.");
