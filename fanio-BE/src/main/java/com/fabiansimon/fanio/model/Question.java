@@ -34,5 +34,4 @@ public class Question {
     private String answer;
     private String sourceTitle;
     private Double startOffset;
-
 }

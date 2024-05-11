@@ -4,10 +4,11 @@ import {DateUtils, UI} from '../utils/common';
 import {PersonIcon} from '@radix-ui/react-icons';
 import PlaceContainer from './PlaceContainer';
 import {isLocalScore} from '../types/typeGuards';
+import {useUserDataContext} from '../providers/UserDataProvider';
+import {useMemo} from 'react';
 
 interface ScoreTileProps extends React.HTMLProps<HTMLDivElement> {
   score: Score | LocalScore;
-  isLocal?: boolean;
   achievement?: AchievementType | undefined;
   position?: number;
   showSimple?: boolean;
@@ -16,14 +17,21 @@ interface ScoreTileProps extends React.HTMLProps<HTMLDivElement> {
 
 function ScoreTile({
   score,
-  isLocal,
   achievement,
   position,
   showSimple = false,
   hoverContent,
   className,
 }: ScoreTileProps): JSX.Element {
+  const {userData} = useUserDataContext();
   const {timeElapsed, totalScore, createdAt} = score;
+
+  const isSelf = useMemo(() => {
+    if (isLocalScore(score)) return true;
+    if (!userData) return false;
+    return userData?.id === score?.user?.id;
+  }, [userData, score]);
+
   return (
     <HoverCard.Root>
       <HoverCard.Trigger>
@@ -34,7 +42,7 @@ function ScoreTile({
               showSimple={showSimple}
               position={position}
             />
-            {isLocal && (
+            {isSelf && (
               <div className="w-6 items-center justify-center flex flex-col ml-2">
                 <PersonIcon className="text-white" />
                 <Text size={'1'} className="text-white/70 pt-1">

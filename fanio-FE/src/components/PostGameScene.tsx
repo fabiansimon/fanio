@@ -1,18 +1,26 @@
 import {useEffect, useMemo, useState} from 'react';
 import {motion} from 'framer-motion';
-import {AchievementType, ButtonType, LocalScore, Score} from '../types';
+import {
+  AchievementType,
+  ButtonType,
+  LocalScore,
+  Score,
+  UserData,
+} from '../types';
 import {fetchScorePlacement, uploadScore} from '../utils/api';
 import {LocalStorage} from '../utils/localStorage';
 import {GAME_OPTIONS} from '../constants/Game';
 import {rateScore} from '../utils/logic';
 import {Heading, Text} from '@radix-ui/themes';
 import ScoreTile from './ScoreTile';
-import {CheckIcon} from '@radix-ui/react-icons';
+import {CheckIcon, PersonIcon} from '@radix-ui/react-icons';
 import InputField from './InputField';
 import Button from './Button';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
 import HoverContainer from './HoverContainer';
+import {UI} from '../utils/common';
+import {useUserDataContext} from '../providers/UserDataProvider';
 
 const ANIMATION_DURATION = 0.15; // in secon
 const transition = {
@@ -30,14 +38,26 @@ function PostGameScene({
   topScore?: Score;
   lastAttempt: LocalScore;
   quizId: string;
+  userData?: UserData;
   onRestart: () => void;
 }): JSX.Element {
+  const {userData, openAuthModal, isAuth} = useUserDataContext();
+
+  const formattedName = useMemo(() => {
+    if (!userData) return 'Last Attempt';
+    return UI.cn(userData.firstName, userData.lastName);
+  }, [userData]);
+
+  useEffect(() => {
+    setAttempt(prev => ({...prev, userName: formattedName}));
+  }, [formattedName]);
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUploaded, setIsUploaded] = useState<boolean>(false);
   const [placement, setPlacement] = useState<number | undefined>();
   const [attempt, setAttempt] = useState<LocalScore & {userName: string}>({
     ...lastAttempt,
-    userName: '',
+    userName: formattedName,
   });
 
   const navigate = useNavigate();
@@ -59,17 +79,20 @@ function PostGameScene({
   }, [lastAttempt]);
 
   const uploadGameScore = async () => {
+    if (isUploaded || !userData) return;
     setIsLoading(true);
     try {
       const {totalScore, timeElapsed, userName} = attempt;
       const {id: scoreId} = await uploadScore({
-        totalScore,
-        timeElapsed,
-        userName,
-        quizId,
+        score: {
+          totalScore,
+          timeElapsed,
+          userName: userName || formattedName,
+          quizId,
+        },
+        userId: userData.id,
       });
       LocalStorage.saveScoreId(scoreId);
-      LocalStorage.removeLastAttempt(quizId);
       setIsUploaded(true);
     } catch (error) {
       console.log(error);
@@ -133,46 +156,57 @@ function PostGameScene({
       <HoverContainer className="items-center overflow-hiddenf flex justify-between px-3 py-4 overflow-hidden">
         <ScoreTile
           achievement={achievement}
-          score={attempt.userName ? attempt : lastAttempt}
+          score={{...attempt, userName: attempt.userName || formattedName}}
           position={placement}
         />
-        <div className="relative w-full mt-4 -mb-1 bottom-0">
-          <motion.div
-            animate={!isUploaded ? 'hidden' : 'shown'}
-            variants={{shown: {x: 0}, hidden: {x: -1000}}}
-            transition={transition}
-            className="absolute flex bg-green-400/30 rounded-xl h-11 w-full items-center justify-center space-x-2">
-            <CheckIcon className="text-green-300 size-5" />
-            <Text size={'2'} weight={'medium'} className="text-green-300">
-              Successfully uploaded
-            </Text>
-          </motion.div>
-          <motion.div
-            transition={transition}
-            variants={{shown: {x: 0}, hidden: {x: 1000}}}
-            animate={isUploaded ? 'hidden' : 'shown'}
-            className="flex w-full flex-grow space-x-0 space-y-2 flex-col md:flex-row md:space-x-2 md:space-y-0">
-            <InputField
-              disabled={isLoading}
-              maxLength={GAME_OPTIONS.MAX_SCORE_USERNAME_LENGTH}
-              value={attempt.userName}
-              onInput={handleInput}
-              placeholder="Enter your name"
-              className="flex flex-grow w-full"
-            />
-            <Button
-              type={ButtonType.outline}
-              text="Upload Score"
-              textSize="2"
-              hotkey={!isUploaded && 'Enter'}
-              ignoreMetaKey
-              loading={isLoading}
-              onClick={uploadGameScore}
-              className="flex flex-grow w-full"
-              disabled={attempt.userName.trim().length === 0}
-            />
-          </motion.div>
-        </div>
+        {isAuth ? (
+          <div className="relative w-full mt-4 -mb-1 bottom-0">
+            <motion.div
+              animate={!isUploaded ? 'hidden' : 'shown'}
+              variants={{shown: {x: 0}, hidden: {x: -1000}}}
+              transition={transition}
+              className="absolute flex bg-green-400/30 rounded-xl h-11 w-full items-center justify-center space-x-2">
+              <CheckIcon className="text-green-300 size-5" />
+              <Text size={'2'} weight={'medium'} className="text-green-300">
+                Successfully uploaded
+              </Text>
+            </motion.div>
+            <motion.div
+              transition={transition}
+              variants={{shown: {x: 0}, hidden: {x: 1000}}}
+              animate={isUploaded ? 'hidden' : 'shown'}
+              className="flex w-full flex-grow space-x-0 space-y-2 flex-col md:flex-row md:space-x-2 md:space-y-0">
+              <InputField
+                disabled={isLoading}
+                maxLength={GAME_OPTIONS.MAX_SCORE_USERNAME_LENGTH}
+                value={attempt.userName}
+                onInput={handleInput}
+                placeholder="Enter your name"
+                onDelete={() => setAttempt(prev => ({...prev, userName: ''}))}
+                className="flex flex-grow w-full"
+              />
+              <Button
+                type={ButtonType.outline}
+                text="Upload Score"
+                textSize="2"
+                hotkey={!isUploaded && 'Enter'}
+                ignoreMetaKey
+                loading={isLoading}
+                onClick={uploadGameScore}
+                className="flex flex-grow w-full"
+              />
+            </motion.div>
+          </div>
+        ) : (
+          <Button
+            type={ButtonType.secondary}
+            textSize="2"
+            onClick={openAuthModal}
+            className="flex-grow w-full mt-4 -mb-2"
+            icon={<PersonIcon className="text-white" />}
+            text="Log in to upload your score."
+          />
+        )}
       </HoverContainer>
       <div className="flex w-full justify-between space-x-2">
         <Button

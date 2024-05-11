@@ -3,16 +3,19 @@ import {
   GameStatistic,
   MetaData,
   PaginatedData,
+  PlayableQuiz,
   Quiz,
   QuizInput,
   Score,
   ScoreInput,
   TimeFrame,
+  UserData,
 } from '../types/index';
 import ToastController from '../controllers/ToastController';
 import {sanitizeTerm} from './logic';
 
-const BASE_URL = 'http://localhost:8080/api';
+// const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = 'http://ec2-18-212-100-114.compute-1.amazonaws.com:8080/api';
 
 const _axios = axios.create({
   baseURL: BASE_URL,
@@ -64,9 +67,9 @@ export async function fetchPlayableQuizById({
 }: {
   quizId: string;
   showScore?: boolean;
-}): Promise<{quiz: Quiz; topScore: Score}> {
+}): Promise<PlayableQuiz> {
   try {
-    const response = await _axios.get<{quiz: Quiz; topScore: Score}>(
+    const response = await _axios.get<PlayableQuiz>(
       `/quiz/${quizId}?includeDetails=true`,
     );
     return response.data;
@@ -76,9 +79,15 @@ export async function fetchPlayableQuizById({
   }
 }
 
-export async function uploadQuiz(quiz: QuizInput): Promise<Quiz> {
+export async function uploadQuiz({
+  quiz,
+  userId,
+}: {
+  quiz: QuizInput;
+  userId: string;
+}): Promise<Quiz> {
   try {
-    const response = await _axios.post<Quiz>('/create-quiz', {
+    const response = await _axios.post<Quiz>(`/create-quiz?userId=${userId}`, {
       ...quiz,
       ...quiz.options,
     });
@@ -89,9 +98,18 @@ export async function uploadQuiz(quiz: QuizInput): Promise<Quiz> {
   }
 }
 
-export async function uploadScore(score: ScoreInput): Promise<Score> {
+export async function uploadScore({
+  score,
+  userId,
+}: {
+  score: ScoreInput;
+  userId: string;
+}): Promise<Score> {
   try {
-    const res = await _axios.post<Score>('/upload-score', score);
+    const res = await _axios.post<Score>(
+      `/upload-score?userId=${userId}`,
+      score,
+    );
     return res.data;
   } catch (error) {
     handleError({error, callName: 'uploadScore'});
@@ -222,12 +240,11 @@ export async function fetchScorePlacement({
   }
 }
 
-export async function authUser({token}: {token: string}): Promise<string> {
+export async function authUser({token}: {token: string}): Promise<UserData> {
   try {
     const res = await _axios.post('/auth/google', {
       token,
     });
-    console.log(res.data);
     return res.data;
   } catch (error) {
     handleError({error, callName: 'authUser'});

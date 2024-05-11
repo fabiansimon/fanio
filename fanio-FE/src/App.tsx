@@ -18,6 +18,7 @@ import PlayQuizScreen from './pages/PlayQuizScreen';
 import {GoogleOAuthProvider} from '@react-oauth/google';
 import UserDataProvider from './providers/UserDataProvider';
 import NavBar from './components/NavBar';
+import AccountScreen from './pages/AccountScreen';
 
 const googleAuthClientId = process.env.REACT_APP_GOOGLE_AUTH_CLIENT_ID!;
 
@@ -25,9 +26,9 @@ function App(): JSX.Element {
   return (
     <>
       <GoogleOAuthProvider clientId={googleAuthClientId}>
-        <UserDataProvider>
-          <Theme>
-            <Router>
+        <Theme>
+          <Router>
+            <UserDataProvider>
               <Routes>
                 <Route path="*" element={<Navigate to="/" replace={true} />} />
                 <Route path="/" element={<LandingScreen />} />
@@ -35,8 +36,8 @@ function App(): JSX.Element {
                   path={`${ROUTES.playQuiz}/:quizId`}
                   element={<PlayQuizScreen />}
                 />
-
                 <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
+                <Route path={ROUTES.account} element={<AccountScreen />} />
                 <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
                 <Route
                   path={ROUTES.leaderboard}
@@ -48,10 +49,10 @@ function App(): JSX.Element {
                 />
               </Routes>
               <NavBar />
-            </Router>
-            <Toast />
-          </Theme>
-        </UserDataProvider>
+              <Toast />
+            </UserDataProvider>
+          </Router>
+        </Theme>
       </GoogleOAuthProvider>
     </>
   );

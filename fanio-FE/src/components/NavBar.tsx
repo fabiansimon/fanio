@@ -4,10 +4,15 @@ import ROUTES from '../constants/Routes';
 import {BarChartIcon, PlayIcon, PlusCircledIcon} from '@radix-ui/react-icons';
 import {Text} from '@radix-ui/themes';
 import Logo from './Logo';
+import Avatar from './Avatar';
+import {useUserDataContext} from '../providers/UserDataProvider';
+import Button from './Button';
 
 function NavBar(): JSX.Element {
   const navigation = useNavigate();
   const {pathname} = useLocation();
+
+  const {isAuth, openAuthModal, userData} = useUserDataContext();
 
   const linkData = useMemo(() => {
     return [
@@ -30,13 +35,23 @@ function NavBar(): JSX.Element {
   }, []);
 
   return (
-    <nav className="bg-neutral-800/50 left-0 h-12 right-0 backdrop-blur-sm shadow-sm py-2 px-8 flex items-center fixed top-0 z-20">
+    <nav className="bg-neutral-800/50 left-0 h-12 right-0 backdrop-blur-sm shadow-sm py-2 px-8 flex items-center fixed top-0 z-20 justify-between">
       <Logo
         onClick={() => {
           navigation('/');
         }}
         className="z-10"
       />
+
+      {isAuth ? (
+        <Avatar
+          user={userData!}
+          onClick={() => navigation(ROUTES.account)}
+          className="size-7 border border-white/30 z-10"
+        />
+      ) : (
+        <Button text="Sign Up/Login" onClick={openAuthModal} textSize="1" />
+      )}
       <ul className="flex absolute left-0 justify-center flex-grow w-full space-x-8">
         {linkData.map(({title, route, icon}, index) => {
           const {textColor} = {

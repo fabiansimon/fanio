@@ -25,6 +25,10 @@ export interface Quiz {
   totalPlays: number;
 }
 
+export type PlayableQuiz = {quiz: Quiz & {creator: UserData}} & {
+  topScore: Score;
+};
+
 export interface Question {
   id: string;
   url: string;
@@ -42,9 +46,12 @@ export interface Score {
   userName: string;
   timeElapsed: number;
   totalScore: number;
+  user: UserData;
 }
 
-export type LocalScore = Omit<Score, 'id' | 'userName'> & {isUploaded: boolean};
+export type LocalScore = Omit<Score, 'id' | 'userName' | 'user'> & {
+  isUploaded: boolean;
+};
 
 export interface QuestionInput {
   url: string;
@@ -196,4 +203,15 @@ export enum StatusType {
   SUCCESS,
   ERROR,
   WARNING,
+}
+
+export interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  authId: string;
+  id: string;
+  quizzes: Quiz[];
+  scores: Score[];
+  createdAt: Date;
 }

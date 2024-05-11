@@ -2,7 +2,9 @@ package com.fabiansimon.fanio.controller;
 
 import com.fabiansimon.fanio.enums.TimeFrame;
 import com.fabiansimon.fanio.model.Score;
+import com.fabiansimon.fanio.model.User;
 import com.fabiansimon.fanio.service.ScoreService;
+import com.fabiansimon.fanio.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,8 @@ import java.util.UUID;
 public class ScoreController {
     @Autowired
     private ScoreService scoreService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/scores")
     public ResponseEntity<Page<Score>> getAllScores(
@@ -63,13 +67,16 @@ public class ScoreController {
     }
 
     @PostMapping("/upload-score")
-    public ResponseEntity<?> createScore(@RequestBody Score score) {
+    public ResponseEntity<?> createScore(@RequestBody Score score, @RequestParam("userId") UUID userId) {
         if (scoreService.usesProfanity(score.getUserName())) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("Profanity detected", "The username contains inappropriate content.");
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_ACCEPTABLE);
         }
+        User user = userService.findUser(userId).get();
+        score.setUser(user);
         Score savedScore = scoreService.saveScore(score);
+
         return new ResponseEntity<>(savedScore, HttpStatus.CREATED);
     }
 }

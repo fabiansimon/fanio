@@ -7,6 +7,7 @@ import {
   Quiz,
   Score,
   TimeFrame,
+  UserData,
 } from '../types';
 import ScoreTile from '../components/ScoreTile';
 import {LocalStorage} from '../utils/localStorage';
@@ -17,6 +18,7 @@ import Loading from '../components/Loading';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
 import EmptyContainer from '../components/EmptyContainer';
+import Avatar from '../components/Avatar';
 
 const timeFrameData = {
   [TimeFrame.DAILY]: {
@@ -42,12 +44,13 @@ function LeaderboardScreen(): JSX.Element {
     content: Score[];
     totalElements: number;
   } | null>(null);
-  const [localScores, setLocalScores] = useState<Set<string> | null>(null);
   const [timeFrame, setTimeFrame] = useState<TimeFrame>(TimeFrame.DAILY);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     maxItems: 10,
   });
+
+  const navigate = useNavigate();
 
   const emptyList = useMemo(() => {
     return !scoreData || scoreData.totalElements === 0;
@@ -61,7 +64,6 @@ function LeaderboardScreen(): JSX.Element {
         page: pageIndex,
         size: maxItems,
       });
-      setLocalScores(LocalStorage.fetchScoreIds());
       setScoreData(scores);
     } catch (error) {
       console.error(error);
@@ -109,10 +111,9 @@ function LeaderboardScreen(): JSX.Element {
               return (
                 <ScoreTile
                   className="cursor-pointer"
-                  hoverContent={<QuizLink quizId={s.quizId} />}
+                  hoverContent={<QuizLink quizId={s.quizId} user={s.user} />}
                   position={position}
                   achievement={achievement}
-                  isLocal={localScores?.has(s.id)}
                   key={i}
                   score={s}
                 />
@@ -123,10 +124,22 @@ function LeaderboardScreen(): JSX.Element {
           <div className="h-full items-center justify-center flex flex-col">
             <EmptyContainer
               className="py-auto"
-              title="No Scores to show yet 💨"
-              description="Start off the race and be the first one to submit a score"
-              buttonText="Show All Time Scores"
-              onClick={() => setTimeFrame(TimeFrame.ALLTIME)}
+              title="No scores to be show yet 💨"
+              description={
+                timeFrame === TimeFrame.ALLTIME
+                  ? 'Start off the race and be the first one to submit a score'
+                  : 'No new daily scores but check out the All Time Greats'
+              }
+              buttonText={
+                timeFrame === TimeFrame.ALLTIME
+                  ? 'Play a Quiz'
+                  : 'Show All Time Scores'
+              }
+              onClick={() => {
+                timeFrame === TimeFrame.ALLTIME
+                  ? navigate(ROUTES.listQuizzes)
+                  : setTimeFrame(TimeFrame.ALLTIME);
+              }}
             />
           </div>
         )}
@@ -140,7 +153,13 @@ function LeaderboardScreen(): JSX.Element {
   );
 }
 
-function QuizLink({quizId}: {quizId: string}): JSX.Element {
+function QuizLink({
+  quizId,
+  user,
+}: {
+  quizId: string;
+  user: UserData;
+}): JSX.Element {
   const [quizData, setQuizData] = useState<Quiz | null>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigation = useNavigate();
@@ -172,6 +191,11 @@ function QuizLink({quizId}: {quizId: string}): JSX.Element {
         <Loading className="size-6 text-white" />
       ) : (
         <div className="flex space-x-4 items-center">
+          <Avatar
+            user={user}
+            onClick={() => console.log(user.email)}
+            className="size-7"
+          />
           <div>
             <Heading size={'2'} className="text-white">
               {quizData?.title}

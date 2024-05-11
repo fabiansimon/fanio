@@ -28,4 +28,7 @@ public class Score {
     private Double timeElapsed;
     private Double totalScore;
     private UUID quizId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 }

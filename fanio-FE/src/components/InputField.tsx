@@ -4,6 +4,12 @@ import {forwardRef, useEffect, useRef, useState} from 'react';
 import Loading from './Loading';
 import KeyBinding from './KeyBinding';
 import useKeyShortcut from '../hooks/useKeyShortcut';
+import {
+  Cross1Icon,
+  Cross2Icon,
+  CrossCircledIcon,
+  Crosshair2Icon,
+} from '@radix-ui/react-icons';
 
 export interface InputFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -12,6 +18,7 @@ export interface InputFieldProps
   showSimple?: boolean;
   autoFocus?: boolean;
   hotkey?: string;
+  onDelete?: () => void;
 }
 
 const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
@@ -26,9 +33,12 @@ const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
           props.className,
         )}
       />
-      <div className="absolute right-0 bottom-0 flex">
+      <div className="absolute bottom-0 right-0 flex">
+        {props.onDelete && (
+          <DeleteIcon className="mr-4 mb-3" onClick={props.onDelete} />
+        )}
         {!isLoading && trailing && trailing}
-        {isLoading && <Loading className="text-white size-5 mb-3" />}
+        {isLoading && <Loading className="text-white size-5" />}
       </div>
     </div>
   ),
@@ -43,6 +53,7 @@ function InputField(
     isLoading = false,
     trailing,
     autoFocus,
+    onDelete,
     ...props
   }: InputFieldProps,
   ref: any,
@@ -94,6 +105,7 @@ function InputField(
         {...props}
         ref={setRefs}
         trailing={trailing}
+        onDelete={onDelete}
         isLoading={isLoading}
         className={className}
       />
@@ -133,6 +145,7 @@ function InputField(
           ref={setRefs}
           {...props}
         />
+        {onDelete && <DeleteIcon className="mr-4" onClick={onDelete} />}
         {isLoading && <Loading className="size-6 mr-2" />}
         {!isLoading && hotkey && (
           <KeyBinding
@@ -143,6 +156,22 @@ function InputField(
         )}
       </div>
     </motion.div>
+  );
+}
+
+function DeleteIcon({
+  className,
+  onClick,
+}: {
+  className?: string;
+  onClick: () => void;
+}): JSX.Element {
+  return (
+    <div
+      className={UI.cn('cursor-pointer rounded-full bg-white/90', className)}
+      onClick={onClick}>
+      <Cross2Icon className="text-neutral-800 size-4 p-[3px]" />
+    </div>
   );
 }
 

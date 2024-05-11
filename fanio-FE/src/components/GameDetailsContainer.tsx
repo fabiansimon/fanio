@@ -3,7 +3,7 @@ import Avatar from './Avatar';
 import {UI} from '../utils/common';
 import {PlayIcon} from '@radix-ui/react-icons';
 import Chip from './Chip';
-import {ChipType, Quiz} from '../types';
+import {ChipType, Quiz, UserData} from '../types';
 import {useMemo} from 'react';
 
 function GameDetailsContainer({
@@ -11,18 +11,23 @@ function GameDetailsContainer({
   quiz,
 }: {
   className?: string;
-  quiz: Quiz;
+  quiz: Quiz & {creator: UserData};
 }): JSX.Element {
-  const {isPrivate, randomOffsets, totalPlays} = quiz;
+  const {
+    isPrivate,
+    randomOffsets,
+    totalPlays,
+    creator: {firstName, lastName},
+  } = quiz;
   const detailsData = useMemo(
     () => [
       {
         title: 'Created By',
         content: (
           <div className="flex space-x-2 items-end">
-            <Avatar className="size-6" />
+            <Avatar user={quiz.creator} className="size-6" />
             <Text size={'2'} className="text-white">
-              Fabian S.
+              {UI.formatName({firstName, lastName})}
             </Text>
             ,
           </div>

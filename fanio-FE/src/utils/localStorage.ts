@@ -1,12 +1,13 @@
-import {GameSettings, LocalScore, Quiz, QuizInput} from '../types';
+import {GameSettings, LocalScore, Quiz, QuizInput, UserData} from '../types';
 
 const KEYS = {
   scoreIds: 'scoreIds',
   quizData: 'quizData',
-  lastAttempts: 'lastAttempts',
+  lastAttempt: 'lastAttempt',
   bestAttempts: 'bestAttempts',
   userSettings: 'userSettings',
   unsavedQuiz: 'unsavedQuiz',
+  userData: 'userData',
   sessionToken: 'sessionToken',
 };
 
@@ -48,32 +49,6 @@ export class LocalStorage {
     localStorage.removeItem(KEYS.quizData);
   }
 
-  static fetchLastAttempts(): Map<string, LocalScore> {
-    const storedAttempts = localStorage.getItem(KEYS.lastAttempts);
-    if (storedAttempts) return new Map(JSON.parse(storedAttempts));
-
-    return new Map();
-  }
-
-  static fetchLastAttempt(quizId: string): LocalScore | undefined {
-    const storedAttempts = this.fetchLastAttempts();
-    if (storedAttempts.has(quizId)) return storedAttempts.get(quizId);
-
-    return;
-  }
-
-  static saveLastAttempt(quizId: string, score: LocalScore) {
-    const storedAttemps = this.fetchLastAttempts();
-    storedAttemps.set(quizId, score);
-    localStorage.setItem(KEYS.lastAttempts, JSON.stringify([...storedAttemps]));
-  }
-
-  static removeLastAttempt(quizId: string) {
-    const storedAttemps = this.fetchLastAttempts();
-    if (storedAttemps.has(quizId)) storedAttemps.delete(quizId);
-    localStorage.setItem(KEYS.lastAttempts, JSON.stringify([...storedAttemps]));
-  }
-
   static saveUserSettings(settings: GameSettings) {
     localStorage.setItem(KEYS.userSettings, JSON.stringify(settings));
   }
@@ -110,7 +85,21 @@ export class LocalStorage {
 
   static fetchSessionToken() {
     const savedToken = localStorage.getItem(KEYS.sessionToken);
-    if (savedToken) return savedToken;
-    return;
+    if (!savedToken) return;
+    return savedToken;
+  }
+
+  static saveUserData(user: UserData) {
+    localStorage.setItem(KEYS.userData, JSON.stringify(user));
+  }
+
+  static fetchUserData() {
+    const savedUser = localStorage.getItem(KEYS.userData);
+    if (!savedUser) return;
+    return JSON.parse(savedUser);
+  }
+
+  static clearUserData() {
+    localStorage.removeItem(KEYS.userData);
   }
 }

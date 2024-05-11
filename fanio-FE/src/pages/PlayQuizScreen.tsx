@@ -11,6 +11,7 @@ import {
   Score,
   ScoreState,
   UIState,
+  UserData,
 } from '../types';
 import {fetchPlayableQuizById, onGameFinish} from '../utils/api';
 import {shuffle} from 'lodash';
@@ -61,7 +62,9 @@ function PlayQuizScreen(): JSX.Element {
   const [gameState, setGameState] = useState<GameState>(GameState.PRE);
   const [questionIndex, setQuestionIndex] = useState<number>(0);
 
-  const [quizData, setQuizData] = useState<Quiz | undefined>();
+  const [quizData, setQuizData] = useState<
+    (Quiz & {creator: UserData}) | undefined
+  >();
   const [topScore, setTopScore] = useState<Score | undefined>();
   const [lastAttempt, setLastAttempt] = useState<LocalScore | undefined>();
 
@@ -105,7 +108,8 @@ function PlayQuizScreen(): JSX.Element {
     let offset: number;
 
     if (quizData.randomOffsets) {
-      const boundary = videoRef.current.getDuration() * 0.1;
+      const boundary =
+        videoRef.current.getDuration() * GAME_OPTIONS.MAX_OFFSET_BOUNDARY;
       offset = randomNumber({
         min: boundary,
         max: videoRef.current.getDuration() - boundary,
@@ -123,14 +127,13 @@ function PlayQuizScreen(): JSX.Element {
     setScore(INIT_SCORE);
   };
 
-  const lastStoredAttempt = useMemo(
-    () => LocalStorage.fetchLastAttempt(quizId!),
-    [quizId],
-  );
-
   useEffect(() => {
     if (settings.autoInput.status) handleSubmitGuess();
   }, [input, settings]);
+
+  useEffect(() => {
+    LocalStorage.saveUserSettings(settings);
+  }, [settings]);
 
   useEffect(() => {
     if (questionIndex === quizData?.questions.length) {
@@ -145,6 +148,7 @@ function PlayQuizScreen(): JSX.Element {
         const {quiz, topScore} = await fetchPlayableQuizById({quizId});
         setQuizData({
           ...quiz,
+
           questions: shuffle(quiz.questions),
         });
         setTopScore(topScore);
@@ -165,15 +169,13 @@ function PlayQuizScreen(): JSX.Element {
   };
 
   const onFinishRound = () => {
-    const _lastAttempt: LocalScore = {
+    setLastAttempt({
       createdAt: new Date(),
       quizId: quizId!,
       timeElapsed: score.totalTime,
       totalScore: score.totalScore,
       isUploaded: false,
-    };
-    LocalStorage.saveLastAttempt(quizId!, _lastAttempt!);
-    setLastAttempt(_lastAttempt);
+    });
     updateTotalPlays();
     setQuizData(prev => {
       if (!prev) return;
@@ -321,7 +323,7 @@ function PlayQuizScreen(): JSX.Element {
           <PreGameScene
             quizId={quizId!}
             topScore={topScore}
-            lastAttempt={lastAttempt || lastStoredAttempt}
+            lastAttempt={lastAttempt}
             onChangeScene={(scene: GameState) => setGameState(scene)}
           />
         )}
@@ -331,6 +333,7 @@ function PlayQuizScreen(): JSX.Element {
             onRestart={resetGame}
             lastAttempt={lastAttempt!}
             topScore={topScore}
+            userData={quizData?.creator!}
           />
         )}
         {gameState === GameState.PLAYING && (

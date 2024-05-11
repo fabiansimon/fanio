@@ -8,6 +8,7 @@ import {
   Cross1Icon,
   VideoIcon,
   CheckCircledIcon,
+  PersonIcon,
 } from '@radix-ui/react-icons';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
@@ -32,7 +33,7 @@ import useIsSmall from '../hooks/useIsSmall';
 import OptionsContainer from '../components/OptionsContainer';
 import {motion} from 'framer-motion';
 import {useUserDataContext} from '../providers/UserDataProvider';
-import AuthPopUp from '../components/AuthPopUp';
+
 import AddQuestionModal, {
   AddQuestionModalRef,
 } from '../components/AddQuestionModal';
@@ -57,8 +58,6 @@ function CreateScreen(): JSX.Element {
   const [quizInput, setQuizInput] = useState<QuizInput | undefined>();
 
   const addModalRef = useRef<AddQuestionModalRef>(null);
-
-  const {isAuth} = useUserDataContext();
 
   const containsDuplicated = useMemo(() => {
     if (!quizInput?.questions) return false;
@@ -113,7 +112,7 @@ function CreateScreen(): JSX.Element {
       switch (type) {
         case InputType.TITLE:
           const newTitle = value as string;
-          const tagTitle = newTitle.toUpperCase();
+          const tagTitle = newTitle.toUpperCase().trim();
           const tags = [...prev.tags];
 
           if (tags[0]?.includes(tagTitle.slice(0, -1))) {
@@ -363,7 +362,7 @@ function CreateScreen(): JSX.Element {
                   <ValidationChip
                     status={StatusType.ERROR}
                     onClick={removeDuplicates}
-                    text="Contains Duplicates"
+                    text="Remove Duplicates"
                   />
                 )}
                 {missingAnswerIndex !== -1 && (
@@ -391,9 +390,6 @@ function CreateScreen(): JSX.Element {
                   </div>
                 );
               })}
-              {/* <Text size={'1'} className="text-white/50 text-center pb-4 mt-6">
-                3 songs left
-              </Text> */}
               {quizInput &&
                 quizInput?.questions.length < GAME_OPTIONS.MAX_QUIZ_SONGS && (
                   <div className="flex border border-neutral-700/80 rounded-xl mt-4 overflow-hidden">
@@ -521,8 +517,10 @@ function SummaryContainer({
 }): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [newTag, setNewTag] = useState<string>('');
+
+  const {isAuth, openAuthModal, userData} = useUserDataContext();
+
   const navigation = useNavigate();
-  const isSmall = useIsSmall();
 
   const {
     title,
@@ -561,9 +559,14 @@ function SummaryContainer({
   };
 
   const createQuiz = async () => {
+    if (!isAuth) return openAuthModal();
     setIsLoading(true);
+
     try {
-      const {id} = await uploadQuiz(cleanInput(quiz));
+      const {id} = await uploadQuiz({
+        quiz: cleanInput(quiz),
+        userId: userData?.id!,
+      });
       LocalStorage.removeUnsavedQuiz();
       navigation(`${ROUTES.playQuiz}/${id}`);
     } catch (error) {
@@ -586,7 +589,7 @@ function SummaryContainer({
       animate={isValid ? 'visible' : 'hidden'}
       transition={{damping: 300}}
       variants={{hidden: {translateY: 1000}, visible: {translateY: 0}}}
-      className="absolute bg-neutral-800/50 flex min-h-44 flex-col mb-8 pb-8 px-4 pt-4 rounded-t-2xl shadow-lg shadow-black left-0 right-0 bottom-0 backdrop-blur-sm max-w-screen-xl w-full mx-auto">
+      className="absolute bg-neutral-800/50 flex min-h-44 flex-col mb-8 pb-8 px-4 pt-4 max-w-screen-xl w-full mx-auto rounded-t-2xl shadow-lg shadow-black left-0 right-0 bottom-0 backdrop-blur-sm">
       <div className="flex justify-between">
         <div className="flex flex-col justify-between">
           <div>
@@ -644,10 +647,17 @@ function SummaryContainer({
           <Button
             onClick={createQuiz}
             loading={isLoading}
+            icon={
+              isAuth ? (
+                <MagicWandIcon className="text-white size-4" />
+              ) : (
+                <PersonIcon className="text-white size-[14px]" />
+              )
+            }
             textSize="2"
-            icon={<MagicWandIcon className="text-white size-4" />}
+            type={isAuth ? ButtonType.primary : ButtonType.secondary}
             className="w-52 font-medium"
-            text="Create Quiz"
+            text={isAuth ? 'Create Quiz' : 'Sign in first'}
           />
         </div>
       </div>

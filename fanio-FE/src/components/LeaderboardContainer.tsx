@@ -43,7 +43,6 @@ function LeaderboardContainer(): JSX.Element {
                 showSimple
                 position={i + 1}
                 achievement={achievement}
-                isLocal={localScores?.has(s.id)}
                 key={i}
                 score={s}
               />
