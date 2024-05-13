@@ -15,7 +15,7 @@ import ToastController from '../controllers/ToastController';
 import {sanitizeTerm} from './logic';
 
 // const BASE_URL = 'http://localhost:8080/api';
-const BASE_URL = 'http://ec2-18-212-100-114.compute-1.amazonaws.com:8080/api';
+const BASE_URL = 'https://verseus.world/api/';
 
 const _axios = axios.create({
   baseURL: BASE_URL,
