@@ -13,9 +13,10 @@ import {
 } from '../types/index';
 import ToastController from '../controllers/ToastController';
 import {sanitizeTerm} from './logic';
+import {LocalStorage} from './localStorage';
 
-// const BASE_URL = 'http://localhost:8080/api';
-const BASE_URL = 'https://verseus.world/api/';
+const BASE_URL = 'http://localhost:8080/api';
+// const BASE_URL = 'https://verseus.world/api/';
 
 const _axios = axios.create({
   baseURL: BASE_URL,
@@ -50,6 +51,11 @@ function handleError({
   }
 
   ToastController.showErrorToast(errorTitle, errorDescription);
+}
+
+export function setJwtToken(jwt: string) {
+  console.log('Token: ', jwt);
+  _axios.defaults.headers.common.Authorization = `Bearer ${jwt}`;
 }
 
 export async function fetchQuizById({id}: {id: string}): Promise<Quiz> {
@@ -245,7 +251,12 @@ export async function authUser({token}: {token: string}): Promise<UserData> {
     const res = await _axios.post('/auth/google', {
       token,
     });
-    return res.data;
+
+    const {jwt, user} = res.data;
+    LocalStorage.saveJwtToken(jwt);
+    setJwtToken(jwt);
+
+    return user;
   } catch (error) {
     handleError({error, callName: 'authUser'});
     throw error;

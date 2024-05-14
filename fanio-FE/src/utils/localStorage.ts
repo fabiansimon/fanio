@@ -1,4 +1,4 @@
-import {GameSettings, LocalScore, Quiz, QuizInput, UserData} from '../types';
+import {GameSettings, Quiz, QuizInput, UserData} from '../types';
 
 const KEYS = {
   scoreIds: 'scoreIds',
@@ -9,6 +9,7 @@ const KEYS = {
   unsavedQuiz: 'unsavedQuiz',
   userData: 'userData',
   sessionToken: 'sessionToken',
+  jwtToken: 'jwtToken',
 };
 
 export class LocalStorage {
@@ -101,5 +102,17 @@ export class LocalStorage {
 
   static clearUserData() {
     localStorage.removeItem(KEYS.userData);
+  }
+
+  static saveJwtToken(jwt: string) {
+    localStorage.setItem(KEYS.jwtToken, jwt);
+  }
+
+  static fetchJwtToken() {
+    return localStorage.getItem(KEYS.jwtToken);
+  }
+
+  static clearJwtToken() {
+    localStorage.removeItem(KEYS.jwtToken);
   }
 }

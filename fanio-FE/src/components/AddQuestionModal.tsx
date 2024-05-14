@@ -131,8 +131,7 @@ function AddQuestionModal(
       if (type === QuestionInputType.PLAYLIST && res.length > 1) {
         const questions: QuestionInput[] = res
           .slice(0, maxAmount)
-          .map((question, index) => {
-            console.log(index);
+          .map(question => {
             const {title, length, imageUri, sourceTitle, tags, sourceUrl} =
               question;
             return {

@@ -2,8 +2,10 @@ package com.fabiansimon.fanio.controller;
 
 import com.fabiansimon.fanio.DTO.AuthTokenDTO;
 
+import com.fabiansimon.fanio.DTO.JWTUserDTO;
 import com.fabiansimon.fanio.model.User;
 import com.fabiansimon.fanio.service.UserService;
+import com.fabiansimon.fanio.utils.JwtTokenUtil;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ import java.util.Optional;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/auth/google")
     public ResponseEntity<?> authenticateUser(@RequestBody AuthTokenDTO tokenDTO) {
@@ -36,13 +40,16 @@ public class UserController {
         String authId = payload.getSubject();
         Optional<User> user = userService.findUser(authId);
 
+        String jwt;
         if (user.isPresent()) {
-            return ResponseEntity.ok(user.get());
+            jwt = jwtTokenUtil.generateToken(user.get().getEmail());
+            return ResponseEntity.ok(new JWTUserDTO(jwt, user.get()));
         }
 
         User newUser = userService.createUserFromPayload(payload);
         User savedUser = userService.saveUser(newUser);
+        jwt = jwtTokenUtil.generateToken(savedUser.getEmail());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new JWTUserDTO(jwt, savedUser));
     }
 }
