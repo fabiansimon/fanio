@@ -20,6 +20,7 @@ public class JwtTokenUtil {
     public String generateToken(String userEmail) {
         Long now = System.currentTimeMillis();
         return Jwts.builder()
+                .claim("email", userEmail)
                 .setSubject(userEmail)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + JWT_TOKEN_VALIDITY * 86_400))
