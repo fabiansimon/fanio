@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,24 +18,35 @@ public class JwtTokenUtil {
     private String SECRET_KEY;
     private final long JWT_TOKEN_VALIDITY =  14; // In days
 
+    private final String TOKEN_HEADER = "Authorization";
+    private final String TOKEN_PREFIX = "Bearer ";
+
     public String generateToken(String userEmail) {
-        Long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
         return Jwts.builder()
                 .claim("email", userEmail)
-                .setSubject(userEmail)
-                .setIssuedAt(new Date(now))
-                .setExpiration(new Date(now + JWT_TOKEN_VALIDITY * 86_400))
+                .subject(userEmail)
+                .issuedAt(new Date(now)).expiration(new Date(now + JWT_TOKEN_VALIDITY * 86_400))
                 .signWith(getSecretKey())
                 .compact();
     }
 
     public Boolean validToken(String token, String userEmail) {
         final String tokenResponse = getUserEmailFromToken(token);
-        return tokenResponse.equals(userEmail);
+        return tokenResponse.equals(userEmail) && !tokenExpired(token);
     }
 
     public String getUserEmailFromToken(String token) {
         return getTokenClaims(token).getSubject();
+    }
+
+    public String extractJWT(HttpServletRequest request) {
+        String bearer = request.getHeader(TOKEN_HEADER);
+        if (bearer != null && bearer.startsWith(TOKEN_PREFIX)) {
+            return bearer.substring(7);
+        }
+
+        return null;
     }
 
     private Boolean tokenExpired(String token) {

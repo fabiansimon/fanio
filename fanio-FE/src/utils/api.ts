@@ -54,8 +54,8 @@ function handleError({
 }
 
 export function setJwtToken(jwt: string) {
-  console.log('Token: ', jwt);
-  _axios.defaults.headers.common.Authorization = `Bearer ${jwt}`;
+  console.log('Hallo Token: ', jwt);
+  _axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
 }
 
 export async function fetchQuizById({id}: {id: string}): Promise<Quiz> {
