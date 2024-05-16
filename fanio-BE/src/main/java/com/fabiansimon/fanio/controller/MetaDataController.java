@@ -27,7 +27,7 @@ public class MetaDataController {
     @Autowired
     MetaDataService metaDataService = new MetaDataService();
 
-    @GetMapping("statistics")
+    @GetMapping("statistic")
     public ResponseEntity<GameStatisticDTO> fetchTotalGameStatistic() {
         try {
             GameStatisticDTO gameStatistic = new GameStatisticDTO();

@@ -38,7 +38,26 @@ public class SecurityConfig {
     }
 
     private String[] getOpenRoutes() {
-        String[] publicRoutes = {"statistics", "top-quizzes", "top-scores", "strip-meta", "quiz/**", "auth/**"};
+        String[] publicRoutes = {
+                // Meta routes
+                "statistic",
+                "strip-meta", // good idea?
+
+                // Quiz routes
+                "quizzes",
+                "top-quizzes",
+                "search-quiz",
+                "quiz/**",
+
+                // Score routes
+                "scores/**",
+                "top-scores",
+                "upload-score",
+
+                // User routes
+                "auth/**"
+        };
+
         return Arrays.stream(publicRoutes)
                 .map(route -> "/api/" + route)
                 .toArray(String[]::new);

@@ -89,7 +89,7 @@ function PlayQuizScreen(): JSX.Element {
     [result, isPlaying],
   );
 
-  console.warn('Current Question', question?.answer);
+  // console.warn('Current Question', question?.answer);
 
   const handlePlay = useCallback(() => {
     if (!isPlaying) setIsPlaying(true);
