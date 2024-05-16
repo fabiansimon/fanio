@@ -25,8 +25,8 @@ function AuthPopUp(): JSX.Element {
     }
 
     try {
-      const userData = await authUser({token: res.credential});
-      updateUserData(userData);
+      const user = await authUser({token: res.credential});
+      updateUserData(user);
     } catch (error) {
       console.error(error);
       onError();

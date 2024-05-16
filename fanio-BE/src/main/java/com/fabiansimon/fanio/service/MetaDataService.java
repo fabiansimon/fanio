@@ -6,7 +6,6 @@ import com.fabiansimon.fanio.DTO.MetaResponseDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.hibernate.jdbc.Expectation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -154,7 +153,7 @@ public class MetaDataService {
 
     public static String cleanRawTitle(String title) {
         try {
-            String[] featKeys = {"feat", "feat.", "ft", "ft.", "feature", "featuring", "by", "official video", "official music video", "music video", "prod", "prod.", "official version", "audio", "lyrics", "official lyric video", "visualizer", "net video", "official hd video"};
+            String[] featKeys = {"feat", "feat.", "ft", "ft.", "feature", "featuring", "by", "official video", "official music video", "music video", "prod", "prod.", "official version", "audio", "lyrics", "official lyric video", "visualizer", "net video", "official hd video", "offizielles"};
             String lowerTitle = title.toLowerCase();
 
             String[] dashes = {" - ", " – ", " – "};

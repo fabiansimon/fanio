@@ -40,6 +40,7 @@ export class UI {
   }
 
   static formatNumber(number: number) {
+    if (!number) return number;
     return number.toLocaleString('de-DE', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,

@@ -9,8 +9,9 @@ import {
 import AuthPopUp from '../components/AuthPopUp';
 import {UserData} from '../types';
 import {LocalStorage} from '../utils/localStorage';
-import {useNavigate, useNavigation} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
+import {setJwtToken} from '../utils/api';
 
 interface UserDataContextType {
   userData: UserData | undefined;
@@ -50,8 +51,16 @@ function UserDataProvider({
   }, [navigate]);
 
   useEffect(() => {
+    const jwt = LocalStorage.fetchJwtToken();
     const user = LocalStorage.fetchUserData();
-    if (user) updateUserData(user);
+    if (!user || !jwt) {
+      LocalStorage.clearJwtToken();
+      LocalStorage.clearUserData();
+      return;
+    }
+
+    setJwtToken(jwt);
+    updateUserData(user);
   }, [updateUserData]);
 
   const isAuth = useMemo(() => {

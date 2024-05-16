@@ -112,7 +112,7 @@ function CreateScreen(): JSX.Element {
       switch (type) {
         case InputType.TITLE:
           const newTitle = value as string;
-          const tagTitle = newTitle.toUpperCase().trim();
+          const tagTitle = newTitle.toUpperCase();
           const tags = [...prev.tags];
 
           if (tags[0]?.includes(tagTitle.slice(0, -1))) {
