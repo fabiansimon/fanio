@@ -38,9 +38,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             String email = jwtUtil.getUserEmailFromToken(jwt);
 
              if (email != null && jwtUtil.validToken(jwt, email) && SecurityContextHolder.getContext().getAuthentication() == null) {
-                 System.out.println("email: " + email);
-                 System.out.println("hello");
-                 System.out.println();
                  UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                  UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                  authToken.setDetails(
@@ -53,7 +50,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             System.out.println(e);
-            System.out.println("Error handling jwt token");
+            System.out.println("Error handling jwt token: " + e);
         }
 
         filterChain.doFilter(request, response);

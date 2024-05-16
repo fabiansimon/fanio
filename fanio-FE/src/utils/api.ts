@@ -15,8 +15,7 @@ import ToastController from '../controllers/ToastController';
 import {sanitizeTerm} from './logic';
 import {LocalStorage} from './localStorage';
 
-const BASE_URL = 'http://localhost:8080/api';
-// const BASE_URL = 'https://verseus.world/api/';
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
 const _axios = axios.create({
   baseURL: BASE_URL,
