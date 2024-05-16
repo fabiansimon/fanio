@@ -7,8 +7,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -17,8 +20,8 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
-    @Autowired
-    private JwtTokenUtil jwtUtil;
+    final UserDetailsService userDetailsService;
+    final JwtTokenUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -32,18 +35,27 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 return;
             }
 
-             String email = jwtUtil.getUserEmailFromToken(jwt);
+            String email = jwtUtil.getUserEmailFromToken(jwt);
 
-            System.out.println(email);
              if (email != null && jwtUtil.validToken(jwt, email) && SecurityContextHolder.getContext().getAuthentication() == null) {
-//                 SecurityContextHolder.set
-                 filterChain.doFilter(request, response);
-                 return;
+                 System.out.println("email: " + email);
+                 System.out.println("hello");
+                 System.out.println();
+                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                 authToken.setDetails(
+                         new WebAuthenticationDetailsSource().buildDetails(request)
+                 );
+                 SecurityContextHolder.getContext().setAuthentication(authToken);
+             } else {
+                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
              }
 
-             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } catch (Exception e) {
+            System.out.println(e);
             System.out.println("Error handling jwt token");
         }
+
+        filterChain.doFilter(request, response);
     }
 }
