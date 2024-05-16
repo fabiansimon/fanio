@@ -16,7 +16,7 @@ import {sanitizeTerm} from './logic';
 import {LocalStorage} from './localStorage';
 
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
-
+console.log(BASE_URL);
 const _axios = axios.create({
   baseURL: BASE_URL,
   headers: {'Access-Control-Allow-Origin': '*'},
