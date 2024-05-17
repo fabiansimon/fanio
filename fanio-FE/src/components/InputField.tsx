@@ -18,7 +18,6 @@ export interface InputFieldProps
   showSimple?: boolean;
   autoFocus?: boolean;
   hotkey?: string;
-  onDelete?: () => void;
 }
 
 const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
@@ -34,9 +33,6 @@ const SimpleInputField = forwardRef<HTMLInputElement, InputFieldProps>(
         )}
       />
       <div className="absolute bottom-0 right-0 flex">
-        {props.onDelete && (
-          <DeleteIcon className="mr-4 mb-3" onClick={props.onDelete} />
-        )}
         {!isLoading && trailing && trailing}
         {isLoading && <Loading className="text-white size-5" />}
       </div>
@@ -53,7 +49,6 @@ function InputField(
     isLoading = false,
     trailing,
     autoFocus,
-    onDelete,
     ...props
   }: InputFieldProps,
   ref: any,
@@ -105,7 +100,6 @@ function InputField(
         {...props}
         ref={setRefs}
         trailing={trailing}
-        onDelete={onDelete}
         isLoading={isLoading}
         className={className}
       />
@@ -145,7 +139,6 @@ function InputField(
           ref={setRefs}
           {...props}
         />
-        {onDelete && <DeleteIcon className="mr-4" onClick={onDelete} />}
         {isLoading && <Loading className="size-6 mr-2" />}
         {!isLoading && hotkey && (
           <KeyBinding

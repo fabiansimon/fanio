@@ -152,7 +152,6 @@ function PostGameScene({
           {subtitle}
         </Text>
       </div>
-      {/* <div className="bg-black/20 border shadow-md shadow-black rounded-lg border-neutral-500/20  items-center justify-center overflow-hidden p-3"> */}
       <HoverContainer className="items-center overflow-hiddenf flex justify-between px-3 py-4 overflow-hidden">
         <ScoreTile
           achievement={achievement}
@@ -182,7 +181,6 @@ function PostGameScene({
                 value={attempt.userName}
                 onInput={handleInput}
                 placeholder="Enter your name"
-                onDelete={() => setAttempt(prev => ({...prev, userName: ''}))}
                 className="flex flex-grow w-full"
               />
               <Button

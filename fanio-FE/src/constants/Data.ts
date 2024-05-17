@@ -3,7 +3,7 @@ export const DATA = {
     'Challenge yourself',
     'Real Fan',
     'Where will you land',
-    'Fanio',
+    'Verseus',
   ],
   artistList: [
     'Beyoncé',

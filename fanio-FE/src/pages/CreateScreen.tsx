@@ -7,7 +7,6 @@ import {
   MagicWandIcon,
   Cross1Icon,
   VideoIcon,
-  CheckCircledIcon,
   PersonIcon,
 } from '@radix-ui/react-icons';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
