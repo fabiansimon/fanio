@@ -1,24 +1,15 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {fetchQuizById, fetchTopScores} from '../utils/api';
-import {PlayIcon} from '@radix-ui/react-icons';
-import {
-  AchievementType,
-  PaginationState,
-  Quiz,
-  Score,
-  TimeFrame,
-  UserData,
-} from '../types';
+import {fetchTopScores} from '../utils/api';
+import {AchievementType, PaginationState, Score, TimeFrame} from '../types';
 import ScoreTile from '../components/ScoreTile';
-import {LocalStorage} from '../utils/localStorage';
 import PageContainer from '../components/PageContainer';
 import PaginationBar from '../components/PaginationBar';
-import {Heading, Select, Text} from '@radix-ui/themes';
-import Loading from '../components/Loading';
+import {Select} from '@radix-ui/themes';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
 import EmptyContainer from '../components/EmptyContainer';
-import Avatar from '../components/Avatar';
+import QuizLink from '../components/QuizLink';
+import Hoverable from '../components/Hoverable';
 
 const timeFrameData = {
   [TimeFrame.DAILY]: {
@@ -111,8 +102,8 @@ function LeaderboardScreen(): JSX.Element {
               return (
                 <ScoreTile
                   className="cursor-pointer"
-                  hoverContent={<QuizLink quizId={s.quizId} user={s.user} />}
                   position={position}
+                  hoverContent={<QuizLink quizId={s.quizId} user={s.user} />}
                   achievement={achievement}
                   key={i}
                   score={s}
@@ -150,76 +141,6 @@ function LeaderboardScreen(): JSX.Element {
         />
       </div>
     </PageContainer>
-  );
-}
-
-function QuizLink({
-  quizId,
-  user,
-}: {
-  quizId: string;
-  user: UserData;
-}): JSX.Element {
-  const [quizData, setQuizData] = useState<Quiz | null>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const navigation = useNavigate();
-
-  useEffect(() => {
-    (async () => {
-      const storedQuiz = LocalStorage.fetchStoredQuizById(quizId);
-      if (storedQuiz) {
-        setQuizData(storedQuiz);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const quiz = await fetchQuizById({id: quizId});
-        setQuizData(quiz);
-        LocalStorage.saveQuizData(quiz);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, [quizId]);
-
-  return (
-    <div className="border bg-neutral-900 border-neutral-500/20 shadow-black rounded-lg py-2 px-3 -m-4">
-      {isLoading ? (
-        <Loading className="size-6 text-white" />
-      ) : (
-        <div className="flex space-x-4 items-center">
-          <Avatar
-            user={user}
-            onClick={() => console.log(user.email)}
-            className="size-7"
-          />
-          <div>
-            <Heading size={'2'} className="text-white">
-              {quizData?.title}
-            </Heading>
-            {quizData?.description && (
-              <Text size={'1'} className="text-white/60">
-                {quizData.description}
-              </Text>
-            )}
-          </div>
-          <div
-            onClick={() =>
-              !quizData?.isPrivate && navigation(`${ROUTES.playQuiz}/${quizId}`)
-            }
-            className="flex cursor-pointer size-10 bg-neutral-300/10 items-center justify-center rounded-full">
-            {quizData?.isPrivate ? (
-              <Text className="text-white/80 text-[9px]">Private</Text>
-            ) : (
-              <PlayIcon className="text-white/50" />
-            )}
-          </div>
-        </div>
-      )}
-    </div>
   );
 }
 

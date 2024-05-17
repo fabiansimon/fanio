@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,6 +25,12 @@ public class ScoreService {
 
     public Page<Score> getScoresFromQuiz(Pageable pageable, UUID quizId) {
         return scoreRepository.findByQuizId(pageable, quizId);
+    }
+
+    public Page<Score> getScoresForUser(Pageable pageable, UUID userId, Optional<UUID> quizId) {
+        if (!quizId.isPresent())
+            return scoreRepository.findScoresFromUser(pageable, userId);
+        return scoreRepository.findScoresFromUserByQuiz(pageable, userId, quizId.get());
     }
 
     public Score getTopScoreFromQuiz(UUID quizId) { return scoreRepository.findQuizTopScore(quizId); }

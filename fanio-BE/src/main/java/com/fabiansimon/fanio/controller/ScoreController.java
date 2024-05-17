@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -26,16 +27,6 @@ public class ScoreController {
     private ScoreService scoreService;
     @Autowired
     private UserService userService;
-
-    @GetMapping("/scores")
-    public ResponseEntity<Page<Score>> getAllScores(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Score> scores = scoreService.getAllScores(pageable);
-        return ResponseEntity.ok(scores);
-    }
 
     @GetMapping("/top-scores")
     public ResponseEntity<Page<Score>> getTopScores(
@@ -48,15 +39,21 @@ public class ScoreController {
         return ResponseEntity.ok(scores);
     }
 
-
-    @GetMapping("/scores/{id}")
-    public ResponseEntity<Page<Score>> getScoresFromQuiz(
+    @GetMapping("/scores")
+    public ResponseEntity<?> getScoresFromQuizAndUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @PathVariable UUID id
-            ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("totalScore").descending());
-        Page<Score> scores = scoreService.getScoresFromQuiz(pageable, id);
+            @RequestParam Optional<UUID> quizId,
+            @RequestParam Optional<UUID> userId
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Score> scores;
+        if (!userId.isPresent() && quizId.isPresent()) {
+            scores = scoreService.getScoresFromQuiz(pageable, quizId.get());
+        } else {
+            scores = scoreService.getScoresForUser(pageable, userId.get(), quizId);
+        }
+
         return ResponseEntity.ok(scores);
     }
 

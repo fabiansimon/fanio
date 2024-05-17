@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,4 +25,8 @@ public interface ScoreRepository extends JpaRepository<Score, UUID> {
     Score findQuizTopScore(UUID quizId);
     @Query(value = "SELECT COUNT(*) FROM scores WHERE quiz_id = :quizId AND total_score > :score", nativeQuery = true)
     Integer findScorePlacement(UUID quizId, Double score);
+    @Query(value = "SELECT s.* FROM scores s JOIN users u ON s.user_id = u.id WHERE u.id = :userId ORDER BY s.total_score DESC", nativeQuery = true)
+    Page<Score> findScoresFromUser(Pageable pageable, UUID userId);
+    @Query(value = "SELECT s.* FROM scores s JOIN users u ON s.user_id = u.id WHERE u.id = :userId AND s.quiz_id = :quizId ORDER BY s.total_score DESC", nativeQuery = true)
+    Page<Score> findScoresFromUserByQuiz(Pageable pageable, UUID userId, UUID quizId);
 }

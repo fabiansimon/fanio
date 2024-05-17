@@ -37,10 +37,6 @@ public class JwtTokenUtil {
     }
 
     public String getUserEmailFromToken(String token) {
-        System.out.println("Token: " + token);
-        System.out.println("Secret Key: " + getSecretKey());
-        System.out.println("Claims: " + getTokenClaims(token));
-        System.out.println();
         return getTokenClaims(token).getSubject();
     }
 

@@ -29,7 +29,6 @@ import PageContainer from '../components/PageContainer';
 import Chip from '../components/Chip';
 import {GAME_OPTIONS} from '../constants/Game';
 import {LocalStorage} from '../utils/localStorage';
-import useIsSmall from '../hooks/useIsSmall';
 import OptionsContainer from '../components/OptionsContainer';
 import {motion} from 'framer-motion';
 import {useUserDataContext} from '../providers/UserDataProvider';
@@ -263,7 +262,6 @@ function CreateScreen(): JSX.Element {
 
   return (
     <>
-      {/* {!isAuth && <AuthPopUp />} */}
       <AddQuestionModal
         ref={addModalRef}
         ignoreOffset={quizInput?.options.randomOffsets}

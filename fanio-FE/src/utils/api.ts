@@ -16,7 +16,7 @@ import {sanitizeTerm} from './logic';
 import {LocalStorage} from './localStorage';
 
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
-console.log(BASE_URL);
+
 const _axios = axios.create({
   baseURL: BASE_URL,
   headers: {'Access-Control-Allow-Origin': '*'},
@@ -53,7 +53,6 @@ function handleError({
 }
 
 export function setJwtToken(jwt: string) {
-  console.log('Hallo Token: ', jwt);
   _axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
 }
 
@@ -132,7 +131,51 @@ export async function fetchScoresFromQuiz({
   size?: number;
 }): Promise<{content: Score[] | []; totalElements: number}> {
   try {
-    const res = await _axios.get(`/scores/${quizId}?page=${page}&size=${size}`);
+    const res = await _axios.get(
+      `/scores?page=${page}&size=${size}&quizId=${quizId}`,
+    );
+    return res.data;
+  } catch (error) {
+    handleError({error, callName: 'fetchScoresFromQuiz'});
+    throw error;
+  }
+}
+
+export async function fetchScoresFromUser({
+  userId,
+  page = 0,
+  size = 30,
+}: {
+  userId: string;
+  page?: number;
+  size?: number;
+}): Promise<{content: Score[] | []; totalElements: number}> {
+  try {
+    const res = await _axios.get(
+      `/scores?page=${page}&size=${size}&userId=${userId}`,
+    );
+    return res.data;
+  } catch (error) {
+    handleError({error, callName: 'fetchScoresFromQuiz'});
+    throw error;
+  }
+}
+
+export async function fetchScoresFromUserByQuiz({
+  userId,
+  quizId,
+  page = 0,
+  size = 30,
+}: {
+  userId: string;
+  quizId: string;
+  page?: number;
+  size?: number;
+}): Promise<{content: Score[] | []; totalElements: number}> {
+  try {
+    const res = await _axios.get(
+      `/scores?page=${page}&size=${size}&userId=${userId}&quizId=${quizId}`,
+    );
     return res.data;
   } catch (error) {
     handleError({error, callName: 'fetchScoresFromQuiz'});

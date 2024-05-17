@@ -50,7 +50,7 @@ public class SecurityConfig {
                 "quiz/**",
 
                 // Score routes
-                "scores/**",
+                "scores",
                 "top-scores",
                 "upload-score",
 
