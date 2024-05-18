@@ -7,13 +7,13 @@ import java.util.List;
 public class PythonScriptRunner {
     static public String run(String scriptName, String input) throws Exception {
         String homeDirectory = System.getProperty("user.home");
-        String path = homeDirectory + "/Developer/python_scripts/" + scriptName + ".py";
+        String path = homeDirectory + "/usr/local/bin/" + scriptName + ".py";
 
         /*  TODO:
             Handle Command Injection Vulnerability
          */
 
-        List<String> commands = List.of("/Users/fabiansimon/opt/anaconda3/bin/python3", path, input);
+        List<String> commands = List.of("/usr/bin/python3", path, input);
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
