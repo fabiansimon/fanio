@@ -8,7 +8,6 @@ const KEYS = {
   userSettings: 'userSettings',
   unsavedQuiz: 'unsavedQuiz',
   userData: 'userData',
-  sessionToken: 'sessionToken',
   jwtToken: 'jwtToken',
 };
 
@@ -74,20 +73,6 @@ export class LocalStorage {
   }
   static removeUnsavedQuiz() {
     localStorage.removeItem(KEYS.unsavedQuiz);
-  }
-
-  static saveSessionToken(token: string) {
-    localStorage.setItem(KEYS.sessionToken, token);
-  }
-
-  static clearSessionToken() {
-    localStorage.removeItem(KEYS.sessionToken);
-  }
-
-  static fetchSessionToken() {
-    const savedToken = localStorage.getItem(KEYS.sessionToken);
-    if (!savedToken) return;
-    return savedToken;
   }
 
   static saveUserData(user: UserData) {

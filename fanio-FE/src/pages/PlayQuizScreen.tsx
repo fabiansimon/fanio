@@ -298,6 +298,7 @@ function PlayQuizScreen(): JSX.Element {
         'Song unable to play',
         'Youtube is currently not responding',
       );
+    setInput(question!.answer);
     changeUIState(UIState.INCORRECT);
     barRef.current?.clear();
     const now = performance.now();

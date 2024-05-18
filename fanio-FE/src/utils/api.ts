@@ -14,6 +14,7 @@ import {
 import ToastController from '../controllers/ToastController';
 import {sanitizeTerm} from './logic';
 import {LocalStorage} from './localStorage';
+import {error, log} from 'console';
 
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
@@ -50,6 +51,18 @@ function handleError({
   }
 
   ToastController.showErrorToast(errorTitle, errorDescription);
+}
+
+export function initAxiosInterceptors(logoutUser: (forceful: boolean) => void) {
+  _axios.interceptors.response.use(
+    res => res,
+    error => {
+      if (error?.response.status === 401) {
+        logoutUser(true);
+      }
+      return Promise.reject(error);
+    },
+  );
 }
 
 export function setJwtToken(jwt: string) {

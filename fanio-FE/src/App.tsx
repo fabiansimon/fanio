@@ -16,9 +16,13 @@ import QuizScoreScreen from './pages/QuizScoreScreen';
 import LeaderboardScreen from './pages/LeaderboardScreen';
 import PlayQuizScreen from './pages/PlayQuizScreen';
 import {GoogleOAuthProvider} from '@react-oauth/google';
-import UserDataProvider from './providers/UserDataProvider';
+import UserDataProvider, {
+  useUserDataContext,
+} from './providers/UserDataProvider';
 import NavBar from './components/NavBar';
 import AccountScreen from './pages/AccountScreen';
+import {initAxiosInterceptors} from './utils/api';
+import {useLayoutEffect} from 'react';
 
 const googleAuthClientId = process.env.REACT_APP_GOOGLE_AUTH_CLIENT_ID!;
 
@@ -29,25 +33,7 @@ function App(): JSX.Element {
         <Theme>
           <Router>
             <UserDataProvider>
-              <Routes>
-                <Route path="*" element={<Navigate to="/" replace={true} />} />
-                <Route path="/" element={<LandingScreen />} />
-                <Route
-                  path={`${ROUTES.playQuiz}/:quizId`}
-                  element={<PlayQuizScreen />}
-                />
-                <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
-                <Route path={ROUTES.account} element={<AccountScreen />} />
-                <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
-                <Route
-                  path={ROUTES.leaderboard}
-                  element={<LeaderboardScreen />}
-                />
-                <Route
-                  path={`${ROUTES.quizScores}/:id`}
-                  element={<QuizScoreScreen />}
-                />
-              </Routes>
+              <RouteContainer />
               <NavBar />
               <Toast />
             </UserDataProvider>
@@ -55,6 +41,28 @@ function App(): JSX.Element {
         </Theme>
       </GoogleOAuthProvider>
     </>
+  );
+}
+
+function RouteContainer(): JSX.Element {
+  const {logoutUser} = useUserDataContext();
+
+  // Pass logoutUser function to axios (must be in provider)
+  useLayoutEffect(() => {
+    initAxiosInterceptors(logoutUser);
+  }, []);
+
+  return (
+    <Routes>
+      <Route path="*" element={<Navigate to="/" replace={true} />} />
+      <Route path="/" element={<LandingScreen />} />
+      <Route path={`${ROUTES.playQuiz}/:quizId`} element={<PlayQuizScreen />} />
+      <Route path={ROUTES.createQuiz} element={<CreateScreen />} />
+      <Route path={ROUTES.account} element={<AccountScreen />} />
+      <Route path={ROUTES.listQuizzes} element={<QuizListScreen />} />
+      <Route path={ROUTES.leaderboard} element={<LeaderboardScreen />} />
+      <Route path={`${ROUTES.quizScores}/:id`} element={<QuizScoreScreen />} />
+    </Routes>
   );
 }
 

@@ -14,6 +14,7 @@ import AllGamesContainer from '../components/AllGamesContainer';
 import LeaderboardContainer from '../components/LeaderboardContainer';
 import useBreakingPoints from '../hooks/useBreakingPoints';
 import Logo from '../components/Logo';
+import {UI} from '../utils/common';
 
 interface MenuOptions {
   title: string;
@@ -90,11 +91,8 @@ function LandingScreen(): JSX.Element {
   return (
     <div className="flex flex-col bg-neutral-950 items-center w-full h-screen fixed">
       <>
-        <div className="w-full mt-16 mb-2 pl-4 space-y-2 flex items-center justify-center">
-          <Logo className="size-6" />
-          <Heading size={'6'} weight={'medium'} className="text-white pb-1">
-            anio
-          </Heading>
+        <div className="w-full mt-20 mb-8 pl-4 space-y-2 flex items-center justify-center">
+          <Logo full className="w-72 h-32" />
         </div>
 
         <MarqueeContainer className="-ml-4" />
@@ -152,7 +150,7 @@ function MarqueeContainer({className}: {className?: string}): JSX.Element {
   const {artistList} = DATA;
 
   return (
-    <div className={className}>
+    <div className={UI.cn('', className)}>
       <Marquee>
         {artistList
           .filter((_, i) => i % 2)

@@ -7,17 +7,14 @@ import {ButtonType, Score, UserData} from '../types';
 import HoverContainer from '../components/HoverContainer';
 import Button from '../components/Button';
 import {useEffect, useState} from 'react';
-import {fetchScoresFromQuiz, fetchScoresFromUser} from '../utils/api';
+import {fetchScoresFromUser} from '../utils/api';
 import ToastController from '../controllers/ToastController';
-import ScoreTile from '../components/ScoreTile';
 import PlaceContainer from '../components/PlaceContainer';
 import Hoverable from '../components/Hoverable';
 import QuizLink from '../components/QuizLink';
 
 function AccountScreen(): JSX.Element {
   const {userData, isAuth, openAuthModal, logoutUser} = useUserDataContext();
-
-  useEffect(() => {}, []);
 
   return (
     <PageContainer title="Your Account">
@@ -28,7 +25,7 @@ function AccountScreen(): JSX.Element {
           <Button
             type={ButtonType.outline}
             text="Sign Out"
-            onClick={logoutUser}
+            onClick={() => logoutUser()}
             textSize="2"
             className="mx-auto mt-4"
           />

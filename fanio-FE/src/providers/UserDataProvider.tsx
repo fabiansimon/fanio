@@ -12,6 +12,7 @@ import {LocalStorage} from '../utils/localStorage';
 import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
 import {setJwtToken} from '../utils/api';
+import ToastController from '../controllers/ToastController';
 
 interface UserDataContextType {
   userData: UserData | undefined;
@@ -44,11 +45,28 @@ function UserDataProvider({
     setUserData(userData);
   }, []);
 
-  const logoutUser = useCallback(() => {
-    navigate(ROUTES.home);
-    LocalStorage.clearUserData();
-    setUserData(undefined);
-  }, [navigate]);
+  const logoutUser = useCallback(
+    (forceful?: boolean) => {
+      if (forceful) {
+        ToastController.showErrorToast(
+          'Invalid credentials',
+          'You were logged out.',
+        );
+      } else {
+        ToastController.showSuccessToast(
+          'Logged out',
+          'We hope you come back soon.',
+        );
+      }
+
+      setAuthModalVisible(false);
+      navigate(ROUTES.home);
+      setUserData(undefined);
+      LocalStorage.clearUserData();
+      LocalStorage.clearJwtToken();
+    },
+    [navigate],
+  );
 
   useEffect(() => {
     const jwt = LocalStorage.fetchJwtToken();
@@ -87,7 +105,7 @@ function UserDataProvider({
 export function useUserDataContext() {
   const context = useContext(UserDataContext);
   if (!context)
-    throw new Error('useLobbyContext must be used within a LobbyProvider');
+    throw new Error('useUserDataContext must be used within a LobbyProvider');
 
   return context;
 }
