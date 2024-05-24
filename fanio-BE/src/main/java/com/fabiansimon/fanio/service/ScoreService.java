@@ -59,6 +59,7 @@ public class ScoreService {
     }
 
     public boolean usesProfanity(String username) {
+        if (true) return false;
         try {
             for (String variant : usernameVariants(username)) {
                 if (Boolean.parseBoolean(PythonScriptRunner.run("profanity_filter", variant))) return true;

@@ -48,10 +48,12 @@ public class SecurityConfig {
                 "top-quizzes",
                 "search-quiz",
                 "quiz/**",
+                "quiz-finished/**",
 
                 // Score routes
                 "scores",
                 "top-scores",
+                "score-placement",
                 "upload-score",
 
                 // User routes

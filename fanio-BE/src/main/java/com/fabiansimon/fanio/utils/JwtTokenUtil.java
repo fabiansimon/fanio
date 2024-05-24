@@ -23,10 +23,12 @@ public class JwtTokenUtil {
 
     public String generateToken(String userEmail) {
         long now = System.currentTimeMillis();
+        long expiresBy = JWT_TOKEN_VALIDITY * 86_400_000L;
         return Jwts.builder()
                 .claim("email", userEmail)
                 .subject(userEmail)
-                .issuedAt(new Date(now)).expiration(new Date(now + JWT_TOKEN_VALIDITY * 86_400))
+                .issuedAt(new Date(now))
+                .expiration(new Date(now + expiresBy))
                 .signWith(getSecretKey())
                 .compact();
     }

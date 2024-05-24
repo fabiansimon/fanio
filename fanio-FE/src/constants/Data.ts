@@ -91,5 +91,6 @@ export const DATA = {
 };
 
 export const PAGE_DATA = {
-  maxItemsOptions: [5, 10, 30, 50],
+  maxItemsOptions: [1, 10, 30, 50],
+  initItemsSize: 10,
 };
