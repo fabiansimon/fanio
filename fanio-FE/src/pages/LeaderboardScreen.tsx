@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {fetchTopScores} from '../utils/api';
-import {AchievementType, PaginationState, Score, TimeFrame} from '../types';
+import {AchievementType, PaginationState, TimeFrame} from '../types';
 import ScoreTile from '../components/ScoreTile';
 import PageContainer from '../components/PageContainer';
 import PaginationBar from '../components/PaginationBar';
@@ -9,7 +8,7 @@ import {useNavigate} from 'react-router-dom';
 import ROUTES from '../constants/Routes';
 import EmptyContainer from '../components/EmptyContainer';
 import QuizLink from '../components/QuizLink';
-import Hoverable from '../components/Hoverable';
+import {useGameDataContext} from '../providers/GameDataProvider';
 
 const timeFrameData = {
   [TimeFrame.DAILY]: {
@@ -31,10 +30,9 @@ const timeFrameData = {
 };
 
 function LeaderboardScreen(): JSX.Element {
-  const [scoreData, setScoreData] = useState<{
-    content: Score[];
-    totalElements: number;
-  } | null>(null);
+  const {
+    leaderboard: {data, refetch, isLoading},
+  } = useGameDataContext();
   const [timeFrame, setTimeFrame] = useState<TimeFrame>(TimeFrame.DAILY);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -44,30 +42,25 @@ function LeaderboardScreen(): JSX.Element {
   const navigate = useNavigate();
 
   const emptyList = useMemo(() => {
-    return !scoreData || scoreData.totalElements === 0;
-  }, [scoreData]);
+    return !data || data.totalElements === 0;
+  }, [data]);
 
-  const loadScores = useCallback(async () => {
+  useEffect(() => {
     try {
       const {pageIndex, maxItems} = pagination;
-      const scores = await fetchTopScores({
+      refetch({
         timeFrame,
         page: pageIndex,
         size: maxItems,
       });
-      setScoreData(scores);
     } catch (error) {
       console.error(error);
     }
-  }, [pagination, timeFrame]);
+  }, [pagination, timeFrame, refetch]);
 
   const handlePaginationChange = useCallback((data: PaginationState) => {
     setPagination(data);
   }, []);
-
-  useEffect(() => {
-    (async () => loadScores())();
-  }, [loadScores]);
 
   const {title, description} = useMemo(() => {
     return {
@@ -86,7 +79,7 @@ function LeaderboardScreen(): JSX.Element {
       <div className="flex flex-col h-full overflow-y-auto justify-between">
         {!emptyList ? (
           <div className="mt-6 space-y-3 overflow-y-auto my-4">
-            {scoreData?.content?.map((s, i) => {
+            {data?.content?.map((s, i) => {
               const {pageIndex, maxItems} = pagination;
               const position = i + 1 + pageIndex * maxItems;
 
@@ -136,7 +129,7 @@ function LeaderboardScreen(): JSX.Element {
         )}
         <PaginationBar
           initialState={pagination}
-          totalElements={scoreData?.totalElements || 0}
+          totalElements={data?.totalElements || 0}
           onValueChange={handlePaginationChange}
         />
       </div>

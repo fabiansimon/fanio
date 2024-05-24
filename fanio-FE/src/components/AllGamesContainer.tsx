@@ -1,30 +1,13 @@
 import {Heading, Text} from '@radix-ui/themes';
 import {UI} from '../utils/common';
 import Marquee from 'react-fast-marquee';
-import {GameStatistic} from '../types';
-import {useCallback, useEffect, useState} from 'react';
-import {fetchGameStatistic} from '../utils/api';
+import {useCallback} from 'react';
+import {useGameDataContext} from '../providers/GameDataProvider';
 
 function AllGamesContainer({className}: {className?: string}): JSX.Element {
-  const [statistic, setStatistic] = useState<GameStatistic | null>();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const {totalGuesses, totalQuizzes, totalSongs, totalTime} =
-          await fetchGameStatistic();
-
-        setStatistic({
-          totalGuesses,
-          totalQuizzes,
-          totalSongs,
-          totalTime,
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-  }, []);
+  const {
+    statistic: {isLoading, data},
+  } = useGameDataContext();
 
   const statisticTerm = useCallback((key: string) => {
     switch (key) {
@@ -45,8 +28,9 @@ function AllGamesContainer({className}: {className?: string}): JSX.Element {
   return (
     <div className={UI.cn('-mx-5', className)}>
       <Marquee speed={30} className="mb-4 py-auto">
-        {statistic &&
-          Object.entries(statistic).map(([key, val]) => (
+        {!isLoading &&
+          data &&
+          Object.entries(data).map(([key, val]) => (
             <div key={key} className="mr-6 mt-4">
               <Heading size="4" className="text-white">
                 {UI.formatNumber(val)}

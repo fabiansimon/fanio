@@ -23,6 +23,7 @@ import NavBar from './components/NavBar';
 import AccountScreen from './pages/AccountScreen';
 import {initAxiosInterceptors} from './utils/api';
 import {useLayoutEffect} from 'react';
+import GameDataProvider from './providers/GameDataProvider';
 
 const googleAuthClientId = process.env.REACT_APP_GOOGLE_AUTH_CLIENT_ID!;
 
@@ -33,9 +34,11 @@ function App(): JSX.Element {
         <Theme>
           <Router>
             <UserDataProvider>
-              <RouteContainer />
-              <NavBar />
-              <Toast />
+              <GameDataProvider>
+                <RouteContainer />
+                <NavBar />
+                <Toast />
+              </GameDataProvider>
             </UserDataProvider>
           </Router>
         </Theme>

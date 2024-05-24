@@ -1,11 +1,11 @@
 import {useCallback, useEffect, useState} from 'react';
-import {PaginatedData, PaginationState, Quiz} from '../types';
-import {fetchTopQuizzes} from '../utils/api';
+import {PaginationState, Quiz} from '../types';
 import SearchInput from '../components/SearchInput';
 import PaginationBar from '../components/PaginationBar';
 import QuizList from '../components/QuizList';
 import {PAGE_DATA} from '../constants/Data';
 import PageContainer from '../components/PageContainer';
+import {useGameDataContext} from '../providers/GameDataProvider';
 
 const INIT_PAGINATION_STATE = {
   pageIndex: 0,
@@ -13,30 +13,25 @@ const INIT_PAGINATION_STATE = {
 };
 
 function QuizListScreen(): JSX.Element {
-  const [quizData, setQuizData] = useState<PaginatedData<Quiz> | null>();
+  const {
+    quizList: {data, refetch, isLoading},
+  } = useGameDataContext();
   const [searchResults, setSearchResult] = useState<Quiz[] | null>(null);
   const [pagination, setPagination] = useState(INIT_PAGINATION_STATE);
 
-  const loadQuizzes = useCallback(async () => {
+  useEffect(() => {
+    if (pagination === INIT_PAGINATION_STATE) return;
     try {
       const {pageIndex, maxItems} = pagination;
-      const {totalElements, content} = await fetchTopQuizzes({
-        page: pageIndex,
-        size: maxItems,
-      });
-      setQuizData({totalElements, content});
+      refetch({page: pageIndex, size: maxItems});
     } catch (error) {
       console.error(error);
     }
-  }, [pagination]);
+  }, [pagination, refetch]);
 
   const handlePaginationChange = useCallback((data: PaginationState) => {
     setPagination(data);
   }, []);
-
-  useEffect(() => {
-    (async () => loadQuizzes())();
-  }, [loadQuizzes]);
 
   return (
     <PageContainer
@@ -50,12 +45,12 @@ function QuizListScreen(): JSX.Element {
       />
       <QuizList
         className="flex-grow overflow-y-auto mt-4"
-        data={searchResults || quizData?.content || []}
+        data={searchResults || data?.content || []}
       />
       <PaginationBar
         initialState={INIT_PAGINATION_STATE}
         className="mt-4"
-        totalElements={quizData?.totalElements || 0}
+        totalElements={data?.totalElements || 0}
         onValueChange={handlePaginationChange}
       />
     </PageContainer>

@@ -1,60 +1,22 @@
-import {useCallback, useEffect, useState} from 'react';
 import {UI} from '../utils/common';
 import QuizList from './QuizList';
-import {
-  BreakPoint,
-  PaginatedData,
-  PaginationState,
-  Quiz,
-  TimeFrame,
-} from '../types';
-import {fetchTopQuizzes} from '../utils/api';
+import {BreakPoint} from '../types';
 import Loading from './Loading';
 import useIsMobile from '../hooks/useIsMobile';
 import useBreakingPoints from '../hooks/useBreakingPoints';
+import {useGameDataContext} from '../providers/GameDataProvider';
 
 interface TopQuizListProps {
   className?: string;
 }
 
 function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [quizData, setQuizData] = useState<PaginatedData<Quiz> | null>(null);
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    maxItems: 5,
-  });
-
+  const {
+    topQuizList: {data, isLoading},
+  } = useGameDataContext();
   const breakTriggered = useBreakingPoints(BreakPoint.SM);
 
   const isMobile = useIsMobile();
-
-  const loadQuizzes = useCallback(async () => {
-    try {
-      const {pageIndex, maxItems} = pagination;
-      const {content, totalElements} = await fetchTopQuizzes({
-        page: pageIndex,
-        size: maxItems,
-        timeFrame: TimeFrame.ALLTIME,
-      });
-      setQuizData({
-        content,
-        totalElements,
-      });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [pagination]);
-
-  const handlePaginationChange = useCallback((data: PaginationState) => {
-    setPagination(data);
-  }, []);
-
-  useEffect(() => {
-    (async () => loadQuizzes())();
-  }, [loadQuizzes]);
 
   return (
     <div
@@ -68,7 +30,7 @@ function TopQuizListContainer({className}: TopQuizListProps): JSX.Element {
         <QuizList
           showPlacement={!isMobile}
           showScore={!breakTriggered}
-          data={quizData?.content || []}
+          data={data?.content || []}
           className="py-3 pb-10"
         />
       )}
